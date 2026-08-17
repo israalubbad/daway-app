@@ -4,14 +4,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/birth_date_field.dart';
+import '../../../../core/widgets/incomplete_profile_banner.dart';
+import '../../../../core/widgets/profile_avatar_picker.dart';
+import '../../../../core/widgets/profile_load_error.dart';
+import '../../../../core/widgets/profile_location_field.dart';
 import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
 import '../widgets/patient_side_menu.dart';
-import '../widgets/profile_avatar_picker.dart';
-import '../widgets/profile_location_field.dart';
 
 /// The "حسابي" tab: view/edit a patient's own profile. Loads it from the
 /// server on open, starts in read-only mode, and switches to editable
@@ -71,7 +75,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
           builder: (context, state) {
             return switch (state) {
               PatientProfileLoading() => const Center(child: CircularProgressIndicator()),
-              PatientProfileLoadFailure(:final message) => _LoadError(message: message),
+              PatientProfileLoadFailure(:final message) => ProfileLoadError(
+                  message: message,
+                  onRetry: () => context.read<PatientProfileCubit>().load(),
+                ),
               PatientProfileLoaded() => _buildLoaded(context, state),
             };
           },
@@ -91,7 +98,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (state.isIncomplete) ...[
-            const _IncompleteProfileBanner(),
+            const IncompleteProfileBanner(),
             SizedBox(height: 16.h),
           ],
           Center(
@@ -104,35 +111,50 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          Text('الاسم الكامل', style: AppTextStyles.inputLabel),
-          SizedBox(height: 8.h),
-          AppTextField(
-            controller: _nameController,
-            readOnly: !state.isEditing,
-            icon: Icon(Icons.person_outline, color: AppColors.grey, size: 20.sp),
-            onChanged: (value) => context.read<PatientProfileCubit>().nameChanged(value),
-          ),
-          SizedBox(height: 16.h),
-          Text('رقم الهاتف', style: AppTextStyles.inputLabel),
-          SizedBox(height: 8.h),
-          AppTextField(
-            controller: _phoneController,
-            textAlign: TextAlign.left,
-            icon: Icon(Icons.lock_outline, color: AppColors.grey, size: 18.sp),
-            readOnly: true,
-          ),
-          SizedBox(height: 16.h),
-          Text('الموقع', style: AppTextStyles.inputLabel),
-          SizedBox(height: 8.h),
-          IgnorePointer(
-            ignoring: !state.isEditing,
-            child: ProfileLocationField(
-              hasLocation: state.hasLocation,
-              latitude: state.latitude,
-              longitude: state.longitude,
-              address: state.address,
-              onLocationPicked: (location) =>
-                  context.read<PatientProfileCubit>().locationSelected(location),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('الاسم الكامل', style: AppTextStyles.inputLabel),
+                SizedBox(height: 8.h),
+                AppTextField(
+                  controller: _nameController,
+                  readOnly: !state.isEditing,
+                  prefixIcon: Icon(Icons.person_outline, color: AppColors.grey, size: 20.sp),
+                  onChanged: (value) => context.read<PatientProfileCubit>().nameChanged(value),
+                ),
+                SizedBox(height: 16.h),
+                Text('رقم الهاتف', style: AppTextStyles.inputLabel),
+                SizedBox(height: 8.h),
+                AppTextField(
+                  controller: _phoneController,
+                  prefixIcon: Icon(Icons.lock_outline, color: AppColors.grey, size: 18.sp),
+                  readOnly: true,
+                ),
+                SizedBox(height: 16.h),
+                Text('تاريخ الميلاد', style: AppTextStyles.inputLabel),
+                SizedBox(height: 8.h),
+                BirthDateField(
+                  birthDate: state.birthDate,
+                  enabled: state.isEditing,
+                  onChanged: (value) =>
+                      context.read<PatientProfileCubit>().birthDateChanged(value),
+                ),
+                SizedBox(height: 16.h),
+                Text('الموقع', style: AppTextStyles.inputLabel),
+                SizedBox(height: 8.h),
+                IgnorePointer(
+                  ignoring: !state.isEditing,
+                  child: ProfileLocationField(
+                    hasLocation: state.hasLocation,
+                    latitude: state.latitude,
+                    longitude: state.longitude,
+                    address: state.address,
+                    onLocationPicked: (location) =>
+                        context.read<PatientProfileCubit>().locationSelected(location),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 24.h),
@@ -171,61 +193,6 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _IncompleteProfileBanner extends StatelessWidget {
-  const _IncompleteProfileBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.patientIconBackground.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline, color: AppColors.mainTeal, size: 20.sp),
-          SizedBox(width: 8.w),
-          Expanded(
-            child: Text(
-              'بياناتك غير مكتملة، يرجى تعديل حسابك لإكمالها',
-              style: AppTextStyles.cardDescription.copyWith(color: AppColors.mainTeal),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoadError extends StatelessWidget {
-  final String message;
-
-  const _LoadError({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, style: AppTextStyles.authSubtitle, textAlign: TextAlign.center),
-            SizedBox(height: 16.h),
-            AppCustomButton(
-              text: 'إعادة المحاولة',
-              onPressed: () => context.read<PatientProfileCubit>().load(),
-            ),
-          ],
-        ),
       ),
     );
   }
