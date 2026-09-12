@@ -2,27 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_logo.dart';
 import '../cubit/patient_auth_cubit.dart';
 import '../cubit/patient_auth_state.dart';
 import '../widgets/patient_phone_form.dart';
-import '../widgets/pharmacy_login_link.dart';
 import 'otp_verification_screen.dart';
 
-/// Merged screen for patient sign-in and sign-up: a single phone field and
-/// "send verification code" button. Whether the number is new or already
-/// registered is never revealed here — that only surfaces after the OTP is
-/// verified, on [OtpVerificationScreen].
 class PatientAuthScreen extends StatelessWidget {
   const PatientAuthScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: BlocListener<PatientAuthCubit, PatientAuthState>(
           listenWhen: (previous, current) => !previous.otpSent && current.otpSent,
@@ -40,27 +32,27 @@ class PatientAuthScreen extends StatelessWidget {
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 88.h),
-                const AppLogo(size: 96),
-                SizedBox(height: 16.h),
+                SizedBox(height: 32.h),
+                const Center(child: AppLogo()),
+                SizedBox(height: 32.h),
+
                 Text(
-                  'أهلاً بك في دوائي',
-                  style: AppTextStyles.authTitle,
-                  textAlign: TextAlign.center,
+                  'مرحباً بعودتك!',
+                  textAlign: TextAlign.right,
+                  style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
+
                 Text(
-                  'أدخل رقم جوالك للمتابعة',
-                  style: AppTextStyles.authSubtitle,
-                  textAlign: TextAlign.center,
+                  'سجّل دخولك برقم هاتفك للوصول إلى حسابك ومتابعة طلباتك بسهولة.',
+                  textAlign: TextAlign.right,
+                  style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),
-                const AppCard(child: PatientPhoneForm()),
-                SizedBox(height: 20.h),
-                const PharmacyLoginLink(),
-                SizedBox(height: 16.h),
+
+                const PatientPhoneForm(),
               ],
             ),
           ),
