@@ -46,5 +46,11 @@ abstract class AppColors {
 
   // Patient Home Screen
   static const Color homeChipBackground = Color(0x1AF0F7FB);
+
+  // Pharmacy Home Screen — mini stat card categories
+  static const Color statRatingColor = Color(0xFFCAC842);
+  static const Color statOutOfStockColor = Color(0xFFFF0000);
+  static const Color statLowStockColor = Color(0xFFFF9000);
+  static const Color statAvailableColor = Color(0xFF22C55E);
 }
 

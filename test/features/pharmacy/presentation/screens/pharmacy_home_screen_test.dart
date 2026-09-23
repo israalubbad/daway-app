@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
@@ -8,11 +10,17 @@ import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
-import 'package:daway_app/features/pharmacy/domain/entities/inquiry.dart';
+import 'package:daway_app/features/patient/domain/repositories/avatar_repository.dart';
+import 'package:daway_app/features/patient/domain/usecases/upload_avatar_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_dashboard_stats.dart';
+import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_profile.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_dashboard_repository.dart';
+import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_profile_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_dashboard_stats_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/update_pharmacy_profile_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_dashboard_cubit.dart';
+import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,7 +64,10 @@ class _FakeAuthRepository implements AuthRepository {
 }
 
 class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
+  UserSession? savedSession = const UserSession(
+    accountType: AccountType.pharmacy,
+    token: 'tok-1',
+  );
 
   @override
   Future<void> saveSession(UserSession session) async {
@@ -73,29 +84,64 @@ class _FakeSessionRepository implements SessionRepository {
 }
 
 class _FakePharmacyDashboardRepository implements PharmacyDashboardRepository {
-  final List<Inquiry> recentInquiries;
+  final PharmacyDashboardStats stats;
 
-  const _FakePharmacyDashboardRepository({this.recentInquiries = const []});
+  const _FakePharmacyDashboardRepository(this.stats);
 
   @override
   Future<ApiResult<PharmacyDashboardStats>> getDashboardStats({
     required String token,
-  }) async {
-    return Success(
-      PharmacyDashboardStats(
-        totalMedicines: 10,
-        availableCount: 7,
-        lowStockCount: 2,
-        outOfStockCount: 1,
-        newInquiriesCount: 3,
-        averageRating: 4.5,
-        ratingsCount: 6,
-        lowStockItems: const [],
-        recentInquiries: recentInquiries,
-      ),
-    );
-  }
+  }) async => Success(stats);
 }
+
+const _profile = PharmacyProfile(
+  pharmacyId: 'PH-1234',
+  name: 'صيدلية النور',
+  phone: '+970591234567',
+  address: 'غزة الرمال',
+);
+
+class _FakePharmacyProfileRepository implements PharmacyProfileRepository {
+  @override
+  Future<ApiResult<PharmacyProfile>> getProfile({required String token}) async =>
+      const Success(_profile);
+
+  @override
+  Future<ApiResult<void>> updateProfile({
+    required String token,
+    required PharmacyProfile profile,
+  }) async => const Success(null);
+}
+
+class _FakeAvatarRepository implements AvatarRepository {
+  @override
+  Future<ApiResult<String>> uploadAvatar(File imageFile) async =>
+      const Success('https://example.com/logo.jpg');
+}
+
+const _emptyStats = PharmacyDashboardStats(
+  totalMedicines: 0,
+  availableCount: 0,
+  lowStockCount: 0,
+  outOfStockCount: 0,
+  newInquiriesCount: 0,
+  averageRating: null,
+  ratingsCount: 0,
+  lowStockItems: [],
+  recentInquiries: [],
+);
+
+const _populatedStats = PharmacyDashboardStats(
+  totalMedicines: 120,
+  availableCount: 45,
+  lowStockCount: 30,
+  outOfStockCount: 75,
+  newInquiriesCount: 3,
+  averageRating: 4.5,
+  ratingsCount: 6,
+  lowStockItems: [],
+  recentInquiries: [],
+);
 
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
@@ -106,21 +152,30 @@ void main() {
   }
 
   Widget buildTestableScreen(
-    LogoutCubit cubit, {
+    LogoutCubit logoutCubit,
+    PharmacyDashboardStats stats, {
     List<String>? visitedRoutes,
-    List<Inquiry> recentInquiries = const [],
   }) {
     final dashboardCubit = PharmacyDashboardCubit(
       GetPharmacyDashboardStatsUseCase(
-        _FakePharmacyDashboardRepository(recentInquiries: recentInquiries),
-        _FakeSessionRepository()
-          ..savedSession = const UserSession(
-            accountType: AccountType.pharmacy,
-            token: 'tok-1',
-          ),
+        _FakePharmacyDashboardRepository(stats),
+        _FakeSessionRepository(),
       ),
     );
     addTearDown(dashboardCubit.close);
+
+    final profileCubit = PharmacyProfileCubit(
+      GetPharmacyProfileUseCase(
+        _FakePharmacyProfileRepository(),
+        _FakeSessionRepository(),
+      ),
+      UpdatePharmacyProfileUseCase(
+        _FakePharmacyProfileRepository(),
+        _FakeSessionRepository(),
+      ),
+      UploadAvatarUseCase(_FakeAvatarRepository()),
+    );
+    addTearDown(profileCubit.close);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),
@@ -133,8 +188,9 @@ void main() {
         },
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
+            BlocProvider.value(value: logoutCubit),
             BlocProvider.value(value: dashboardCubit),
+            BlocProvider.value(value: profileCubit),
           ],
           child: const PharmacyHomeScreen(),
         ),
@@ -142,7 +198,7 @@ void main() {
     );
   }
 
-  testWidgets('shows the confirmation dialog when tapping logout', (
+  testWidgets('shows the pharmacy name and address from the profile', (
     tester,
   ) async {
     await setPhoneViewport(tester);
@@ -151,18 +207,103 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    await tester.pumpWidget(buildTestableScreen(cubit));
+    await tester.pumpWidget(buildTestableScreen(cubit, _populatedStats));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.logout));
-    await tester.pumpAndSettle();
-
-    expect(find.text('تأكيد تسجيل الخروج'), findsOneWidget);
+    expect(find.textContaining('صيدلية النور'), findsOneWidget);
+    expect(find.text('غزة الرمال'), findsOneWidget);
   });
 
-  testWidgets('navigates to account-type screen after confirming logout', (
+  group('empty state (no medicines yet)', () {
+    testWidgets('shows the dashed add-medicine-file card', (tester) async {
+      await setPhoneViewport(tester);
+      final cubit = LogoutCubit(
+        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
+      );
+      addTearDown(cubit.close);
+
+      await tester.pumpWidget(buildTestableScreen(cubit, _emptyStats));
+      await tester.pumpAndSettle();
+
+      expect(find.text('أضف ملف الأدوية'), findsOneWidget);
+    });
+
+    testWidgets('shows zeroed-out stats and no orders section', (
+      tester,
+    ) async {
+      await setPhoneViewport(tester);
+      final cubit = LogoutCubit(
+        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
+      );
+      addTearDown(cubit.close);
+
+      await tester.pumpWidget(buildTestableScreen(cubit, _emptyStats));
+      await tester.pumpAndSettle();
+
+      expect(find.text('0'), findsNWidgets(4)); // products, out, low, available
+      expect(find.text('—'), findsNWidgets(2)); // sales placeholder + no rating
+      expect(find.text('الطلبات'), findsNothing);
+    });
+
+    testWidgets('tapping the add-medicine card navigates to the add screen', (
+      tester,
+    ) async {
+      await setPhoneViewport(tester);
+      final cubit = LogoutCubit(
+        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
+      );
+      addTearDown(cubit.close);
+
+      final visitedRoutes = <String>[];
+      await tester.pumpWidget(
+        buildTestableScreen(cubit, _emptyStats, visitedRoutes: visitedRoutes),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('أضف ملف الأدوية'));
+      await tester.pumpAndSettle();
+
+      expect(visitedRoutes, contains(Routes.addPharmacyMedicineScreen));
+    });
+  });
+
+  group('populated state (has medicines)', () {
+    testWidgets('hides the dashed add-medicine-file card', (tester) async {
+      await setPhoneViewport(tester);
+      final cubit = LogoutCubit(
+        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
+      );
+      addTearDown(cubit.close);
+
+      await tester.pumpWidget(buildTestableScreen(cubit, _populatedStats));
+      await tester.pumpAndSettle();
+
+      expect(find.text('أضف ملف الأدوية'), findsNothing);
+    });
+
+    testWidgets('shows the real stats and the pending orders section', (
+      tester,
+    ) async {
+      await setPhoneViewport(tester);
+      final cubit = LogoutCubit(
+        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
+      );
+      addTearDown(cubit.close);
+
+      await tester.pumpWidget(buildTestableScreen(cubit, _populatedStats));
+      await tester.pumpAndSettle();
+
+      expect(find.text('120'), findsOneWidget); // totalMedicines
+      expect(find.text('75'), findsOneWidget); // outOfStockCount
+      expect(find.text('30'), findsOneWidget); // lowStockCount
+      expect(find.text('45'), findsOneWidget); // availableCount
+      expect(find.text('4.5'), findsOneWidget); // averageRating
+      expect(find.text('الطلبات'), findsOneWidget);
+      expect(find.text('ميزة الطلبات قريباً'), findsOneWidget);
+    });
+  });
+
+  testWidgets('navigates to account-type screen once logged out', (
     tester,
   ) async {
     await setPhoneViewport(tester);
@@ -173,84 +314,14 @@ void main() {
 
     final visitedRoutes = <String>[];
     await tester.pumpWidget(
-      buildTestableScreen(cubit, visitedRoutes: visitedRoutes),
+      buildTestableScreen(cubit, _populatedStats, visitedRoutes: visitedRoutes),
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.logout));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('تأكيد'));
+    await cubit.logout();
     await tester.pumpAndSettle();
 
     expect(cubit.state.isLoggedOut, isTrue);
     expect(visitedRoutes, contains(Routes.accountTypeScreen));
   });
-
-  testWidgets('shows the loaded dashboard stats', (tester) async {
-    await setPhoneViewport(tester);
-    final cubit = LogoutCubit(
-      LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
-    );
-    addTearDown(cubit.close);
-
-    await tester.pumpWidget(buildTestableScreen(cubit));
-    await tester.pumpAndSettle();
-
-    expect(find.text('10'), findsOneWidget); // totalMedicines
-    expect(find.text('7'), findsOneWidget); // availableCount
-    expect(find.text('2'), findsOneWidget); // lowStockCount
-    expect(find.text('1'), findsOneWidget); // outOfStockCount
-    expect(find.text('3'), findsOneWidget); // newInquiriesCount
-    expect(find.text('4.5'), findsOneWidget); // averageRating
-  });
-
-  testWidgets('shows an empty state when there are no recent inquiries', (
-    tester,
-  ) async {
-    await setPhoneViewport(tester);
-    final cubit = LogoutCubit(
-      LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
-    );
-    addTearDown(cubit.close);
-
-    await tester.pumpWidget(buildTestableScreen(cubit));
-    await tester.pumpAndSettle();
-
-    expect(find.text('لا توجد استفسارات بعد'), findsOneWidget);
-  });
-
-  testWidgets(
-    'renders a recent-inquiry tile with the patient name, medicine, and message',
-    (tester) async {
-      await setPhoneViewport(tester);
-      final cubit = LogoutCubit(
-        LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()),
-      );
-      addTearDown(cubit.close);
-
-      await tester.pumpWidget(
-        buildTestableScreen(
-          cubit,
-          recentInquiries: [
-            Inquiry(
-              id: 1,
-              message: 'هل يتوفر دواء الضغط؟',
-              status: InquiryStatus.newInquiry,
-              createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-              patientName: 'أحمد محمد',
-              medicineName: 'بانادول',
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('لا توجد استفسارات بعد'), findsNothing);
-      expect(find.text('هل يتوفر دواء الضغط؟'), findsOneWidget);
-      expect(find.textContaining('أحمد محمد'), findsOneWidget);
-      expect(find.textContaining('بانادول'), findsOneWidget);
-    },
-  );
 }

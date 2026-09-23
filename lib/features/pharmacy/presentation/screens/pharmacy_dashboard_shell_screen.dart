@@ -38,8 +38,11 @@ class _PharmacyDashboardShellScreenState
   Widget build(BuildContext context) {
     // Order must match PharmacyDashboardTab's declaration order.
     final tabs = [
-      BlocProvider(
-        create: (_) => getIt<PharmacyDashboardCubit>(),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => getIt<PharmacyDashboardCubit>()),
+          BlocProvider(create: (_) => getIt<PharmacyProfileCubit>()),
+        ],
         child: const PharmacyHomeScreen(),
       ),
       BlocProvider(

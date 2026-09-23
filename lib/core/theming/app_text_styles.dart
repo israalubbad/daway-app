@@ -315,4 +315,54 @@ abstract class AppTextStyles {
         fontWeight: FontWeight.w400,
         color: AppColors.onboardingText,
       );
+
+  // ---- Pharmacy Home Screen ----
+
+  /// The address line under the greeting ("غزة الرمال") — regular weight,
+  /// unlike the patient home screen's [homeLocationText] which is medium.
+  static TextStyle get pharmacyHomeLocationText => TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        color: AppColors.onboardingText,
+      );
+
+  /// "أضف ملف الأدوية" inside the dashed add-medicine-file card.
+  static TextStyle get pharmacyAddMedicineFileText => TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.4,
+        letterSpacing: 0.2,
+        color: AppColors.mainTeal,
+      );
+
+  /// Label on the sales/products summary cards ("إجمالي المنتجات").
+  static TextStyle get pharmacySummaryCardLabel => TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        height: 19.25 / 14,
+        color: AppColors.onboardingText,
+      );
+
+  /// The big number on the sales/products summary cards.
+  static TextStyle get pharmacySummaryCardValue => TextStyle(
+        fontSize: 32.sp,
+        fontWeight: FontWeight.w700,
+        height: 44 / 32,
+        color: AppColors.onboardingText,
+      );
+
+  /// The number on a mini stat card (التقييمات / نافذ / مخزون منخفض / متوفرة).
+  static TextStyle get pharmacyMiniStatValue => TextStyle(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w700,
+        color: AppColors.onboardingText,
+      );
+
+  /// A mini stat card's label — color is passed per card to match its
+  /// category (see [AppColors.statRatingColor] and friends).
+  static TextStyle miniStatLabel(Color color) => TextStyle(
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w600,
+        color: color,
+      );
 }
