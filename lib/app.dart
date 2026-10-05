@@ -28,6 +28,14 @@ class DawayApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           onGenerateRoute: appRouter.generateRoute,
           initialRoute: initialRoute,
+          // By default MaterialApp first pushes a route for "/" and then the
+          // initial route on top of it; the router has no "/" page, so that
+          // bottom route is the "No route defined for /" placeholder and the
+          // phone's back button from the home screen landed on it. Build only
+          // the real initial route, so back from it leaves the app.
+          onGenerateInitialRoutes: (name) => [
+            ?appRouter.generateRoute(RouteSettings(name: name)),
+          ],
           locale: const Locale('ar'),
           supportedLocales: const [Locale('ar')],
           localizationsDelegates: const [
