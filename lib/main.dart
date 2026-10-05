@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -13,6 +14,12 @@ import 'features/auth/domain/usecases/get_session_usecase.dart';
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // No time / battery / signal strip at the top of the app: only the system
+  // navigation bar stays. (Swiping down from the top still shows it briefly.)
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.bottom],
+  );
   AppFonts.preload();
 
   await dotenv.load(fileName: '.env');

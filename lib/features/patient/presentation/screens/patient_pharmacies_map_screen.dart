@@ -17,6 +17,7 @@ import '../../../../core/widgets/profile_load_error.dart';
 import '../../domain/entities/nearby_pharmacy.dart';
 import '../cubit/nearby_pharmacies_cubit.dart';
 import '../cubit/nearby_pharmacies_state.dart';
+import '../helpers/pharmacy_marker.dart';
 
 /// "اكتشف الصيدليات القريبة منك" from the home screen — a live map (see
 /// LocationPickerScreen for the same google_maps_flutter setup) with a
@@ -111,7 +112,7 @@ class _PharmaciesMapViewState extends State<_PharmaciesMapView> {
   }
 }
 
-class _MapContent extends StatelessWidget {
+class _MapContent extends StatefulWidget {
   final NearbyPharmaciesLoaded state;
   final TextEditingController searchController;
   final ValueChanged<GoogleMapController> onMapCreated;
@@ -127,6 +128,46 @@ class _MapContent extends StatelessWidget {
     required this.onCallTap,
     required this.onDirectionsTap,
   });
+
+  @override
+  State<_MapContent> createState() => _MapContentState();
+}
+
+class _MapContentState extends State<_MapContent> {
+  NearbyPharmaciesLoaded get state => widget.state;
+
+  /// Marker bitmaps by "id:selected"; drawn once per pharmacy and look, then
+  /// reused. Until one is ready the pharmacy shows the default pin.
+  final Map<String, BitmapDescriptor> _icons = {};
+  final Set<String> _requested = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _ensureIcons();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MapContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _ensureIcons();
+  }
+
+  Future<void> _ensureIcons() async {
+    final pixelRatio = WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+    for (final pharmacy in state.pharmacies) {
+      final selected = state.selectedPharmacy?.id == pharmacy.id;
+      final key = '${pharmacy.id}:$selected';
+      if (!_requested.add(key)) continue;
+      final icon = await buildPharmacyMarker(
+        name: pharmacy.name,
+        selected: selected,
+        pixelRatio: pixelRatio,
+      );
+      if (!mounted) return;
+      setState(() => _icons[key] = icon);
+    }
+  }
 
   /// The patient's own position, unless the nearest pharmacy is more than
   /// 50 km away (or the position is unknown) — then the nearest pharmacy, so
@@ -158,7 +199,7 @@ class _MapContent extends StatelessWidget {
             target: _initialTarget(),
             zoom: 14,
           ),
-          onMapCreated: onMapCreated,
+          onMapCreated: widget.onMapCreated,
           myLocationEnabled: state.hasUserLocation,
           myLocationButtonEnabled: state.hasUserLocation,
           zoomControlsEnabled: false,
@@ -168,7 +209,10 @@ class _MapContent extends StatelessWidget {
               Marker(
                 markerId: MarkerId('pharmacy_${pharmacy.id}'),
                 position: LatLng(pharmacy.latitude, pharmacy.longitude),
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                icon: _icons['${pharmacy.id}:${selected?.id == pharmacy.id}'] ??
+                    BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                // The selected pharmacy's pill sits on top of its neighbours.
+                zIndexInt: selected?.id == pharmacy.id ? 1 : 0,
                 onTap: () => cubit.selectPharmacy(pharmacy),
               ),
           },
@@ -196,7 +240,7 @@ class _MapContent extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12.r),
                         color: Colors.white,
                         child: AppTextField(
-                          controller: searchController,
+                          controller: widget.searchController,
                           hintText: 'ابحث عن صيدلية',
                           textInputAction: TextInputAction.search,
                           onChanged: cubit.searchChanged,
@@ -235,9 +279,9 @@ class _MapContent extends StatelessWidget {
               pharmacy: selected,
               isLoadingHours: state.isLoadingHours,
               workingHoursLabel: state.selectedWorkingHours,
-              onMessageTap: () => onMessageTap(selected),
-              onCallTap: () => onCallTap(selected.phoneNumber),
-              onDirectionsTap: () => onDirectionsTap(selected),
+              onMessageTap: () => widget.onMessageTap(selected),
+              onCallTap: () => widget.onCallTap(selected.phoneNumber),
+              onDirectionsTap: () => widget.onDirectionsTap(selected),
             ),
           ),
       ],
