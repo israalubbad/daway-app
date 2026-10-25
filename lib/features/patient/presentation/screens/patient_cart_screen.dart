@@ -62,9 +62,10 @@ class _CartView extends StatelessWidget {
                 switch (state) {
                   case CheckoutNeedsAddress():
                     _pickLocationAndSubmit(context);
-                  case CheckoutSuccess():
+                  case CheckoutSuccess(:final orderId):
                     AppSnackbar.show(context, 'تم إنشاء طلبك بنجاح');
                     context.read<CartCubit>().load();
+                    Navigator.of(context).pushNamed(Routes.paymentScreen, arguments: orderId);
                   case CheckoutFailure(:final message):
                     AppSnackbar.show(context, message);
                   case CheckoutIdle():

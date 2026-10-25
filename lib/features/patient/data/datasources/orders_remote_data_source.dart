@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/helpers/idempotency_key.dart';
 
 class OrdersRemoteDataSource {
   final Dio _dio;
@@ -32,6 +33,7 @@ class OrdersRemoteDataSource {
       ApiConstants.patientCheckout,
       data: {
         'address_id': addressId,
+        'idempotency_key': newIdempotencyKey(),
         'coupon_code': ?couponCode,
         'notes': ?notes,
       },

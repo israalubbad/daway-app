@@ -36,6 +36,7 @@ abstract class ApiConstants {
   static const String patientAddresses = '/patient/addresses';
   static const String patientOrders = '/patient/orders';
   static const String patientCheckout = '/patient/checkout';
+  static const String patientPaymentBanks = '/patient/payment-banks';
   static const String patientInquiries = '/patient/inquiries';
   static const String patientAvailabilityAlerts = '/patient/availability-alerts';
   static const String patientHealthProfile = '/patient/health-profile';

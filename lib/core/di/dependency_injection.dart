@@ -37,6 +37,11 @@ import '../../features/patient/data/datasources/favorites_remote_data_source.dar
 import '../../features/patient/data/datasources/medicine_detail_remote_data_source.dart';
 import '../../features/patient/data/datasources/medicine_search_remote_data_source.dart';
 import '../../features/patient/data/datasources/orders_remote_data_source.dart';
+import '../../features/payment/data/datasources/payment_remote_data_source.dart';
+import '../../features/payment/data/repositories/payment_repository_impl.dart';
+import '../../features/payment/domain/repositories/payment_repository.dart';
+import '../../features/payment/domain/usecases/payment_usecases.dart';
+import '../../features/payment/presentation/cubit/payment_cubit.dart';
 import '../../features/patient/data/datasources/patient_addresses_remote_data_source.dart';
 import '../../features/patient/data/datasources/patient_inquiries_remote_data_source.dart';
 import '../../features/patient/data/datasources/patient_ratings_remote_data_source.dart';
@@ -387,6 +392,16 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => OrdersCubit(getIt(), getIt()));
   getIt.registerFactory(
     () => CheckoutCubit(getIt(), getIt(), getIt(), getIt()),
+  );
+
+  // ---------------- Payment ----------------
+  getIt.registerLazySingleton(() => PaymentRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PaymentRepository>(() => PaymentRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => GetPaymentUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => SubmitPaymentReceiptUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => ReportPaymentProblemUseCase(getIt(), getIt()));
+  getIt.registerFactoryParam<PaymentCubit, int, void>(
+    (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt()),
   );
 
   // ---------------- Medicine Detail ----------------
