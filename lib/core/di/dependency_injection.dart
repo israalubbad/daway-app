@@ -1,4 +1,9 @@
 import 'package:dio/dio.dart';
+import '../../features/assistant/data/datasources/assistant_remote_data_source.dart';
+import '../../features/assistant/data/repositories/assistant_repository_impl.dart';
+import '../../features/assistant/domain/repositories/assistant_repository.dart';
+import '../../features/assistant/domain/usecases/send_assistant_message_usecase.dart';
+import '../../features/assistant/presentation/cubit/assistant_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -427,6 +432,12 @@ Future<void> setupGetIt() async {
   getIt.registerFactoryParam<AvailabilityAlertCubit, int, void>(
     (medicineId, _) => AvailabilityAlertCubit(medicineId, getIt()),
   );
+
+  // ---------------- Assistant (chatbot) ----------------
+  getIt.registerLazySingleton(() => AssistantRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<AssistantRepository>(() => AssistantRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => SendAssistantMessageUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => AssistantCubit(getIt(), getIt()));
 
   // ---------------- Chat (patient <-> pharmacy) ----------------
   getIt.registerLazySingleton(() => ChatActivity());

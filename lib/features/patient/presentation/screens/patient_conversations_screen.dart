@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../assistant/presentation/widgets/assistant_orb.dart';
 import '../../../chat/presentation/cubit/conversations_cubit.dart';
 import '../../../chat/presentation/widgets/conversations_view.dart';
 
@@ -15,11 +17,17 @@ class PatientConversationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<ConversationsCubit>(instanceName: 'patient'),
-      child: const ConversationsView(
-        title: 'الاستشارات',
-        description: 'راجع استفساراتك للصيدليات وردودها.',
-        emptyText:
-            'لا توجد مراسلات بعد.\nافتح صفحة أي دواء واضغط «اسأل الصيدلية قبل الشراء».',
+      child: Stack(
+        children: [
+          const ConversationsView(
+            title: 'الاستشارات',
+            description: 'راجع استفساراتك للصيدليات وردودها.',
+            emptyText:
+                'لا توجد مراسلات بعد.\nافتح صفحة أي دواء واضغط «اسأل الصيدلية قبل الشراء».',
+          ),
+          // The assistant, floating at the bottom-left like in the design.
+          Positioned(left: 24.w, bottom: 24.h, child: const AssistantOrb()),
+        ],
       ),
     );
   }
