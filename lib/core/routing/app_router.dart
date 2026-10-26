@@ -11,7 +11,10 @@ import 'package:daway_app/features/patient/presentation/screens/medicine_detail_
 import 'package:daway_app/features/patient/presentation/screens/medicine_reminders_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_cart_screen.dart';
 import 'package:daway_app/features/payment/presentation/screens/order_tracking_screen.dart';
-import 'package:daway_app/features/payment/presentation/screens/payment_screen.dart';
+import 'package:daway_app/features/payment/presentation/screens/payment_method_screen.dart';
+import 'package:daway_app/features/payment/presentation/screens/upload_receipt_screen.dart';
+import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
+import 'package:daway_app/features/patient/presentation/screens/checkout_details_screen.dart';
 import 'package:daway_app/features/chat/presentation/screens/chat_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_pharmacies_map_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/rate_experience_screen.dart';
@@ -193,10 +196,20 @@ class AppRouter {
           builder: (_) => OrderTrackingScreen(orderId: settings.arguments as int),
         );
 
+      case Routes.checkoutDetailsScreen:
+        return MaterialPageRoute<int>(
+          builder: (_) => CheckoutDetailsScreen(items: settings.arguments as List<CartItem>),
+        );
+
+      case Routes.uploadReceiptScreen:
+        return MaterialPageRoute(
+          builder: (_) => UploadReceiptScreen(args: settings.arguments as UploadReceiptArgs),
+        );
+
       case Routes.paymentScreen:
         final orderId = settings.arguments as int;
         return MaterialPageRoute(
-          builder: (_) => PaymentScreen(orderId: orderId),
+          builder: (_) => PaymentMethodScreen(orderId: orderId),
         );
 
       case Routes.patientCartScreen:

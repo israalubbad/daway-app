@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
-import '../../../../core/models/picked_location.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
@@ -12,10 +11,6 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../cubit/cart_cubit.dart';
 import '../cubit/cart_state.dart';
-import '../cubit/checkout_cubit.dart';
-import '../cubit/checkout_state.dart';
-import '../../../payment/presentation/cubit/coupon_cubit.dart';
-import '../../../payment/presentation/widgets/coupon_box.dart';
 import '../widgets/cart_item_card.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
@@ -27,12 +22,8 @@ class PatientCartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => getIt<CartCubit>()),
-        BlocProvider(create: (_) => getIt<CheckoutCubit>()),
-        BlocProvider(create: (_) => getIt<CouponCubit>()),
-      ],
+    return BlocProvider(
+      create: (_) => getIt<CartCubit>(),
       child: const _CartView(),
     );
   }
@@ -45,83 +36,59 @@ class _CartView extends StatelessWidget {
     Navigator.of(context).pushNamed(Routes.allCategoriesScreen);
   }
 
-  Future<void> _pickLocationAndSubmit(BuildContext context) async {
-    final cubit = context.read<CheckoutCubit>();
-    final location = await Navigator.of(context).pushNamed<PickedLocation>(
-      Routes.locationPickerScreen,
+  /// "إتمام الطلب" opens "أكمل طلبك"; when that creates the order it pops with
+  /// the order id, and the payment starts from here.
+  Future<void> _checkout(BuildContext context, CartLoaded state) async {
+    final cart = context.read<CartCubit>();
+    final orderId = await Navigator.of(context).pushNamed<int>(
+      Routes.checkoutDetailsScreen,
+      arguments: state.items,
     );
-    if (location == null) return;
-    await cubit.submitWithNewAddress(location);
+    if (orderId == null || !context.mounted) return;
+    AppSnackbar.show(context, 'تم إنشاء طلبك بنجاح');
+    cart.load();
+    Navigator.of(context).pushNamed(Routes.paymentScreen, arguments: orderId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: MultiBlocListener(
-          listeners: [
-            BlocListener<CheckoutCubit, CheckoutState>(
-              listener: (context, state) {
-                switch (state) {
-                  case CheckoutNeedsAddress():
-                    _pickLocationAndSubmit(context);
-                  case CheckoutSuccess(:final orderId):
-                    AppSnackbar.show(context, 'تم إنشاء طلبك بنجاح');
-                    context.read<CartCubit>().load();
-                    Navigator.of(context).pushNamed(Routes.paymentScreen, arguments: orderId);
-                  case CheckoutFailure(:final message):
-                    AppSnackbar.show(context, message);
-                  case CheckoutIdle():
-                  case CheckoutInProgress():
-                }
-              },
-            ),
-          ],
-          child: BlocBuilder<CartCubit, CartState>(
-            builder: (context, state) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: const PatientSubScreenHeader(
-                      title: 'السلة',
-                      description: 'راجع منتجاتك وتأكد من تفاصيل طلبك قبل الدفع.',
-                    ),
+        child: BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: const PatientSubScreenHeader(
+                    title: 'السلة',
+                    description: 'راجع منتجاتك وتأكد من تفاصيل طلبك قبل الدفع.',
                   ),
-                  Expanded(
-                    child: switch (state) {
-                      CartLoading() => const Center(child: CircularProgressIndicator()),
-                      CartLoadFailure(:final message) => ProfileLoadError(
-                          message: message,
-                          onRetry: () => context.read<CartCubit>().load(),
-                        ),
-                      CartLoaded(:final items) when items.isEmpty =>
-                        _EmptyCart(onBrowseTap: () => _browseCategories(context)),
-                      CartLoaded() => _CartList(state: state),
-                    },
-                  ),
-                  if (state is CartLoaded && state.items.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
-                      child: BlocBuilder<CheckoutCubit, CheckoutState>(
-                        builder: (context, checkoutState) {
-                          return AppCustomButton(
-                            text: 'إتمام الطلب',
-                            isLoading: checkoutState is CheckoutInProgress,
-                            onPressed: () {
-                              final checkout = context.read<CheckoutCubit>();
-                              checkout.couponCode = context.read<CouponCubit>().appliedCode;
-                              checkout.start();
-                            },
-                          );
-                        },
+                ),
+                Expanded(
+                  child: switch (state) {
+                    CartLoading() => const Center(child: CircularProgressIndicator()),
+                    CartLoadFailure(:final message) => ProfileLoadError(
+                        message: message,
+                        onRetry: () => context.read<CartCubit>().load(),
                       ),
+                    CartLoaded(:final items) when items.isEmpty =>
+                      _EmptyCart(onBrowseTap: () => _browseCategories(context)),
+                    CartLoaded() => _CartList(state: state),
+                  },
+                ),
+                if (state is CartLoaded && state.items.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
+                    child: AppCustomButton(
+                      text: 'إتمام الطلب',
+                      onPressed: () => _checkout(context, state),
                     ),
-                ],
-              );
-            },
-          ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -171,8 +138,6 @@ class _CartList extends StatelessWidget {
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel,
           ),
-          SizedBox(height: 16.h),
-          CouponBox(orderTotal: state.total),
           SizedBox(height: 16.h),
           Align(
             alignment: Alignment.centerRight,

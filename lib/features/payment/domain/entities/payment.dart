@@ -5,6 +5,7 @@ class PaymentBank {
   final String? accountNumber;
   final String? iban;
   final String? notes;
+  final String? logoUrl;
 
   const PaymentBank({
     required this.id,
@@ -13,6 +14,7 @@ class PaymentBank {
     this.accountNumber,
     this.iban,
     this.notes,
+    this.logoUrl,
   });
 }
 

@@ -19,7 +19,7 @@ abstract class PaymentRepository {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   });
 
   /// `POST /patient/orders/{id}/payment/problem`.

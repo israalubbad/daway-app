@@ -403,7 +403,7 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => SubmitPaymentReceiptUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => ReportPaymentProblemUseCase(getIt(), getIt()));
   getIt.registerFactoryParam<PaymentCubit, int, void>(
-    (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt()),
+    (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt(), getIt()),
   );
 
   getIt.registerLazySingleton(() => ValidateCouponUseCase(getIt(), getIt()));

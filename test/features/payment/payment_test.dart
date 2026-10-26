@@ -6,6 +6,9 @@ import 'package:daway_app/core/helpers/idempotency_key.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
+import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
+import 'package:daway_app/features/patient/domain/repositories/patient_profile_repository.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_patient_profile_usecase.dart';
 import 'package:daway_app/features/payment/data/models/payment_models.dart';
 import 'package:daway_app/features/payment/domain/entities/payment.dart';
 import 'package:daway_app/features/payment/domain/repositories/payment_repository.dart';
@@ -75,7 +78,7 @@ class _FakePaymentRepository implements PaymentRepository {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   }) async {
     lastBankId = bankId;
     lastAmount = amount;
@@ -94,6 +97,19 @@ class _FakePaymentRepository implements PaymentRepository {
     lastSubmissionId = submissionId;
     return problemResult;
   }
+}
+
+class _FakeProfileRepository implements PatientProfileRepository {
+  @override
+  Future<ApiResult<PatientProfile>> getProfile({required String token}) async =>
+      const Success(PatientProfile(name: 'أحمد', phone: '0599'));
+
+  @override
+  Future<ApiResult<void>> updateProfile({
+    required String token,
+    required PatientProfile profile,
+  }) async =>
+      const Success(null);
 }
 
 class _FakeSession implements SessionRepository {
@@ -196,6 +212,7 @@ void main() {
         GetPaymentUseCase(repository, session),
         SubmitPaymentReceiptUseCase(repository, session),
         ReportPaymentProblemUseCase(repository, session),
+        GetPatientProfileUseCase(_FakeProfileRepository(), session),
       );
       addTearDown(cubit.close);
       return cubit;
@@ -279,6 +296,44 @@ void main() {
       expect(cubit.state.message, PaymentCubit.problemSentMessage);
     });
 
+
+    test('the patient name is loaded to be the default sender', () async {
+      final cubit = build();
+
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.patientName, 'أحمد');
+    });
+
+    test('a receipt can be sent without a photo (typed details) and marks submitted', () async {
+      final cubit = build();
+      await cubit.load();
+
+      await cubit.submitReceipt(
+        bankId: 3,
+        amount: 60,
+        senderName: 'أحمد',
+        transferReference: 'R1',
+      );
+
+      expect(cubit.state.submitted, isTrue);
+    });
+
+    test('a rejected receipt does not mark submitted', () async {
+      repository.submitResult = const ApiError(ValidationFailure('x'));
+      final cubit = build();
+      await cubit.load();
+
+      await cubit.submitReceipt(
+        bankId: 3,
+        amount: 60,
+        senderName: 'أحمد',
+        transferReference: 'R1',
+      );
+
+      expect(cubit.state.submitted, isFalse);
+    });
     test('a problem report without a submission or text is ignored', () async {
       final cubit = build();
       await cubit.load();

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/api_result.dart';
+import '../../../patient/domain/usecases/get_patient_profile_usecase.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/usecases/payment_usecases.dart';
 
@@ -11,6 +12,12 @@ class PaymentState {
   final String? loadError;
   final PaymentSummary? summary;
   final bool isBusy;
+
+  /// True once a receipt was sent (and is under review).
+  final bool submitted;
+
+  /// The patient name, sent as the sender of the transfer unless they type one.
+  final String? patientName;
 
   /// A one-off message for a snackbar (success or failure of an action);
   /// [messageId] changes on every new one so listeners can tell them apart.
@@ -22,6 +29,8 @@ class PaymentState {
     this.loadError,
     this.summary,
     this.isBusy = false,
+    this.submitted = false,
+    this.patientName,
     this.message,
     this.messageId = 0,
   });
@@ -31,6 +40,8 @@ class PaymentState {
     String? loadError,
     PaymentSummary? summary,
     bool? isBusy,
+    bool? submitted,
+    String? patientName,
     String? message,
     bool clearLoadError = false,
   }) {
@@ -39,6 +50,8 @@ class PaymentState {
       loadError: clearLoadError ? null : (loadError ?? this.loadError),
       summary: summary ?? this.summary,
       isBusy: isBusy ?? this.isBusy,
+      submitted: submitted ?? this.submitted,
+      patientName: patientName ?? this.patientName,
       message: message ?? this.message,
       messageId: message == null ? messageId : messageId + 1,
     );
@@ -55,12 +68,14 @@ class PaymentCubit extends Cubit<PaymentState> {
   final GetPaymentUseCase _getPaymentUseCase;
   final SubmitPaymentReceiptUseCase _submitReceiptUseCase;
   final ReportPaymentProblemUseCase _reportProblemUseCase;
+  final GetPatientProfileUseCase _getProfileUseCase;
 
   PaymentCubit(
     this.orderId,
     this._getPaymentUseCase,
     this._submitReceiptUseCase,
     this._reportProblemUseCase,
+    this._getProfileUseCase,
   ) : super(const PaymentState());
 
   Future<void> load() async {
@@ -70,8 +85,19 @@ class PaymentCubit extends Cubit<PaymentState> {
     switch (result) {
       case Success(:final data):
         emit(state.copyWith(isLoading: false, summary: data));
+        _loadPatientName();
       case ApiError(:final failure):
         emit(state.copyWith(isLoading: false, loadError: failure.message));
+    }
+  }
+
+  /// Best effort: only used as the default sender of the transfer.
+  Future<void> _loadPatientName() async {
+    if (state.patientName != null) return;
+    final result = await _getProfileUseCase();
+    if (isClosed) return;
+    if (result case Success(:final data) when data.name.trim().isNotEmpty) {
+      emit(state.copyWith(patientName: data.name.trim()));
     }
   }
 
@@ -82,7 +108,7 @@ class PaymentCubit extends Cubit<PaymentState> {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   }) async {
     if (state.isBusy) return;
     emit(state.copyWith(isBusy: true));
@@ -97,7 +123,7 @@ class PaymentCubit extends Cubit<PaymentState> {
     if (isClosed) return;
     switch (result) {
       case Success():
-        emit(state.copyWith(isBusy: false, message: receiptSentMessage));
+        emit(state.copyWith(isBusy: false, submitted: true, message: receiptSentMessage));
         await load();
       case ApiError(:final failure):
         emit(state.copyWith(isBusy: false, message: failure.message));

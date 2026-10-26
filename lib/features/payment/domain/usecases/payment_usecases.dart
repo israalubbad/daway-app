@@ -51,7 +51,7 @@ class SubmitPaymentReceiptUseCase {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   }) async {
     final session = await _sessionRepository.getSession();
     if (session == null) return const ApiError(_sessionExpired);

@@ -6,29 +6,15 @@ import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
-import 'package:daway_app/features/patient/domain/entities/order.dart';
-import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
-import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
 import 'package:daway_app/features/patient/domain/repositories/cart_repository.dart';
-import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
-import 'package:daway_app/features/patient/domain/repositories/patient_addresses_repository.dart';
-import 'package:daway_app/features/patient/domain/repositories/patient_profile_repository.dart';
-import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
-import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/clear_cart_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/delete_cart_item_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_cart_items_usecase.dart';
-import 'package:daway_app/features/patient/domain/usecases/get_patient_addresses_usecase.dart';
-import 'package:daway_app/features/patient/domain/usecases/get_patient_profile_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/update_cart_item_quantity_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/cart_cubit.dart';
-import 'package:daway_app/features/patient/presentation/cubit/checkout_cubit.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:daway_app/features/payment/domain/repositories/payment_repository.dart';
-import 'package:daway_app/features/payment/domain/usecases/payment_usecases.dart';
-import 'package:daway_app/features/payment/presentation/cubit/coupon_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
@@ -51,16 +37,6 @@ const _items = [
   ),
 ];
 
-const _address = PatientAddress(
-  id: 1,
-  label: 'المنزل',
-  recipientName: 'مريض تجريبي',
-  phone: '0599112233',
-  address: 'غزة',
-  latitude: 31.5,
-  longitude: 34.47,
-  isDefault: true,
-);
 
 class _FakeCartRepository implements CartRepository {
 
@@ -110,88 +86,6 @@ class _FakeCartRepository implements CartRepository {
   }
 }
 
-class _FakeAddressesRepository implements PatientAddressesRepository {
-
-  @override
-  Future<ApiResult<void>> deleteAddress({required String token, required int addressId}) async =>
-      const Success(null);
-  ApiResult<List<PatientAddress>> addressesResult = const Success([]);
-  ApiResult<PatientAddress> createResult = const Success(_address);
-
-  @override
-  Future<ApiResult<List<PatientAddress>>> getAddresses({required String token}) async =>
-      addressesResult;
-
-  @override
-  Future<ApiResult<PatientAddress>> createAddress({
-    required String token,
-    required String label,
-    required String recipientName,
-    required String phone,
-    required String address,
-    required double latitude,
-    required double longitude,
-    bool isDefault = true,
-  }) async =>
-      createResult;
-
-  @override
-  Future<ApiResult<PatientAddress>> updateAddress({
-    required String token,
-    required int addressId,
-    required String label,
-    required String recipientName,
-    required String phone,
-    required String address,
-    required double latitude,
-    required double longitude,
-    required bool isDefault,
-  }) async =>
-      createResult;
-}
-
-class _FakeProfileRepository implements PatientProfileRepository {
-  @override
-  Future<ApiResult<PatientProfile>> getProfile({required String token}) async =>
-      const Success(PatientProfile(name: 'مريض تجريبي', phone: '0599112233'));
-
-  @override
-  Future<ApiResult<void>> updateProfile({
-    required String token,
-    required PatientProfile profile,
-  }) async =>
-      const Success(null);
-}
-
-/// The coupon box is only built here, never used.
-class _UnusedPaymentRepository implements PaymentRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _FakeOrdersRepository implements OrdersRepository {
-
-  @override
-  Future<ApiResult<void>> cancelOrder({required String token, required int orderId}) async =>
-      const Success(null);
-  ApiResult<int> checkoutResult = const Success(1);
-  int? lastAddressId;
-
-  @override
-  Future<ApiResult<List<Order>>> getOrders({required String token}) async => const Success([]);
-
-  @override
-  Future<ApiResult<int>> checkout({
-    required String token,
-    required int addressId,
-    String? couponCode,
-    String? notes,
-  }) async {
-    lastAddressId = addressId;
-    return checkoutResult;
-  }
-}
-
 class _FakeSessionRepository implements SessionRepository {
   UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
 
@@ -215,14 +109,10 @@ void main() {
 
   final getIt = GetIt.instance;
   late _FakeCartRepository cartRepository;
-  late _FakeAddressesRepository addressesRepository;
-  late _FakeOrdersRepository ordersRepository;
   late _FakeSessionRepository sessionRepository;
 
   setUp(() {
     cartRepository = _FakeCartRepository();
-    addressesRepository = _FakeAddressesRepository();
-    ordersRepository = _FakeOrdersRepository();
     sessionRepository = _FakeSessionRepository();
 
     getIt.registerFactory<CartCubit>(
@@ -231,17 +121,6 @@ void main() {
         UpdateCartItemQuantityUseCase(cartRepository, sessionRepository),
         DeleteCartItemUseCase(cartRepository, sessionRepository),
         ClearCartUseCase(cartRepository, sessionRepository),
-      ),
-    );
-    getIt.registerFactory<CouponCubit>(
-      () => CouponCubit(ValidateCouponUseCase(_UnusedPaymentRepository(), sessionRepository)),
-    );
-    getIt.registerFactory<CheckoutCubit>(
-      () => CheckoutCubit(
-        GetPatientAddressesUseCase(addressesRepository, sessionRepository),
-        CreatePatientAddressUseCase(addressesRepository, sessionRepository),
-        GetPatientProfileUseCase(_FakeProfileRepository(), sessionRepository),
-        CheckoutUseCase(ordersRepository, sessionRepository),
       ),
     );
   });
@@ -265,6 +144,9 @@ void main() {
                 ),
               ),
             );
+          }
+          if (settings.name == Routes.checkoutDetailsScreen) {
+            return MaterialPageRoute<int>(builder: (_) => const Scaffold(body: SizedBox.shrink()));
           }
           return MaterialPageRoute(builder: (_) => const Scaffold(body: SizedBox.shrink()));
         },
@@ -329,56 +211,21 @@ void main() {
     expect(find.text('الاجمالي للمنتجات : 42 \$'), findsOneWidget);
   });
 
-  testWidgets(
-      'tapping "إتمام الطلب" with a saved default address checks out directly and refreshes the cart',
+
+
+
+  testWidgets('tapping "إتمام الطلب" opens the checkout page with the cart lines',
       (tester) async {
     await setPhoneViewport(tester);
-    addressesRepository.addressesResult = const Success([_address]);
     cartRepository.itemsResult = const Success(_items);
-
-    await tester.pumpWidget(buildTestableScreen());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('إتمام الطلب'));
-    await tester.pumpAndSettle();
-
-    expect(ordersRepository.lastAddressId, 1);
-    expect(find.text('تم إنشاء طلبك بنجاح'), findsOneWidget);
-  });
-
-  testWidgets(
-      'tapping "إتمام الطلب" with no saved address sends the patient to pick one, then checks out',
-      (tester) async {
-    await setPhoneViewport(tester);
-    addressesRepository.addressesResult = const Success([]);
-    const location = PickedLocation(latitude: 31.5, longitude: 34.47, address: 'غزة');
     final visitedRoutes = <String>[];
 
-    await tester.pumpWidget(
-      buildTestableScreen(visitedRoutes: visitedRoutes, pickedLocation: location),
-    );
+    await tester.pumpWidget(buildTestableScreen(visitedRoutes: visitedRoutes));
     await tester.pumpAndSettle();
     await tester.tap(find.text('إتمام الطلب'));
     await tester.pumpAndSettle();
 
-    expect(visitedRoutes, contains(Routes.locationPickerScreen));
-    await tester.tap(find.text('pick'));
-    await tester.pumpAndSettle();
-
-    expect(ordersRepository.lastAddressId, 1); // the address CreatePatientAddressUseCase returns
-    expect(find.text('تم إنشاء طلبك بنجاح'), findsOneWidget);
-  });
-
-  testWidgets('a checkout failure shows its message instead of a fake success', (tester) async {
-    await setPhoneViewport(tester);
-    addressesRepository.addressesResult = const Success([_address]);
-    ordersRepository.checkoutResult = const ApiError(ApiFailure(message: 'السلة فارغة'));
-
-    await tester.pumpWidget(buildTestableScreen());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('إتمام الطلب'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('السلة فارغة'), findsOneWidget);
+    expect(visitedRoutes, contains(Routes.checkoutDetailsScreen));
   });
 
   testWidgets('a load failure shows the error with a working retry button', (tester) async {

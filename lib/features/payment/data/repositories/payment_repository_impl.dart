@@ -45,7 +45,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   }) async {
     try {
       await _remoteDataSource.submitReceipt(

@@ -24,6 +24,7 @@ PaymentBank? parsePaymentBank(Object? json) {
     accountNumber: _text(json['account_number']) ?? _text(json['account_no']),
     iban: _text(json['iban']),
     notes: _text(json['instructions']) ?? _text(json['notes']),
+    logoUrl: _text(json['logo_url']) ?? _text(json['logo']) ?? _text(json['image_url']),
   );
 }
 

@@ -25,6 +25,8 @@ class Routes {
   static const String medicineDetailScreen = '/medicineDetailScreen';
   static const String patientCartScreen = '/patientCartScreen';
   static const String paymentScreen = '/paymentScreen';
+  static const String uploadReceiptScreen = '/uploadReceiptScreen';
+  static const String checkoutDetailsScreen = '/checkoutDetailsScreen';
   static const String orderTrackingScreen = '/orderTrackingScreen';
   static const String patientPharmaciesMapScreen = '/patientPharmaciesMapScreen';
   static const String logoutFarewellScreen = '/logoutFarewellScreen';

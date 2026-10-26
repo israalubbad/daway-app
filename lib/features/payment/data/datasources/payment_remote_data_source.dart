@@ -24,14 +24,14 @@ class PaymentRemoteDataSource {
     required double amount,
     required String senderName,
     required String transferReference,
-    required File receipt,
+    File? receipt,
   }) async {
     final form = FormData.fromMap({
       'bank_id': bankId,
       'amount': amount,
       'sender_name': senderName,
       'transfer_reference': transferReference,
-      'receipt': await MultipartFile.fromFile(receipt.path),
+      if (receipt != null) 'receipt': await MultipartFile.fromFile(receipt.path),
     });
     return _dio.post(
       '${ApiConstants.patientOrders}/$orderId/payment/receipt',
