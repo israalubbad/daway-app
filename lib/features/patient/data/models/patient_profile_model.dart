@@ -1,4 +1,5 @@
 import '../../domain/entities/patient_profile.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class PatientProfileModel {
   final String name;
@@ -22,13 +23,13 @@ class PatientProfileModel {
   factory PatientProfileModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>;
     return PatientProfileModel(
-      name: data['name'] as String? ?? '',
-      phone: data['phone'] as String? ?? '',
-      avatarUrl: data['avatar_url'] as String?,
-      birthDate: data['birth_date'] as String?,
-      latitude: (data['latitude'] as num?)?.toDouble(),
-      longitude: (data['longitude'] as num?)?.toDouble(),
-      address: data['address'] as String?,
+      name: jsonString(data['name']) ?? '',
+      phone: jsonString(data['phone']) ?? '',
+      avatarUrl: jsonString(data['avatar_url']),
+      birthDate: jsonString(data['birth_date']),
+      latitude: jsonDouble(data['latitude']),
+      longitude: jsonDouble(data['longitude']),
+      address: jsonString(data['address']),
     );
   }
 

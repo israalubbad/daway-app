@@ -253,7 +253,7 @@ void main() {
   );
 
   test(
-    'a malformed record among otherwise-valid inquiries is skipped, not fatal to the rest',
+    'a record with a wrong-typed field is kept without that field; one with no id is skipped',
     () async {
       remoteDataSource.nextInquiriesResponse = {
         'data': [
@@ -265,8 +265,8 @@ void main() {
             'user': {'id': 36, 'name': 'أحمد محمد'},
             'medicine': {'id': 6, 'trade_name': 'sgd'},
           },
-          // A record whose `medicine` is a string instead of an object —
-          // should be skipped, not blank out the well-formed record above.
+          // A record whose `medicine` is a string instead of an object keeps
+          // its other fields (the medicine name just reads as missing).
           {
             'id': 2,
             'status': 'new',
@@ -275,14 +275,18 @@ void main() {
             'user': {'id': 40, 'name': 'سارة'},
             'medicine': 'not-an-object',
           },
+          {
+            'status': 'new',
+            'message': 'بدون رقم',
+          },
         ],
       };
 
       final result = await repository.getDashboardStats(token: 'tok-1');
 
       final stats = (result as Success).data;
-      expect(stats.recentInquiries, hasLength(1));
-      expect(stats.recentInquiries.single.id, 1);
+      expect(stats.recentInquiries.map((i) => i.id), [1, 2]);
+      expect(stats.recentInquiries.last.medicineName, isNull);
     },
   );
 }

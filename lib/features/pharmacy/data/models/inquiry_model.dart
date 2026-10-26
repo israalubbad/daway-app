@@ -1,4 +1,5 @@
 import '../../domain/entities/inquiry.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 /// Parses one entry from `GET /pharmacy/inquiries` (confirmed against a live
 /// response: `id`, `status`, `message`, `created_at`, nested `user.name`,
@@ -28,19 +29,20 @@ class InquiryModel {
   });
 
   factory InquiryModel.fromJson(Map<String, dynamic> json) {
-    final medicine = json['medicine'] as Map<String, dynamic>?;
-    final user = json['user'] as Map<String, dynamic>?;
+    final medicine = jsonMap(json['medicine']);
+    final user = jsonMap(json['user']);
     return InquiryModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      message: json['message'] as String? ?? '',
-      status: inquiryStatusFrom(json['status'] as String?),
+      // A record without an id cannot be opened or answered: the callers skip it.
+      id: jsonInt(json['id']) ?? (throw const FormatException('Inquiry record has no id')),
+      message: jsonString(json['message']) ?? '',
+      status: inquiryStatusFrom(jsonString(json['status'])),
       createdAt:
-          DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.tryParse(jsonString(json['created_at']) ?? '') ??
           DateTime.now(),
-      patientName: user?['name'] as String? ?? '',
-      medicineName: medicine?['trade_name'] as String?,
-      unreadCount: (json['unread_messages_count'] as num?)?.toInt() ?? 0,
-      patientId: (user?['id'] as num?)?.toInt() ?? (json['user_id'] as num?)?.toInt(),
+      patientName: jsonString(user?['name']) ?? '',
+      medicineName: jsonString(medicine?['trade_name']),
+      unreadCount: jsonInt(json['unread_messages_count']) ?? 0,
+      patientId: jsonInt(user?['id']) ?? jsonInt(json['user_id']),
       lastMessage: _lastMessageText(json['last_message']),
     );
   }

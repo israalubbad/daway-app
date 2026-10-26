@@ -1,4 +1,5 @@
 import '../../domain/entities/patient_address.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class PatientAddressModel {
   final int id;
@@ -23,14 +24,14 @@ class PatientAddressModel {
 
   factory PatientAddressModel.fromJson(Map<String, dynamic> json) {
     return PatientAddressModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      label: json['label'] as String? ?? '',
-      recipientName: json['recipient_name'] as String? ?? '',
-      phone: json['phone'] as String? ?? '',
-      address: json['address'] as String? ?? '',
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
-      isDefault: json['is_default'] as bool? ?? false,
+      id: jsonInt(json['id']) ?? 0,
+      label: jsonString(json['label']) ?? '',
+      recipientName: jsonString(json['recipient_name']) ?? '',
+      phone: jsonString(json['phone']) ?? '',
+      address: jsonString(json['address']) ?? '',
+      latitude: jsonDouble(json['latitude']) ?? 0,
+      longitude: jsonDouble(json['longitude']) ?? 0,
+      isDefault: jsonBool(json['is_default']) ?? false,
     );
   }
 

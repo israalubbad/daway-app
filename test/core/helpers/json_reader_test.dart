@@ -48,4 +48,21 @@ void main() {
       expect(jsonMap('x'), isNull);
     });
   });
+
+  group('jsonBool', () {
+    test('reads booleans, 0/1 and their string forms', () {
+      expect(jsonBool(true), isTrue);
+      expect(jsonBool(false), isFalse);
+      expect(jsonBool(1), isTrue);
+      expect(jsonBool(0), isFalse);
+      expect(jsonBool('1'), isTrue);
+      expect(jsonBool('false'), isFalse);
+    });
+
+    test('anything else reads as missing', () {
+      expect(jsonBool(null), isNull);
+      expect(jsonBool('yes'), isNull);
+      expect(jsonBool([1]), isNull);
+    });
+  });
 }

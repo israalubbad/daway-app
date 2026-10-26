@@ -1,4 +1,5 @@
 import '../../domain/entities/favorite_medicine.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class FavoriteMedicineModel {
   final int medicineId;
@@ -21,14 +22,14 @@ class FavoriteMedicineModel {
 
   factory FavoriteMedicineModel.fromJson(Map<String, dynamic> json) {
     return FavoriteMedicineModel(
-      medicineId: (json['medicine_id'] as num?)?.toInt() ?? 0,
-      tradeName: json['trade_name'] as String? ?? '',
-      tradeNameAr: json['trade_name_ar'] as String?,
-      imageUrl: json['image_url'] as String?,
+      medicineId: jsonInt(json['medicine_id']) ?? 0,
+      tradeName: jsonString(json['trade_name']) ?? '',
+      tradeNameAr: jsonString(json['trade_name_ar']),
+      imageUrl: jsonString(json['image_url']),
       // Seen as both a JSON boolean and a 0/1 integer across endpoints.
       isAvailable: json['is_available'] == true || json['is_available'] == 1,
-      pharmaciesCount: (json['pharmacies_count'] as num?)?.toInt() ?? 0,
-      minPrice: (json['min_price'] as num?)?.toDouble(),
+      pharmaciesCount: jsonInt(json['pharmacies_count']) ?? 0,
+      minPrice: jsonDouble(json['min_price']),
     );
   }
 

@@ -7,6 +7,7 @@ import '../../domain/repositories/category_repository.dart';
 import '../datasources/category_remote_data_source.dart';
 import '../models/category_medicine_model.dart';
 import '../models/category_model.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDataSource _remoteDataSource;
@@ -57,9 +58,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
       return Success(CategoryMedicinesResult(
         medicines: medicines,
-        total: pagination['total'] as int? ?? medicines.length,
-        currentPage: pagination['current_page'] as int? ?? page,
-        lastPage: pagination['last_page'] as int? ?? page,
+        total: jsonInt(pagination['total']) ?? medicines.length,
+        currentPage: jsonInt(pagination['current_page']) ?? page,
+        lastPage: jsonInt(pagination['last_page']) ?? page,
       ));
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));

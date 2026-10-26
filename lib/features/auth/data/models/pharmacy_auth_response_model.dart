@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_reader.dart';
 class PharmacyAuthResponseModel {
   final String token;
   final int? userId;
@@ -9,7 +10,7 @@ class PharmacyAuthResponseModel {
     final user = data['user'];
     return PharmacyAuthResponseModel(
       token: data['token'] as String,
-      userId: user is Map ? (user['id'] as num?)?.toInt() : null,
+      userId: user is Map ? jsonInt(user['id']) : null,
     );
   }
 }

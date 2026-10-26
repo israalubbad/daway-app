@@ -1,4 +1,5 @@
 import '../../domain/entities/patient_health_profile.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class PatientHealthProfileModel {
   final List<String> allergies;
@@ -17,12 +18,12 @@ class PatientHealthProfileModel {
       value is List ? [for (final item in value) if (item != null) item.toString()] : const [];
 
   factory PatientHealthProfileModel.fromJson(Map<String, dynamic> json) {
-    final bloodType = json['blood_type'] as String?;
+    final bloodType = jsonString(json['blood_type']);
     return PatientHealthProfileModel(
       allergies: _strings(json['allergies']),
       chronicDiseases: _strings(json['chronic_diseases']),
       bloodType: (bloodType == null || bloodType.isEmpty) ? null : bloodType,
-      notes: json['notes'] as String? ?? '',
+      notes: jsonString(json['notes']) ?? '',
     );
   }
 

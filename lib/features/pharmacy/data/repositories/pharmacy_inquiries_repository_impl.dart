@@ -5,6 +5,7 @@ import '../../domain/entities/inquiry.dart';
 import '../../domain/repositories/pharmacy_inquiries_repository.dart';
 import '../datasources/pharmacy_inquiries_remote_data_source.dart';
 import '../models/inquiry_model.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class PharmacyInquiriesRepositoryImpl implements PharmacyInquiriesRepository {
   final PharmacyInquiriesRemoteDataSource _remoteDataSource;
@@ -40,13 +41,13 @@ class PharmacyInquiriesRepositoryImpl implements PharmacyInquiriesRepository {
         }
       }
 
-      final counts = body['counts'] as Map<String, dynamic>? ?? const {};
+      final counts = jsonMap(body['counts']) ?? const {};
       return Success(
         InquiriesOverview(
           inquiries: inquiries,
-          newCount: (counts['new'] as num?)?.toInt() ?? 0,
-          answeredCount: (counts['answered'] as num?)?.toInt() ?? 0,
-          closedCount: (counts['closed'] as num?)?.toInt() ?? 0,
+          newCount: jsonInt(counts['new']) ?? 0,
+          answeredCount: jsonInt(counts['answered']) ?? 0,
+          closedCount: jsonInt(counts['closed']) ?? 0,
         ),
       );
     } catch (e) {

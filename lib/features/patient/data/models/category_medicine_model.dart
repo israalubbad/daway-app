@@ -1,4 +1,5 @@
 import '../../domain/entities/category_medicine.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class CategoryMedicineModel {
   final int id;
@@ -21,13 +22,13 @@ class CategoryMedicineModel {
 
   factory CategoryMedicineModel.fromJson(Map<String, dynamic> json) {
     return CategoryMedicineModel(
-      id: json['id'] as int,
-      tradeName: json['trade_name'] as String? ?? '',
-      genericName: json['generic_name'] as String?,
-      dosageForm: json['dosage_form'] as String?,
-      medicineId: (json['medicine_id'] as num?)?.toInt(),
-      imageUrl: (json['image_url'] ?? json['image']) as String?,
-      pharmaciesCount: (json['pharmacies_count'] as num?)?.toInt(),
+      id: jsonInt(json['id']) ?? (throw const FormatException('Record has no id')),
+      tradeName: jsonString(json['trade_name']) ?? '',
+      genericName: jsonString(json['generic_name']),
+      dosageForm: jsonString(json['dosage_form']),
+      medicineId: jsonInt(json['medicine_id']),
+      imageUrl: jsonString(json['image_url']) ?? jsonString(json['image']),
+      pharmaciesCount: jsonInt(json['pharmacies_count']),
     );
   }
 

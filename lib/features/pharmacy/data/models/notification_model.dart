@@ -1,4 +1,5 @@
 import '../../domain/entities/notification.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 /// Parses one entry from `GET /notifications` — confirmed against a live
 /// response: `id`, `type` (`low_stock`/`out_of_stock`/`new_inquiry`),
@@ -31,8 +32,8 @@ class NotificationModel {
       type: notificationTypeFrom(
         json['type'] is String ? json['type'] as String : null,
       ),
-      message: json['message'] as String? ?? '',
-      isRead: json['is_read'] as bool? ?? false,
+      message: jsonString(json['message']) ?? '',
+      isRead: jsonBool(json['is_read']) ?? false,
       // Required too, same reasoning as RatingModel: this repository sorts
       // by createdAt to show the newest notifications first, so a fallback
       // like DateTime.now() would wrongly sort a corrupted record to the top

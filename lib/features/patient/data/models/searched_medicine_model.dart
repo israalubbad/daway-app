@@ -1,4 +1,5 @@
 import '../../domain/entities/searched_medicine.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class SearchedMedicineModel {
   final int id;
@@ -19,14 +20,14 @@ class SearchedMedicineModel {
 
   factory SearchedMedicineModel.fromJson(Map<String, dynamic> json) {
     return SearchedMedicineModel(
-      id: json['id'] as int,
-      tradeName: json['trade_name'] as String? ?? '',
-      activeIngredient: json['active_ingredient'] as String?,
-      imageUrl: json['image_url'] as String?,
+      id: jsonInt(json['id']) ?? (throw const FormatException('Record has no id')),
+      tradeName: jsonString(json['trade_name']) ?? '',
+      activeIngredient: jsonString(json['active_ingredient']),
+      imageUrl: jsonString(json['image_url']),
       // The live API serializes this as an int (0/1), not a JSON boolean.
       isAvailable: json['is_available'] == true || json['is_available'] == 1,
       availablePharmaciesCount:
-          (json['available_pharmacies_count'] as num?)?.toInt() ?? 0,
+          jsonInt(json['available_pharmacies_count']) ?? 0,
     );
   }
 

@@ -1,5 +1,6 @@
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/chat_message.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 /// One entry of `PatientInquiryMessageResource`:
 /// `id`, `inquiry_id`, `sender_user_id`, `message`, `media_url`,
@@ -26,14 +27,14 @@ class ChatMessageModel {
   });
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json, {String? baseHost}) {
-    final media = json['media_url'] as String?;
+    final media = jsonString(json['media_url']);
     return ChatMessageModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      senderUserId: (json['sender_user_id'] as num?)?.toInt() ?? 0,
-      text: json['message'] as String? ?? '',
+      id: jsonInt(json['id']) ?? 0,
+      senderUserId: jsonInt(json['sender_user_id']) ?? 0,
+      text: jsonString(json['message']) ?? '',
       mediaUrl: _absolute(media, baseHost),
       isRead: json['is_read'] == true || json['is_read'] == 1,
-      createdAt: tryParseServerTimestamp(json['created_at'] as String?) ?? DateTime.now(),
+      createdAt: tryParseServerTimestamp(jsonString(json['created_at'])) ?? DateTime.now(),
       serverIsMine:
           json['is_mine'] == null ? null : (json['is_mine'] == true || json['is_mine'] == 1),
       senderRole: (json['sender_role'] ?? json['sender_type']) as String?,

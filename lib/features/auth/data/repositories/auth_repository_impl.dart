@@ -8,6 +8,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 import '../models/patient_auth_response_model.dart';
 import '../models/pharmacy_auth_response_model.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
@@ -36,7 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
           ),
         );
       }
-      return Success(data['otp'] as String?);
+      return Success(jsonString(data['otp']));
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
     }

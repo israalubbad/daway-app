@@ -1,5 +1,6 @@
 import '../../domain/entities/category.dart';
 import '../../domain/entities/category_subcategory.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class SubcategoryModel {
   final int id;
@@ -16,10 +17,10 @@ class SubcategoryModel {
 
   factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
     return SubcategoryModel(
-      id: json['id'] as int,
-      nameAr: json['name_ar'] as String? ?? '',
-      slug: json['slug'] as String? ?? '',
-      groupKey: json['group_key'] as String? ?? '',
+      id: jsonInt(json['id']) ?? (throw const FormatException('Record has no id')),
+      nameAr: jsonString(json['name_ar']) ?? '',
+      slug: jsonString(json['slug']) ?? '',
+      groupKey: jsonString(json['group_key']) ?? '',
     );
   }
 
@@ -45,10 +46,10 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     final rawSubcategories = json['subcategories'];
     return CategoryModel(
-      id: json['id'] as int,
-      nameAr: json['name_ar'] as String? ?? '',
-      slug: json['slug'] as String? ?? '',
-      image: json['image'] as String?,
+      id: jsonInt(json['id']) ?? (throw const FormatException('Record has no id')),
+      nameAr: jsonString(json['name_ar']) ?? '',
+      slug: jsonString(json['slug']) ?? '',
+      image: jsonString(json['image']),
       subcategories: rawSubcategories is List
           ? rawSubcategories
               .map((json) => SubcategoryModel.fromJson(json as Map<String, dynamic>))

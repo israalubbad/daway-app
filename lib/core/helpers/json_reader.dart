@@ -22,3 +22,16 @@ double? jsonDouble(Object? value) {
   if (value is String) return double.tryParse(value.trim());
   return null;
 }
+
+/// A JSON boolean, also accepted as 0/1 or "0"/"1"/"true"/"false", which is how
+/// this backend sends flags from some endpoints.
+bool? jsonBool(Object? value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final text = value.trim().toLowerCase();
+    if (text == 'true' || text == '1') return true;
+    if (text == 'false' || text == '0') return false;
+  }
+  return null;
+}

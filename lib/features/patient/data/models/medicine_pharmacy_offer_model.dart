@@ -1,4 +1,5 @@
 import '../../domain/entities/medicine_pharmacy_offer.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class MedicinePharmacyOfferModel {
   final int pharmacyId;
@@ -17,11 +18,11 @@ class MedicinePharmacyOfferModel {
 
   factory MedicinePharmacyOfferModel.fromJson(Map<String, dynamic> json) {
     return MedicinePharmacyOfferModel(
-      pharmacyId: (json['pharmacy_id'] as num?)?.toInt() ?? 0,
-      pharmacyName: json['name'] as String? ?? '',
-      distanceKm: (json['distance_km'] as num?)?.toDouble(),
-      price: (json['price'] as num?)?.toDouble() ?? 0,
-      pharmacyMedicineId: (json['pharmacy_medicine_id'] as num?)?.toInt(),
+      pharmacyId: jsonInt(json['pharmacy_id']) ?? 0,
+      pharmacyName: jsonString(json['name']) ?? '',
+      distanceKm: jsonDouble(json['distance_km']),
+      price: jsonDouble(json['price']) ?? 0,
+      pharmacyMedicineId: jsonInt(json['pharmacy_medicine_id']),
     );
   }
 

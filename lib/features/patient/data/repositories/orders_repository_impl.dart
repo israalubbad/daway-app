@@ -5,6 +5,7 @@ import '../../domain/entities/order.dart';
 import '../../domain/repositories/orders_repository.dart';
 import '../datasources/orders_remote_data_source.dart';
 import '../models/order_model.dart';
+import '../../../../core/helpers/json_reader.dart';
 
 class OrdersRepositoryImpl implements OrdersRepository {
   final OrdersRemoteDataSource _remoteDataSource;
@@ -53,7 +54,7 @@ class OrdersRepositoryImpl implements OrdersRepository {
         notes: notes,
       );
       final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
-      final orderId = (data['order_id'] as num?)?.toInt();
+      final orderId = jsonInt(data['order_id']);
       if (orderId == null) {
         throw const FormatException('POST /patient/checkout response is missing order_id');
       }
