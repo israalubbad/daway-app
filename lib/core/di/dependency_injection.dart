@@ -41,7 +41,9 @@ import '../../features/payment/data/datasources/payment_remote_data_source.dart'
 import '../../features/payment/data/repositories/payment_repository_impl.dart';
 import '../../features/payment/domain/repositories/payment_repository.dart';
 import '../../features/payment/domain/usecases/payment_usecases.dart';
+import '../../features/payment/presentation/cubit/coupon_cubit.dart';
 import '../../features/payment/presentation/cubit/payment_cubit.dart';
+import '../../features/payment/presentation/cubit/tracking_cubit.dart';
 import '../../features/patient/data/datasources/patient_addresses_remote_data_source.dart';
 import '../../features/patient/data/datasources/patient_inquiries_remote_data_source.dart';
 import '../../features/patient/data/datasources/patient_ratings_remote_data_source.dart';
@@ -402,6 +404,13 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => ReportPaymentProblemUseCase(getIt(), getIt()));
   getIt.registerFactoryParam<PaymentCubit, int, void>(
     (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt()),
+  );
+
+  getIt.registerLazySingleton(() => ValidateCouponUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetOrderTrackingUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => CouponCubit(getIt()));
+  getIt.registerFactoryParam<TrackingCubit, int, void>(
+    (orderId, _) => TrackingCubit(orderId, getIt()),
   );
 
   // ---------------- Medicine Detail ----------------

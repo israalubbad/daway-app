@@ -88,3 +88,29 @@ class ReportPaymentProblemUseCase {
     );
   }
 }
+
+class ValidateCouponUseCase {
+  final PaymentRepository _repository;
+  final SessionRepository _sessionRepository;
+
+  const ValidateCouponUseCase(this._repository, this._sessionRepository);
+
+  Future<ApiResult<double>> call({required String code, required double orderTotal}) async {
+    final session = await _sessionRepository.getSession();
+    if (session == null) return const ApiError(_sessionExpired);
+    return _repository.validateCoupon(token: session.token, code: code, orderTotal: orderTotal);
+  }
+}
+
+class GetOrderTrackingUseCase {
+  final PaymentRepository _repository;
+  final SessionRepository _sessionRepository;
+
+  const GetOrderTrackingUseCase(this._repository, this._sessionRepository);
+
+  Future<ApiResult<OrderTracking>> call(int orderId) async {
+    final session = await _sessionRepository.getSession();
+    if (session == null) return const ApiError(_sessionExpired);
+    return _repository.getTracking(token: session.token, orderId: orderId);
+  }
+}

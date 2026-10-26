@@ -10,7 +10,9 @@ import 'package:daway_app/features/payment/data/models/payment_models.dart';
 import 'package:daway_app/features/payment/domain/entities/payment.dart';
 import 'package:daway_app/features/payment/domain/repositories/payment_repository.dart';
 import 'package:daway_app/features/payment/domain/usecases/payment_usecases.dart';
+import 'package:daway_app/features/payment/presentation/cubit/coupon_cubit.dart';
 import 'package:daway_app/features/payment/presentation/cubit/payment_cubit.dart';
+import 'package:daway_app/features/payment/presentation/cubit/tracking_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakePaymentRepository implements PaymentRepository {
@@ -26,6 +28,31 @@ class _FakePaymentRepository implements PaymentRepository {
   String? lastProblem;
   int? lastSubmissionId;
   int banksCalls = 0;
+  ApiResult<double> couponResult = const Success(5);
+  ApiResult<OrderTracking> trackingResult = const Success(
+    OrderTracking(status: 'confirmed', steps: [TrackingStep(status: 'confirmed')]),
+  );
+  String? lastCouponCode;
+  double? lastCouponTotal;
+
+  @override
+  Future<ApiResult<double>> validateCoupon({
+    required String token,
+    required String code,
+    required double orderTotal,
+  }) async {
+    lastCouponCode = code;
+    lastCouponTotal = orderTotal;
+    return couponResult;
+  }
+
+  @override
+  Future<ApiResult<OrderTracking>> getTracking({
+    required String token,
+    required int orderId,
+  }) async =>
+      trackingResult;
+
 
   @override
   Future<ApiResult<List<PaymentBank>>> getBanks({required String token}) async {
@@ -263,5 +290,71 @@ void main() {
       expect(repository.lastProblem, isNull);
     });
   });
-}
+  group('CouponCubit', () {
+    test('a valid code keeps the discount and is offered to checkout', () async {
+      final repository = _FakePaymentRepository();
+      final cubit = CouponCubit(ValidateCouponUseCase(repository, _FakeSession()));
+      addTearDown(cubit.close);
 
+      await cubit.apply('  SAVE5 ', orderTotal: 60);
+
+      expect(repository.lastCouponCode, 'SAVE5');
+      expect(repository.lastCouponTotal, 60);
+      expect(cubit.state.discount, 5);
+      expect(cubit.appliedCode, 'SAVE5');
+    });
+
+    test('a rejected code shows the server message and is not applied', () async {
+      final repository = _FakePaymentRepository()
+        ..couponResult = const ApiError(ValidationFailure('الكود منتهي'));
+      final cubit = CouponCubit(ValidateCouponUseCase(repository, _FakeSession()));
+      addTearDown(cubit.close);
+
+      await cubit.apply('OLD', orderTotal: 60);
+
+      expect(cubit.state.error, 'الكود منتهي');
+      expect(cubit.appliedCode, isNull);
+    });
+
+    test('a blank code is not sent, and remove clears the applied one', () async {
+      final repository = _FakePaymentRepository();
+      final cubit = CouponCubit(ValidateCouponUseCase(repository, _FakeSession()));
+      addTearDown(cubit.close);
+
+      await cubit.apply('   ', orderTotal: 60);
+      expect(repository.lastCouponCode, isNull);
+
+      await cubit.apply('SAVE5', orderTotal: 60);
+      cubit.remove();
+      expect(cubit.appliedCode, isNull);
+    });
+  });
+
+  group('order tracking', () {
+    test('parses the status and the history', () {
+      final tracking = parseOrderTracking({
+        'status': 'preparing',
+        'status_histories': [
+          {'status': 'confirmed', 'created_at': '2026-10-25T10:00:00Z'},
+          {'status': 'preparing'},
+          {'note': 'no status'},
+        ],
+      });
+
+      expect(tracking.status, 'preparing');
+      expect(tracking.steps.map((s) => s.status), ['confirmed', 'preparing']);
+      expect(tracking.steps.first.at, isNotNull);
+      expect(tracking.steps.last.at, isNull);
+    });
+
+    test('the cubit loads the timeline', () async {
+      final cubit = TrackingCubit(5, GetOrderTrackingUseCase(_FakePaymentRepository(), _FakeSession()));
+      addTearDown(cubit.close);
+
+      await cubit.load();
+
+      expect(cubit.state.tracking?.status, 'confirmed');
+      expect(cubit.state.isLoading, isFalse);
+    });
+  });
+}

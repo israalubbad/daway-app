@@ -14,6 +14,8 @@ import '../cubit/cart_cubit.dart';
 import '../cubit/cart_state.dart';
 import '../cubit/checkout_cubit.dart';
 import '../cubit/checkout_state.dart';
+import '../../../payment/presentation/cubit/coupon_cubit.dart';
+import '../../../payment/presentation/widgets/coupon_box.dart';
 import '../widgets/cart_item_card.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
@@ -29,6 +31,7 @@ class PatientCartScreen extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<CartCubit>()),
         BlocProvider(create: (_) => getIt<CheckoutCubit>()),
+        BlocProvider(create: (_) => getIt<CouponCubit>()),
       ],
       child: const _CartView(),
     );
@@ -106,7 +109,11 @@ class _CartView extends StatelessWidget {
                           return AppCustomButton(
                             text: 'إتمام الطلب',
                             isLoading: checkoutState is CheckoutInProgress,
-                            onPressed: () => context.read<CheckoutCubit>().start(),
+                            onPressed: () {
+                              final checkout = context.read<CheckoutCubit>();
+                              checkout.couponCode = context.read<CouponCubit>().appliedCode;
+                              checkout.start();
+                            },
                           );
                         },
                       ),
@@ -164,6 +171,8 @@ class _CartList extends StatelessWidget {
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel,
           ),
+          SizedBox(height: 16.h),
+          CouponBox(orderTotal: state.total),
           SizedBox(height: 16.h),
           Align(
             alignment: Alignment.centerRight,

@@ -41,3 +41,20 @@ PaymentSummary parsePaymentSummary(Map<String, dynamic> data) {
     latestSubmissionId: latest is Map<String, dynamic> ? (latest['id'] as num?)?.toInt() : null,
   );
 }
+
+OrderTracking parseOrderTracking(Map<String, dynamic> data) {
+  final histories = data['status_histories'];
+  return OrderTracking(
+    status: _text(data['status']) ?? '',
+    steps: histories is List
+        ? [
+            for (final row in histories)
+              if (row is Map<String, dynamic> && _text(row['status']) != null)
+                TrackingStep(
+                  status: _text(row['status'])!,
+                  at: DateTime.tryParse(_text(row['created_at']) ?? '')?.toLocal(),
+                ),
+          ]
+        : const [],
+  );
+}

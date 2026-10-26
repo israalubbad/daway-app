@@ -156,6 +156,25 @@ class _OrderSheet extends StatelessWidget {
               style: TextStyle(fontSize: 14.sp, height: 1.6),
             ),
             SizedBox(height: 24.h),
+            if (int.tryParse(order.orderNumber) case final orderId?) ...[
+              if (order.status.isInProgress) ...[
+                AppCustomButton(
+                  text: 'الدفع',
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(Routes.paymentScreen, arguments: orderId),
+                ),
+                SizedBox(height: 12.h),
+              ],
+              AppCustomButton(
+                text: 'تتبع الطلب',
+                backgroundColor: Colors.white,
+                textColor: AppColors.mainTeal,
+                borderColor: AppColors.mainTeal,
+                onPressed: () => Navigator.of(context)
+                    .pushNamed(Routes.orderTrackingScreen, arguments: orderId),
+              ),
+              SizedBox(height: 12.h),
+            ],
             if (order.status.canCancel)
               AppCustomButton(
                 text: 'إلغاء الطلب',

@@ -52,4 +52,18 @@ class PaymentRemoteDataSource {
         data: {'category': category, 'message': message, 'submission_id': submissionId},
         options: _auth(token),
       );
+
+  Future<Response<dynamic>> validateCoupon({
+    required String token,
+    required String code,
+    required double orderTotal,
+  }) =>
+      _dio.post(
+        ApiConstants.patientCouponsValidate,
+        data: {'code': code, 'order_total': orderTotal},
+        options: _auth(token),
+      );
+
+  Future<Response<dynamic>> getTracking({required String token, required int orderId}) =>
+      _dio.get('${ApiConstants.patientOrders}/$orderId/tracking', options: _auth(token));
 }

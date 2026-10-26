@@ -36,3 +36,18 @@ class PaymentSummary {
     this.latestSubmissionId,
   });
 }
+
+/// One step of an order's timeline, with the status as the server sent it.
+class TrackingStep {
+  final String status;
+  final DateTime? at;
+
+  const TrackingStep({required this.status, this.at});
+}
+
+class OrderTracking {
+  final String status;
+  final List<TrackingStep> steps;
+
+  const OrderTracking({required this.status, this.steps = const []});
+}

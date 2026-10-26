@@ -84,4 +84,42 @@ class PaymentRepositoryImpl implements PaymentRepository {
       return ApiError(mapExceptionToFailure(e));
     }
   }
+
+  @override
+  Future<ApiResult<double>> validateCoupon({
+    required String token,
+    required String code,
+    required double orderTotal,
+  }) async {
+    try {
+      final response = await _remoteDataSource.validateCoupon(
+        token: token,
+        code: code,
+        orderTotal: orderTotal,
+      );
+      final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>?;
+      final discount = data?['discount'];
+      final value = discount is num ? discount.toDouble() : double.tryParse('$discount');
+      if (value == null) {
+        throw const FormatException('POST /patient/coupons/validate response is missing discount');
+      }
+      return Success(value);
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<ApiResult<OrderTracking>> getTracking({
+    required String token,
+    required int orderId,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getTracking(token: token, orderId: orderId);
+      final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      return Success(parseOrderTracking(data));
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
 }

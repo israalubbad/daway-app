@@ -19,6 +19,9 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   final GetPatientProfileUseCase _getProfileUseCase;
   final CheckoutUseCase _checkoutUseCase;
 
+  /// A coupon the patient has validated in the cart; sent along with checkout.
+  String? couponCode;
+
   CheckoutCubit(
     this._getAddressesUseCase,
     this._createAddressUseCase,
@@ -77,7 +80,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   }
 
   Future<void> _submit(int addressId) async {
-    final result = await _checkoutUseCase(addressId: addressId);
+    final result = await _checkoutUseCase(addressId: addressId, couponCode: couponCode);
     if (isClosed) return;
     switch (result) {
       case Success(:final data):

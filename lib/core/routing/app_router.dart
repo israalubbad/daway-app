@@ -10,6 +10,7 @@ import 'package:daway_app/features/patient/presentation/screens/category_medicin
 import 'package:daway_app/features/patient/presentation/screens/medicine_detail_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/medicine_reminders_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_cart_screen.dart';
+import 'package:daway_app/features/payment/presentation/screens/order_tracking_screen.dart';
 import 'package:daway_app/features/payment/presentation/screens/payment_screen.dart';
 import 'package:daway_app/features/chat/presentation/screens/chat_screen.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_pharmacies_map_screen.dart';
@@ -185,6 +186,11 @@ class AppRouter {
         final medicineId = settings.arguments as int;
         return MaterialPageRoute(
           builder: (_) => MedicineDetailScreen(medicineId: medicineId),
+        );
+
+      case Routes.orderTrackingScreen:
+        return MaterialPageRoute(
+          builder: (_) => OrderTrackingScreen(orderId: settings.arguments as int),
         );
 
       case Routes.paymentScreen:

@@ -30,4 +30,16 @@ abstract class PaymentRepository {
     required int submissionId,
     String category = 'other',
   });
+
+  /// `POST /patient/coupons/validate` — the discount the server would give on
+  /// [orderTotal]. 404/422 (unknown, expired, minimum not met) come back as an
+  /// ApiError carrying the server message.
+  Future<ApiResult<double>> validateCoupon({
+    required String token,
+    required String code,
+    required double orderTotal,
+  });
+
+  /// `GET /patient/orders/{id}/tracking` — the parent order's status timeline.
+  Future<ApiResult<OrderTracking>> getTracking({required String token, required int orderId});
 }

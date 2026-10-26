@@ -26,6 +26,9 @@ import 'package:daway_app/features/patient/presentation/cubit/checkout_cubit.dar
 import 'package:daway_app/features/patient/presentation/screens/patient_cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:daway_app/features/payment/domain/repositories/payment_repository.dart';
+import 'package:daway_app/features/payment/domain/usecases/payment_usecases.dart';
+import 'package:daway_app/features/payment/presentation/cubit/coupon_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
@@ -160,6 +163,12 @@ class _FakeProfileRepository implements PatientProfileRepository {
       const Success(null);
 }
 
+/// The coupon box is only built here, never used.
+class _UnusedPaymentRepository implements PaymentRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _FakeOrdersRepository implements OrdersRepository {
 
   @override
@@ -223,6 +232,9 @@ void main() {
         DeleteCartItemUseCase(cartRepository, sessionRepository),
         ClearCartUseCase(cartRepository, sessionRepository),
       ),
+    );
+    getIt.registerFactory<CouponCubit>(
+      () => CouponCubit(ValidateCouponUseCase(_UnusedPaymentRepository(), sessionRepository)),
     );
     getIt.registerFactory<CheckoutCubit>(
       () => CheckoutCubit(
