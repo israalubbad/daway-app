@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
 
 import 'api_error_model.dart';
@@ -9,6 +11,9 @@ Failure mapExceptionToFailure(Object error) {
   if (error is DioException) {
     return _mapDioException(error);
   }
+  // Not a network error: a response that did not parse, or a bug. Logged so a
+  // debug run shows the real cause behind the generic message.
+  developer.log('Unmapped error behind the generic message', error: error, name: 'daway.errors');
   return const UnknownFailure(_genericErrorMessage);
 }
 

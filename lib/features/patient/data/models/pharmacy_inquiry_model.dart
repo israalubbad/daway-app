@@ -31,26 +31,34 @@ class PharmacyInquiryModel {
   });
 
   factory PharmacyInquiryModel.fromJson(Map<String, dynamic> json) {
-    final pharmacy = json['pharmacy'] as Map<String, dynamic>?;
-    final medicine = json['medicine'] as Map<String, dynamic>?;
-    final createdAtRaw = json['created_at'] as String?;
-    final repliedAtRaw = json['replied_at'] as String?;
+    final pharmacy = _map(json['pharmacy']);
+    final medicine = _map(json['medicine']);
 
     return PharmacyInquiryModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      pharmacyId: (pharmacy?['id'] as num?)?.toInt() ?? 0,
-      medicineId: (medicine?['id'] as num?)?.toInt() ?? 0,
-      medicineName: medicine?['trade_name'] as String?,
-      pharmacyName: (pharmacy?['pharmacy_name'] ?? pharmacy?['name']) as String?,
-      message: json['message'] as String? ?? '',
+      id: _int(json['id']) ?? 0,
+      pharmacyId: _int(pharmacy?['id']) ?? 0,
+      medicineId: _int(medicine?['id']) ?? 0,
+      medicineName: _string(medicine?['trade_name']),
+      pharmacyName: _string(pharmacy?['pharmacy_name']) ?? _string(pharmacy?['name']),
+      message: _string(json['message']) ?? '',
       lastMessage: _lastMessageText(json['last_message']),
-      unreadCount: (json['unread_messages_count'] as num?)?.toInt() ?? 0,
-      reply: json['reply'] as String?,
-      status: InquiryStatus.fromApi(json['status'] as String?),
-      createdAt: tryParseServerTimestamp(createdAtRaw) ?? DateTime.now(),
-      repliedAt: tryParseServerTimestamp(repliedAtRaw),
+      unreadCount: _int(json['unread_messages_count']) ?? 0,
+      reply: _string(json['reply']),
+      status: InquiryStatus.fromApi(_string(json['status'])),
+      createdAt: tryParseServerTimestamp(_string(json['created_at'])) ?? DateTime.now(),
+      repliedAt: tryParseServerTimestamp(_string(json['replied_at'])),
     );
   }
+
+  // A field of an unexpected type reads as missing instead of failing the
+  // whole list: one odd row must not hide every conversation.
+  static Map<String, dynamic>? _map(Object? value) =>
+      value is Map ? Map<String, dynamic>.from(value) : null;
+
+  static int? _int(Object? value) =>
+      value is num ? value.toInt() : int.tryParse(value?.toString() ?? '');
+
+  static String? _string(Object? value) => value is String ? value : null;
 
   /// `last_message` may be the message text or the message object.
   static String? _lastMessageText(Object? value) {

@@ -20,7 +20,8 @@ class PatientInquiriesRepositoryImpl implements PatientInquiriesRepository {
             (await _remoteDataSource.getInquiries(token: token, page: page)).data,
       );
       final inquiries = inquiriesJson
-          .map((json) => PharmacyInquiryModel.fromJson(json as Map<String, dynamic>).toEntity())
+          .whereType<Map<String, dynamic>>()
+          .map((json) => PharmacyInquiryModel.fromJson(json).toEntity())
           .toList();
       return Success(inquiries);
     } catch (e) {
