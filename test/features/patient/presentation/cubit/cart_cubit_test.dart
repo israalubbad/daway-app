@@ -26,10 +26,13 @@ class _FakeCartRepository implements CartRepository {
 
   @override
   Future<ApiResult<void>> deleteItem({required String token, required int itemId}) async =>
-      const Success(null);
+      deleteResult;
+  ApiResult<void> deleteResult = const Success(null);
+  ApiResult<void> clearResult = const Success(null);
+  int updateCalls = 0;
 
   @override
-  Future<ApiResult<void>> clearCart({required String token}) async => const Success(null);
+  Future<ApiResult<void>> clearCart({required String token}) async => clearResult;
 
   @override
   Future<ApiResult<void>> addItem({
@@ -58,6 +61,7 @@ class _FakeCartRepository implements CartRepository {
     required int quantity,
   }) async {
     lastQuantity = quantity;
+    updateCalls++;
     return updateResult;
   }
 }
@@ -226,5 +230,63 @@ void main() {
     expect(state.updatingIds, isEmpty);
     // The failed update didn't get applied locally either.
     expect(state.items.single.quantity, 2);
+  });
+
+  test('a refused quantity change returns the server message for the screen to show', () async {
+    repository.updateResult = const ApiError(ValidationFailure('الكمية المطلوبة غير متوفرة'));
+    final cubit = buildCubit();
+    addTearDown(cubit.close);
+    await Future<void>.delayed(Duration.zero);
+
+    final error = await cubit.incrementQuantity(_item);
+
+    expect(error, 'الكمية المطلوبة غير متوفرة');
+  });
+
+  test('a successful quantity change returns null', () async {
+    final cubit = buildCubit();
+    addTearDown(cubit.close);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(await cubit.incrementQuantity(_item), isNull);
+    expect(await cubit.decrementQuantity(_item), isNull);
+  });
+
+  test('a second change on a line that is still updating is ignored', () async {
+    final cubit = buildCubit();
+    addTearDown(cubit.close);
+    await Future<void>.delayed(Duration.zero);
+
+    final first = cubit.incrementQuantity(_item);
+    final second = cubit.incrementQuantity(_item);
+    await Future.wait([first, second]);
+
+    expect(repository.updateCalls, 1);
+  });
+
+  test('deleteItem failure keeps the line and returns the message', () async {
+    repository.deleteResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+    final cubit = buildCubit();
+    addTearDown(cubit.close);
+    await Future<void>.delayed(Duration.zero);
+
+    final error = await cubit.deleteItem(_item);
+
+    expect(error, 'تعذر الاتصال بالخادم');
+    final state = cubit.state as CartLoaded;
+    expect(state.items, hasLength(1));
+    expect(state.updatingIds, isEmpty);
+  });
+
+  test('clear failure keeps the cart and returns the message', () async {
+    repository.clearResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+    final cubit = buildCubit();
+    addTearDown(cubit.close);
+    await Future<void>.delayed(Duration.zero);
+
+    final error = await cubit.clear();
+
+    expect(error, 'تعذر الاتصال بالخادم');
+    expect((cubit.state as CartLoaded).items, hasLength(1));
   });
 }

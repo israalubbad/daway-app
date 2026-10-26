@@ -61,12 +61,15 @@ class _FakeCartRepository implements CartRepository {
   @override
   Future<ApiResult<List<CartItem>>> getItems({required String token}) async => itemsResult;
 
+  String? updateFailure;
+
   @override
   Future<ApiResult<void>> updateQuantity({
     required String token,
     required int itemId,
     required int quantity,
   }) async {
+    if (updateFailure != null) return ApiError(ApiFailure(message: updateFailure!));
     final items = (itemsResult as Success<List<CartItem>>).data;
     itemsResult = Success([
       for (final item in items)
@@ -197,6 +200,20 @@ void main() {
     expect(find.text('2'), findsWidgets); // أموكسيسيلين's quantity is now 2
     // (18*2) + (12*2) = 60
     expect(find.text('الاجمالي للمنتجات : 60 \$'), findsOneWidget);
+  });
+
+  testWidgets('a refused quantity change shows the server message and keeps the quantity',
+      (tester) async {
+    await setPhoneViewport(tester);
+    cartRepository.updateFailure = 'الكمية المطلوبة غير متوفرة';
+
+    await tester.pumpWidget(buildTestableScreen());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('الكمية المطلوبة غير متوفرة'), findsOneWidget);
+    expect(find.text('الاجمالي للمنتجات : 42 \$'), findsOneWidget);
   });
 
   testWidgets('tapping - stops at a quantity of 1', (tester) async {

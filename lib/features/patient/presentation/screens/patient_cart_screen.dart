@@ -126,8 +126,14 @@ class _CartList extends StatelessWidget {
               child: CartItemCard(
                 item: item,
                 isUpdating: state.updatingIds.contains(item.id),
-                onIncrement: () => cubit.incrementQuantity(item),
-                onDecrement: () => cubit.decrementQuantity(item),
+                onIncrement: () async {
+                  final error = await cubit.incrementQuantity(item);
+                  if (error != null && context.mounted) AppSnackbar.show(context, error);
+                },
+                onDecrement: () async {
+                  final error = await cubit.decrementQuantity(item);
+                  if (error != null && context.mounted) AppSnackbar.show(context, error);
+                },
               ),
             ),
             SizedBox(height: 24.h),

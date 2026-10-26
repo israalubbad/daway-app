@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_reader.dart';
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_inquiry.dart';
 
@@ -31,34 +32,25 @@ class PharmacyInquiryModel {
   });
 
   factory PharmacyInquiryModel.fromJson(Map<String, dynamic> json) {
-    final pharmacy = _map(json['pharmacy']);
-    final medicine = _map(json['medicine']);
+    final pharmacy = jsonMap(json['pharmacy']);
+    final medicine = jsonMap(json['medicine']);
 
     return PharmacyInquiryModel(
-      id: _int(json['id']) ?? 0,
-      pharmacyId: _int(pharmacy?['id']) ?? 0,
-      medicineId: _int(medicine?['id']) ?? 0,
-      medicineName: _string(medicine?['trade_name']),
-      pharmacyName: _string(pharmacy?['pharmacy_name']) ?? _string(pharmacy?['name']),
-      message: _string(json['message']) ?? '',
+      id: jsonInt(json['id']) ?? 0,
+      pharmacyId: jsonInt(pharmacy?['id']) ?? 0,
+      medicineId: jsonInt(medicine?['id']) ?? 0,
+      medicineName: jsonString(medicine?['trade_name']),
+      pharmacyName: jsonString(pharmacy?['pharmacy_name']) ?? jsonString(pharmacy?['name']),
+      message: jsonString(json['message']) ?? '',
       lastMessage: _lastMessageText(json['last_message']),
-      unreadCount: _int(json['unread_messages_count']) ?? 0,
-      reply: _string(json['reply']),
-      status: InquiryStatus.fromApi(_string(json['status'])),
-      createdAt: tryParseServerTimestamp(_string(json['created_at'])) ?? DateTime.now(),
-      repliedAt: tryParseServerTimestamp(_string(json['replied_at'])),
+      unreadCount: jsonInt(json['unread_messages_count']) ?? 0,
+      reply: jsonString(json['reply']),
+      status: InquiryStatus.fromApi(jsonString(json['status'])),
+      createdAt: tryParseServerTimestamp(jsonString(json['created_at'])) ?? DateTime.now(),
+      repliedAt: tryParseServerTimestamp(jsonString(json['replied_at'])),
     );
   }
 
-  // A field of an unexpected type reads as missing instead of failing the
-  // whole list: one odd row must not hide every conversation.
-  static Map<String, dynamic>? _map(Object? value) =>
-      value is Map ? Map<String, dynamic>.from(value) : null;
-
-  static int? _int(Object? value) =>
-      value is num ? value.toInt() : int.tryParse(value?.toString() ?? '');
-
-  static String? _string(Object? value) => value is String ? value : null;
 
   /// `last_message` may be the message text or the message object.
   static String? _lastMessageText(Object? value) {
