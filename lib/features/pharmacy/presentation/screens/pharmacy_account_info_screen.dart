@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -23,9 +24,8 @@ import '../widgets/working_hours_dialog.dart';
 /// Expects the shell's [PharmacyProfileCubit] above it. The edits live in that
 /// shared cubit until saved, so leaving the screen discards them.
 ///
-/// The phone number and password have no edit flow yet — the number is what
-/// the pharmacy's account is known by, and there is no password endpoint — so
-/// their chips show "قريباً".
+/// The phone number is edited in place and saved with the rest of the profile;
+/// the password opens its own sheet and is sent right away.
 class PharmacyAccountInfoScreen extends StatefulWidget {
   const PharmacyAccountInfoScreen({super.key});
 
@@ -38,6 +38,9 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
   late final TextEditingController _nameController;
   final FocusNode _nameFocus = FocusNode();
   bool _editingName = false;
+  late final TextEditingController _phoneController;
+  final FocusNode _phoneFocus = FocusNode();
+  bool _editingPhone = false;
 
   @override
   void initState() {
@@ -46,16 +49,24 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
     _nameController = TextEditingController(
       text: state is PharmacyProfileLoaded ? state.name : '',
     );
+    _phoneController = TextEditingController(
+      text: state is PharmacyProfileLoaded ? state.phone : '',
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _nameFocus.dispose();
+    _phoneController.dispose();
+    _phoneFocus.dispose();
     super.dispose();
   }
 
-  void _comingSoon() => AppSnackbar.show(context, 'قريباً');
+  void _editPhone() {
+    setState(() => _editingPhone = true);
+    _phoneFocus.requestFocus();
+  }
 
   void _editName() {
     setState(() => _editingName = true);
@@ -189,13 +200,40 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
           SizedBox(height: 24.h),
           _FieldLabel('رقم الهاتف'),
           ProfileFieldRow(
-            onEditTap: _comingSoon,
-            child: Text(
-              state.profile.phone,
-              textAlign: TextAlign.right,
-              style: AppTextStyles.profileFieldValue,
-            ),
+            onEditTap: _editPhone,
+            child: _editingPhone
+                ? TextField(
+                    controller: _phoneController,
+                    focusNode: _phoneFocus,
+                    keyboardType: TextInputType.phone,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.ltr,
+                    onChanged: cubit.phoneChanged,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[+\d]')),
+                    ],
+                    style: AppTextStyles.profileFieldValue,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  )
+                : Text(
+                    state.phone,
+                    textAlign: TextAlign.right,
+                    style: AppTextStyles.profileFieldValue,
+                  ),
           ),
+          if (_editingPhone && !state.hasValidPhone)
+            Padding(
+              padding: EdgeInsets.only(top: 8.h),
+              child: Text(
+                'أدخل رقم جوال صحيح',
+                textAlign: TextAlign.right,
+                style: AppTextStyles.mutedCaption.copyWith(color: AppColors.error),
+              ),
+            ),
           SizedBox(height: 24.h),
           _FieldLabel('العنوان'),
           ProfileFieldRow(

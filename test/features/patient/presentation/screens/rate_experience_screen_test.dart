@@ -81,7 +81,7 @@ void main() {
     );
   }
 
-  testWidgets('shows the header with the pharmacy name and both rating cards', (tester) async {
+  testWidgets('shows the header with the pharmacy name and only the pharmacy card', (tester) async {
     await setPhoneViewport(tester);
 
     await tester.pumpWidget(buildTestableScreen());
@@ -89,20 +89,18 @@ void main() {
 
     expect(find.text('قيم تجربتك معنا'), findsOneWidget);
     expect(find.textContaining('صيدلية النور'), findsOneWidget);
-    expect(find.text('تقييم التطبيق'), findsOneWidget);
+    expect(find.text('تقييم التطبيق'), findsNothing);
     expect(find.text('تقييم الصيدلية'), findsOneWidget);
-    expect(find.text('اضغط على نجمة لتقييم'), findsNWidgets(2));
+    expect(find.text('اضغط على نجمة لتقييم'), findsOneWidget);
   });
 
-  testWidgets('tapping the 1st star on the app card shows the "سيء" label', (tester) async {
+  testWidgets('tapping the 1st star shows the "سيء" label', (tester) async {
     await setPhoneViewport(tester);
 
     await tester.pumpWidget(buildTestableScreen());
     await tester.pumpAndSettle();
-    // The app-rating card is the first StarRating in the tree; its first
-    // star is its first GestureDetector (the header's own back button has
-    // its own GestureDetector too, so a bare `.first` over the whole tree
-    // would hit that instead).
+    // The header's own back button has a GestureDetector too, so look inside
+    // the StarRating rather than over the whole tree.
     await tester.tap(
       find
           .descendant(of: find.byType(StarRating).first, matching: find.byType(GestureDetector))
@@ -121,6 +119,6 @@ void main() {
     await tester.tap(find.text('إرسال التقييم'));
     await tester.pumpAndSettle();
 
-    expect(find.text('يرجى اختيار تقييم واحد على الأقل'), findsOneWidget);
+    expect(find.text('يرجى اختيار تقييم للصيدلية'), findsOneWidget);
   });
 }

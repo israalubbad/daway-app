@@ -21,6 +21,7 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
   final PharmacyProfile profile;
   final bool isEditing;
   final String name;
+  final String phone;
   final String? logoLocalPath;
   final String? logoUrl;
   final bool isUploadingLogo;
@@ -36,6 +37,7 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
     required this.profile,
     this.isEditing = false,
     required this.name,
+    required this.phone,
     this.logoLocalPath,
     this.logoUrl,
     this.isUploadingLogo = false,
@@ -52,6 +54,7 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
     return PharmacyProfileLoaded(
       profile: profile,
       name: profile.name,
+      phone: profile.phone,
       logoUrl: profile.logoUrl,
       latitude: profile.latitude,
       longitude: profile.longitude,
@@ -71,6 +74,7 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
   /// something to save.
   bool get hasChanges {
     if (name.trim() != profile.name) return true;
+    if (phone.trim() != profile.phone) return true;
     if (logoUrl != profile.logoUrl) return true;
     if (latitude != profile.latitude || longitude != profile.longitude) {
       return true;
@@ -88,11 +92,19 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
     return false;
   }
 
-  bool get canSave => name.trim().isNotEmpty && hasLocation && !isUploadingLogo;
+  /// A phone number is digits with an optional leading "+", 9 to 15 of them;
+  /// the saved one is always accepted so editing something else still saves.
+  bool get hasValidPhone =>
+      phone.trim() == profile.phone ||
+      RegExp(r'^\+?\d{9,15}$').hasMatch(phone.trim());
+
+  bool get canSave =>
+      name.trim().isNotEmpty && hasValidPhone && hasLocation && !isUploadingLogo;
 
   PharmacyProfileLoaded copyWith({
     bool? isEditing,
     String? name,
+    String? phone,
     String? logoLocalPath,
     String? logoUrl,
     bool? isUploadingLogo,
@@ -110,6 +122,7 @@ class PharmacyProfileLoaded extends PharmacyProfileState {
       profile: profile,
       isEditing: isEditing ?? this.isEditing,
       name: name ?? this.name,
+      phone: phone ?? this.phone,
       logoLocalPath: logoLocalPath ?? this.logoLocalPath,
       logoUrl: logoUrl ?? this.logoUrl,
       isUploadingLogo: isUploadingLogo ?? this.isUploadingLogo,

@@ -2,43 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/profile_load_error.dart';
+import '../../../patient/presentation/widgets/patient_sub_screen_header.dart';
 import '../cubit/pharmacy_ratings_cubit.dart';
 import '../cubit/pharmacy_ratings_state.dart';
-import '../helpers/notifications_navigation.dart';
-import '../widgets/pharmacy_side_menu.dart';
 import '../widgets/rating_card.dart';
-import '../widgets/ratings_summary_card.dart';
 
+/// "التقييمات": what patients wrote about the pharmacy, newest first, straight
+/// under the title.
 class PharmacyRatingsScreen extends StatelessWidget {
   const PharmacyRatingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        title: Text(
-          'التقييمات والمراجعات',
-          style: AppTextStyles.screenTitle.copyWith(
-            color: AppColors.mainTeal,
-            fontSize: 20.sp,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: AppColors.mainTeal),
-            onPressed: () => openNotifications(context),
-          ),
-        ],
-      ),
-      drawer: const PharmacySideMenu(),
       body: SafeArea(
         child: BlocBuilder<PharmacyRatingsCubit, PharmacyRatingsState>(
           builder: (context, state) {
@@ -50,7 +28,7 @@ class PharmacyRatingsScreen extends StatelessWidget {
                 message: message,
                 onRetry: () => context.read<PharmacyRatingsCubit>().load(),
               ),
-              PharmacyRatingsLoaded() => _buildLoaded(context, state),
+              PharmacyRatingsLoaded() => _buildLoaded(state),
             };
           },
         ),
@@ -58,51 +36,35 @@ class PharmacyRatingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoaded(BuildContext context, PharmacyRatingsLoaded state) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 12.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'آراء عملائنا تساعدنا على تقديم أفضل خدمة',
-                style: AppTextStyles.cardDescription,
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(height: 16.h),
-              RatingsSummaryCard(
-                averageRating: state.averageRating,
-                totalCount: state.totalCount,
-                starCounts: state.starCounts,
-              ),
-              SizedBox(height: 20.h),
-              Text(
-                'أحدث المراجعات',
-                style: AppTextStyles.cardTitle.copyWith(fontSize: 16.sp),
-                textAlign: TextAlign.right,
-              ),
-            ],
+  Widget _buildLoaded(PharmacyRatingsLoaded state) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const PatientSubScreenHeader(
+            title: 'التقييمات',
+            description: 'آراء عملائك في صيدليتك',
           ),
-        ),
-        Expanded(
-          child: state.ratings.isEmpty
-              ? Center(
-                  child: Text(
-                    'لا توجد مراجعات بعد',
-                    style: AppTextStyles.cardDescription,
+          SizedBox(height: 24.h),
+          Expanded(
+            child: state.ratings.isEmpty
+                ? Center(
+                    child: Text(
+                      'لا توجد مراجعات بعد',
+                      style: AppTextStyles.cardDescription,
+                    ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.only(bottom: 24.h),
+                    itemCount: state.ratings.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    itemBuilder: (context, index) =>
+                        RatingCard(rating: state.ratings[index]),
                   ),
-                )
-              : ListView.separated(
-                  padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 24.h),
-                  itemCount: state.ratings.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) =>
-                      RatingCard(rating: state.ratings[index]),
-                ),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

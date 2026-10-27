@@ -71,17 +71,6 @@ void main() {
     expect(cubit.state.submitted, isFalse);
   });
 
-  test('rating only the app (no pharmacy stars) submits nothing to the backend', () async {
-    final cubit = buildCubit();
-    addTearDown(cubit.close);
-
-    cubit.appRatingChanged(4);
-    await cubit.submit();
-
-    expect(repository.lastStars, isNull);
-    expect(cubit.state.submitted, isTrue);
-  });
-
   test('rating the pharmacy sends its stars and trimmed notes', () async {
     final cubit = buildCubit();
     addTearDown(cubit.close);

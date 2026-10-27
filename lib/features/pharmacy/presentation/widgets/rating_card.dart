@@ -1,61 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
+import '../../../../core/theming/app_fonts.dart';
 import '../../../../core/theming/app_text_styles.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/initials_avatar.dart';
-import '../../../../core/widgets/star_rating.dart';
 import '../../domain/entities/rating.dart';
 
+/// One review: the patient's name and star value on the first line, the
+/// comment under them — a 1px #DCE6E9 card, radius 8, padding 12.
 class RatingCard extends StatelessWidget {
   final Rating rating;
 
   const RatingCard({super.key, required this.rating});
 
+  static const Color _badgeColor = Color(0xFFCAC842);
+
   @override
   Widget build(BuildContext context) {
     final comment = rating.comment;
-    return AppCard(
-      padding: EdgeInsets.all(14.r),
+    return Container(
+      padding: EdgeInsets.all(12.r),
+      constraints: BoxConstraints(minHeight: 106.h),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InitialsAvatar(name: rating.patientName),
-              SizedBox(width: 10.w),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      rating.patientName,
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.personName,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.only(top: 4.h, start: 8.w),
+                  child: Text(
+                    rating.patientName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.start,
+                    style: AppFonts.tajawal(
+                      TextStyle(
+                        fontSize: 14.sp,
+                        height: 21 / 14,
+                        color: AppColors.onboardingText,
+                      ),
+                      FontWeight.w700,
                     ),
-                    SizedBox(height: 4.h),
-                    StarRating(rating: rating.stars.toDouble(), size: 14),
-                  ],
+                  ),
                 ),
               ),
-              SizedBox(width: 8.w),
-              Text(
-                smartDate(rating.createdAt),
-                style: TextStyle(fontSize: 11.sp, color: AppColors.grey),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: _badgeColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                child: Text(
+                  rating.stars.toStringAsFixed(1),
+                  style: AppFonts.tajawal(
+                    TextStyle(
+                      fontSize: 12.sp,
+                      height: 16.5 / 12,
+                      color: _badgeColor,
+                    ),
+                    FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),
           if (comment != null && comment.isNotEmpty) ...[
-            SizedBox(height: 10.h),
+            SizedBox(height: 8.h),
             Text(
               comment,
-              textAlign: TextAlign.right,
-              style: AppTextStyles.cardDescription,
+              textAlign: TextAlign.start,
+              style: AppTextStyles.cardDescription.copyWith(
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
             ),
           ],
         ],

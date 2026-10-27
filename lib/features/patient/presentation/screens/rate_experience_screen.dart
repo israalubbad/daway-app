@@ -13,9 +13,9 @@ import '../cubit/rate_experience_cubit.dart';
 import '../cubit/rate_experience_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
-/// "قيم تجربتك معنا" — no exact spacing/typography was handed over for this
-/// one (just the design screenshots), so it follows this app's existing
-/// card/spacing conventions rather than measured values.
+/// "قيم تجربتك معنا" — rates the pharmacy only (stars + notes) and sends it to
+/// `POST /ratings`. No exact spacing/typography was handed over, so it follows
+/// this app's existing card/spacing conventions.
 class RateExperienceScreen extends StatelessWidget {
   final int pharmacyId;
   final String pharmacyName;
@@ -84,16 +84,9 @@ class _RateExperienceViewState extends State<_RateExperienceView> {
                 children: [
                   PatientSubScreenHeader(
                     title: 'قيم تجربتك معنا',
-                    description: 'شاركنا برأيك بالتطبيق وصيدلية ${widget.pharmacyName}',
+                    description: 'شاركنا برأيك بصيدلية ${widget.pharmacyName}',
                   ),
                   SizedBox(height: 24.h),
-                  _RatingCard(
-                    title: 'تقييم التطبيق',
-                    subtitle: 'كيف كانت تجربتك مع التطبيق؟',
-                    rating: state.appRating,
-                    onChanged: cubit.appRatingChanged,
-                  ),
-                  SizedBox(height: 16.h),
                   _RatingCard(
                     title: 'تقييم الصيدلية',
                     subtitle: 'كيف كانت تجربتك مع الصيدلية؟',

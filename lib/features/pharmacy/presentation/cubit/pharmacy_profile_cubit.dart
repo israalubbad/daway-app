@@ -60,6 +60,12 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
     emit(current.copyWith(name: value, clearSaveError: true));
   }
 
+  void phoneChanged(String value) {
+    final current = state;
+    if (current is! PharmacyProfileLoaded) return;
+    emit(current.copyWith(phone: value, clearSaveError: true));
+  }
+
   void locationSelected(PickedLocation location) {
     final current = state;
     if (current is! PharmacyProfileLoaded) return;
@@ -133,7 +139,7 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
     final updated = PharmacyProfile(
       pharmacyId: current.profile.pharmacyId,
       name: current.name.trim(),
-      phone: current.profile.phone,
+      phone: current.phone.trim(),
       logoUrl: current.logoUrl,
       latitude: current.latitude,
       longitude: current.longitude,
