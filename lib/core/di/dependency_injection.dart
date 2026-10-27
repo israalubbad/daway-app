@@ -616,7 +616,7 @@ Future<void> setupGetIt() async {
   );
   getIt.registerFactory(() => PharmacyMedicinesCubit(getIt(), getIt(), getIt()));
   getIt.registerFactory(
-    () => AddMedicineCubit(getIt(), getIt(), getIt(), getIt()),
+    () => AddMedicineCubit(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerFactoryParam<EditMedicineCubit, Medicine, void>(
     (medicine, _) => EditMedicineCubit(getIt(), medicine),

@@ -6,7 +6,11 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
+import 'package:daway_app/features/patient/domain/entities/category.dart';
+import 'package:daway_app/features/patient/domain/entities/category_medicines_result.dart';
 import 'package:daway_app/features/patient/domain/repositories/avatar_repository.dart';
+import 'package:daway_app/features/patient/domain/repositories/category_repository.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_categories_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/upload_avatar_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -44,6 +48,7 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
   String? lastTradeName;
   String? lastTradeNameAr;
   String? lastActiveIngredient;
+  int? lastCategoryId;
 
   /// When set, searchCatalog() waits for this to complete instead of
   /// resolving immediately — lets a test pause mid-search to exercise races.
@@ -88,6 +93,7 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -96,6 +102,7 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
     lastTradeName = tradeName;
     lastTradeNameAr = tradeNameAr;
     lastActiveIngredient = activeIngredient;
+    lastCategoryId = categoryId;
     lastPrice = price;
     lastQuantity = quantity;
     lastIsAvailable = isAvailable;
@@ -159,373 +166,396 @@ class _FakeAvatarRepository implements AvatarRepository {
   }
 }
 
+
+const _categories = [
+  Category(id: 3, nameAr: 'مسكنات', slug: 'painkillers'),
+  Category(id: 4, nameAr: 'فيتامينات', slug: 'vitamins'),
+];
+
+class _FakeCategoryRepository implements CategoryRepository {
+  ApiResult<List<Category>> result = const Success(_categories);
+
+  @override
+  Future<ApiResult<List<Category>>> getCategories() async => result;
+
+  @override
+  Future<ApiResult<CategoryMedicinesResult>> getCategoryMedicines({
+    required String categorySlug,
+    String? subcategorySlug,
+    String? dosageForm,
+    String? query,
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ApiResult<List<String>>> getDosageForms() async {
+    throw UnimplementedError();
+  }
+}
+
 void main() {
   late _FakePharmacyMedicineRepository repository;
   late _FakeAvatarRepository imageRepository;
+  late _FakeCategoryRepository categoryRepository;
   late AddMedicineCubit cubit;
 
   setUp(() {
     repository = _FakePharmacyMedicineRepository();
     imageRepository = _FakeAvatarRepository();
+    categoryRepository = _FakeCategoryRepository();
     final sessionRepository = _FakeSessionRepository();
     cubit = AddMedicineCubit(
       SearchMedicineCatalogUseCase(repository, sessionRepository),
       AddPharmacyMedicineUseCase(repository, sessionRepository),
       AddPharmacyMedicineByNameUseCase(repository, sessionRepository),
       UploadAvatarUseCase(imageRepository),
+      GetCategoriesUseCase(categoryRepository),
     );
   });
 
   tearDown(() => cubit.close());
 
-  test('starts empty and not submittable', () {
+  void fillStock() {
+    cubit.quantityChanged('20');
+    cubit.priceChanged('25.00');
+  }
+
+  test('starts empty, adding by name, and not submittable', () {
     final formData = cubit.state.formData;
     expect(formData.selectedMedicine, isNull);
+    expect(formData.isManualEntry, isTrue);
     expect(formData.canSubmit, isFalse);
   });
 
-  test('typing a name debounces a catalog search', () async {
-    cubit.nameQueryChanged('pan');
+  group('categories', () {
+    test('loadCategories fills the list', () async {
+      await cubit.loadCategories();
 
-    await Future.delayed(const Duration(milliseconds: 400));
+      final formData = cubit.state.formData;
+      expect(formData.categories, _categories);
+      expect(formData.isLoadingCategories, isFalse);
+      expect(formData.categoriesError, isNull);
+    });
 
-    expect(cubit.state.formData.suggestions, [_catalogItem]);
+    test('a failed load surfaces the message and a retry clears it', () async {
+      categoryRepository.result = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+      await cubit.loadCategories();
+      expect(cubit.state.formData.categoriesError, 'تعذر الاتصال بالخادم');
+      expect(cubit.state.formData.categories, isEmpty);
+
+      categoryRepository.result = const Success(_categories);
+      await cubit.loadCategories();
+      expect(cubit.state.formData.categoriesError, isNull);
+      expect(cubit.state.formData.categories, _categories);
+    });
+
+    test('categorySelected stores the id', () {
+      cubit.categorySelected(4);
+
+      expect(cubit.state.formData.categoryId, 4);
+    });
   });
 
-  test('a single character does not trigger a search', () async {
-    cubit.nameQueryChanged('p');
+  group('search (the second page)', () {
+    test('search returns the catalog matches', () async {
+      await cubit.search('pan');
 
-    await Future.delayed(const Duration(milliseconds: 400));
+      final formData = cubit.state.formData;
+      expect(formData.suggestions, [_catalogItem]);
+      expect(formData.hasSearched, isTrue);
+      expect(formData.isSearching, isFalse);
+    });
 
-    expect(cubit.state.formData.suggestions, isEmpty);
+    test('a query shorter than two characters is refused, not searched', () async {
+      await cubit.search(' p ');
+
+      final formData = cubit.state.formData;
+      expect(formData.suggestions, isEmpty);
+      expect(formData.hasSearched, isFalse);
+      expect(formData.searchError, isNotNull);
+    });
+
+    test('a failed search surfaces the message instead of looking like no results', () async {
+      repository.searchResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+
+      await cubit.search('pan');
+
+      final formData = cubit.state.formData;
+      expect(formData.suggestions, isEmpty);
+      expect(formData.searchError, 'تعذر الاتصال بالخادم');
+    });
+
+    test('a new search clears the previous error', () async {
+      repository.searchResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+      await cubit.search('pan');
+      expect(cubit.state.formData.searchError, isNotNull);
+
+      repository.searchResult = const Success([_catalogItem]);
+      await cubit.search('pan');
+
+      expect(cubit.state.formData.searchError, isNull);
+    });
+
+    test('searchReset forgets the last results', () async {
+      await cubit.search('pan');
+
+      cubit.searchReset();
+
+      final formData = cubit.state.formData;
+      expect(formData.suggestions, isEmpty);
+      expect(formData.hasSearched, isFalse);
+    });
+
+    test('picking a medicine while a search is in flight discards its stale result', () async {
+      final gate = Completer<void>();
+      repository.searchGate = gate;
+
+      final search = cubit.search('pan');
+      cubit.medicineSelected(_catalogItem);
+      gate.complete();
+      await search;
+
+      final formData = cubit.state.formData;
+      expect(formData.selectedMedicine, _catalogItem);
+      expect(formData.suggestions, isEmpty);
+    });
+
+    test('a reset while a search is in flight discards its stale result', () async {
+      final gate = Completer<void>();
+      repository.searchGate = gate;
+
+      final search = cubit.search('pan');
+      cubit.searchReset();
+      gate.complete();
+      await search;
+
+      expect(cubit.state.formData.suggestions, isEmpty);
+      expect(cubit.state.formData.isSearching, isFalse);
+    });
   });
 
-  test('clearing the name query does not trigger a search', () async {
-    cubit.nameQueryChanged('');
+  group('picking from the catalog', () {
+    test('medicineSelected fills the form and clears the results', () async {
+      await cubit.search('pan');
 
-    await Future.delayed(const Duration(milliseconds: 400));
+      cubit.medicineSelected(_catalogItem);
 
-    expect(cubit.state.formData.suggestions, isEmpty);
-    expect(cubit.state.formData.isSearching, isFalse);
-  });
+      final formData = cubit.state.formData;
+      expect(formData.selectedMedicine, _catalogItem);
+      expect(formData.isManualEntry, isFalse);
+      expect(formData.nameQuery, 'Panadol');
+      expect(formData.activeIngredient, 'Paracetamol 500mg');
+      expect(formData.suggestions, isEmpty);
+    });
 
-  test('clearing the query while a search is in flight discards its stale result', () async {
-    final gate = Completer<void>();
-    repository.searchGate = gate;
+    test('selectionCleared empties what the pick filled and goes back to adding by name', () {
+      cubit.medicineSelected(_catalogItem);
 
-    cubit.nameQueryChanged('pan');
-    await Future.delayed(const Duration(milliseconds: 400)); // let the debounce fire
+      cubit.selectionCleared();
 
-    cubit.nameQueryChanged(''); // clear before the in-flight search resolves
-    gate.complete();
-    await Future.delayed(Duration.zero);
+      final formData = cubit.state.formData;
+      expect(formData.selectedMedicine, isNull);
+      expect(formData.isManualEntry, isTrue);
+      expect(formData.nameQuery, isEmpty);
+      expect(formData.activeIngredient, isEmpty);
+    });
 
-    final formData = cubit.state.formData;
-    expect(formData.suggestions, isEmpty);
-    expect(formData.isSearching, isFalse);
-    expect(formData.nameQuery, '');
-  });
+    test('a picked medicine needs no category to be submitted', () {
+      cubit.medicineSelected(_catalogItem);
+      expect(cubit.state.formData.canSubmit, isFalse);
 
-  test('selecting a medicine while a search is in flight discards its stale result', () async {
-    final gate = Completer<void>();
-    repository.searchGate = gate;
+      fillStock();
 
-    cubit.nameQueryChanged('pan');
-    await Future.delayed(const Duration(milliseconds: 400)); // let the debounce fire
+      expect(cubit.state.formData.canSubmit, isTrue);
+    });
 
-    cubit.medicineSelected(_catalogItem);
-    gate.complete();
-    await Future.delayed(Duration.zero);
+    test('canSubmit is false for a non-numeric or non-positive quantity', () {
+      cubit.medicineSelected(_catalogItem);
+      cubit.priceChanged('25.00');
 
-    final formData = cubit.state.formData;
-    expect(formData.selectedMedicine, _catalogItem);
-    expect(formData.suggestions, isEmpty);
-  });
+      cubit.quantityChanged('abc');
+      expect(cubit.state.formData.canSubmit, isFalse);
 
-  test('a failed search surfaces the failure message instead of looking like no results', () async {
-    repository.searchResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+      cubit.quantityChanged('0');
+      expect(cubit.state.formData.canSubmit, isFalse);
 
-    cubit.nameQueryChanged('pan');
-    await Future.delayed(const Duration(milliseconds: 400));
+      cubit.quantityChanged('20');
+      expect(cubit.state.formData.canSubmit, isTrue);
+    });
 
-    final formData = cubit.state.formData;
-    expect(formData.suggestions, isEmpty);
-    expect(formData.searchError, 'تعذر الاتصال بالخادم');
-  });
+    test('isAvailable defaults to true and is sent as entered', () async {
+      expect(cubit.state.formData.isAvailable, isTrue);
 
-  test('a new query clears a previous search error', () async {
-    repository.searchResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
-    cubit.nameQueryChanged('pan');
-    await Future.delayed(const Duration(milliseconds: 400));
-    expect(cubit.state.formData.searchError, isNotNull);
+      cubit.medicineSelected(_catalogItem);
+      fillStock();
+      cubit.isAvailableChanged(false);
 
-    repository.searchResult = const Success([_catalogItem]);
-    cubit.nameQueryChanged('ama');
-    await Future.delayed(const Duration(milliseconds: 400));
+      await cubit.save();
 
-    expect(cubit.state.formData.searchError, isNull);
-  });
+      expect(repository.lastIsAvailable, isFalse);
+    });
 
-  test('medicineSelected fills the form and clears suggestions', () async {
-    cubit.nameQueryChanged('pan');
-    await Future.delayed(const Duration(milliseconds: 400));
+    test('save sends medicine_id for a general-catalog selection', () async {
+      cubit.medicineSelected(_catalogItem); // type: 'medicine' (general catalog)
+      fillStock();
 
-    cubit.medicineSelected(_catalogItem);
+      await cubit.save();
 
-    final formData = cubit.state.formData;
-    expect(formData.selectedMedicine, _catalogItem);
-    expect(formData.nameQuery, 'Panadol');
-    expect(formData.suggestions, isEmpty);
-  });
+      expect(cubit.state, isA<AddMedicineSuccess>());
+      expect(repository.lastMedicineId, 5);
+      expect(repository.lastMohMedicineId, isNull);
+    });
 
-  test('activeIngredient auto-fills on selection but stays editable afterwards', () async {
-    cubit.medicineSelected(_catalogItem);
-    expect(cubit.state.formData.activeIngredient, 'Paracetamol 500mg');
+    test('save sends moh_medicine_id for a Ministry of Health selection', () async {
+      cubit.medicineSelected(_mohCatalogItem);
+      fillStock();
 
-    cubit.activeIngredientChanged('Something else entirely');
-    expect(cubit.state.formData.activeIngredient, 'Something else entirely');
-  });
+      await cubit.save();
 
-  test('activeIngredient resets when the name search restarts', () {
-    cubit.medicineSelected(_catalogItem);
-    expect(cubit.state.formData.activeIngredient, isNotEmpty);
+      expect(cubit.state, isA<AddMedicineSuccess>());
+      expect(repository.lastMedicineId, isNull);
+      expect(repository.lastMohMedicineId, 21);
+    });
 
-    cubit.nameQueryChanged('ama');
-    expect(cubit.state.formData.activeIngredient, isEmpty);
-  });
+    test('save sends the stock and the uploaded image url and emits success', () async {
+      cubit.medicineSelected(_catalogItem);
+      fillStock();
+      await cubit.imageSelected(File('medicine.jpg'));
 
-  test('isAvailable defaults to true and is sent as entered', () async {
-    expect(cubit.state.formData.isAvailable, isTrue);
+      await cubit.save();
 
-    cubit.medicineSelected(_catalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-    cubit.isAvailableChanged(false);
+      expect(cubit.state, isA<AddMedicineSuccess>());
+      expect(repository.lastPrice, 25.0);
+      expect(repository.lastQuantity, 20);
+      expect(repository.lastImageUrl, 'https://res.cloudinary.com/demo/image/upload/a.jpg');
+    });
 
-    await cubit.save();
+    test('save works without a photo — image is optional', () async {
+      cubit.medicineSelected(_catalogItem);
+      fillStock();
 
-    expect(repository.lastIsAvailable, isFalse);
-  });
+      await cubit.save();
 
-  test('canSubmit requires a selected medicine, positive quantity and price', () {
-    cubit.medicineSelected(_catalogItem);
-    expect(cubit.state.formData.canSubmit, isFalse);
+      expect(cubit.state, isA<AddMedicineSuccess>());
+      expect(repository.lastImageUrl, isNull);
+    });
 
-    cubit.quantityChanged('20');
-    expect(cubit.state.formData.canSubmit, isFalse);
+    test('save surfaces a repository failure', () async {
+      cubit.medicineSelected(_catalogItem);
+      fillStock();
+      repository.addResult = const ApiError(ApiFailure(message: 'فشل الحفظ'));
 
-    cubit.priceChanged('25.00');
-    expect(cubit.state.formData.canSubmit, isTrue);
-  });
+      await cubit.save();
 
-  test('canSubmit is false for a non-numeric or non-positive quantity', () {
-    cubit.medicineSelected(_catalogItem);
-    cubit.priceChanged('25.00');
-
-    cubit.quantityChanged('abc');
-    expect(cubit.state.formData.canSubmit, isFalse);
-
-    cubit.quantityChanged('0');
-    expect(cubit.state.formData.canSubmit, isFalse);
-
-    cubit.quantityChanged('20');
-    expect(cubit.state.formData.canSubmit, isTrue);
-  });
-
-  test('imageSelected uploads to Cloudinary and stores the resulting url', () async {
-    await cubit.imageSelected(File('medicine.jpg'));
-
-    final formData = cubit.state.formData;
-    expect(formData.imageUrl, 'https://res.cloudinary.com/demo/image/upload/a.jpg');
-    expect(formData.isUploadingImage, isFalse);
-  });
-
-  test('imageSelected surfaces an upload failure', () async {
-    imageRepository.result = const ApiError(UnknownFailure('تعذر رفع الصورة'));
-
-    await cubit.imageSelected(File('medicine.jpg'));
-
-    final formData = cubit.state.formData;
-    expect(formData.imageUrl, isNull);
-    expect(formData.imageError, 'تعذر رفع الصورة');
-  });
-
-  test('canSubmit is false while an image upload is in flight', () async {
-    final gate = Completer<void>();
-    imageRepository.uploadGate = gate;
-    cubit.medicineSelected(_catalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-
-    final uploadFuture = cubit.imageSelected(File('medicine.jpg'));
-    expect(cubit.state.formData.canSubmit, isFalse);
-
-    gate.complete();
-    await uploadFuture;
-    expect(cubit.state.formData.canSubmit, isTrue);
-  });
-
-  test('picking a second image while the first upload is in flight keeps the newer result', () async {
-    final firstGate = Completer<void>();
-    imageRepository.uploadGate = firstGate;
-    final firstUpload = cubit.imageSelected(File('first.jpg'));
-
-    // Second pick starts its own (already-resolved) upload before the first
-    // one's gate opens.
-    imageRepository
-      ..uploadGate = null
-      ..result = const Success('https://res.cloudinary.com/demo/image/upload/second.jpg');
-    await cubit.imageSelected(File('second.jpg'));
-
-    firstGate.complete();
-    await firstUpload;
-
-    expect(cubit.state.formData.imageUrl, 'https://res.cloudinary.com/demo/image/upload/second.jpg');
-  });
-
-  test('a failed re-upload does not leave the previous photo silently attached', () async {
-    await cubit.imageSelected(File('first.jpg'));
-    expect(cubit.state.formData.imageUrl, isNotNull);
-
-    imageRepository.result = const ApiError(UnknownFailure('تعذر رفع الصورة'));
-    await cubit.imageSelected(File('second.jpg'));
-
-    final formData = cubit.state.formData;
-    expect(formData.imageLocalPath, 'second.jpg');
-    expect(formData.imageUrl, isNull);
-    expect(formData.imageError, 'تعذر رفع الصورة');
-  });
-
-  test('save sends medicine_id for a general-catalog selection', () async {
-    cubit.medicineSelected(_catalogItem); // type: 'medicine' (general catalog)
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-
-    await cubit.save();
-
-    expect(cubit.state, isA<AddMedicineSuccess>());
-    expect(repository.lastMedicineId, 5);
-    expect(repository.lastMohMedicineId, isNull);
-  });
-
-  test('save sends moh_medicine_id for a Ministry of Health selection', () async {
-    cubit.medicineSelected(_mohCatalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-
-    await cubit.save();
-
-    expect(cubit.state, isA<AddMedicineSuccess>());
-    expect(repository.lastMedicineId, isNull);
-    expect(repository.lastMohMedicineId, 21);
+      final state = cubit.state as AddMedicineFailure;
+      expect(state.message, 'فشل الحفظ');
+    });
   });
 
   test('save does nothing when the form is incomplete', () async {
     await cubit.save();
 
     expect(repository.lastMedicineId, isNull);
+    expect(repository.lastTradeName, isNull);
     expect(cubit.state, isA<AddMedicineEditing>());
   });
 
-  test('save sends the form data (including the uploaded image url) and emits success', () async {
-    cubit.medicineSelected(_catalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-    await cubit.imageSelected(File('medicine.jpg'));
-
-    await cubit.save();
-
-    expect(cubit.state, isA<AddMedicineSuccess>());
-    expect(repository.lastMedicineId, 5);
-    expect(repository.lastPrice, 25.0);
-    expect(repository.lastQuantity, 20);
-    expect(repository.lastImageUrl, 'https://res.cloudinary.com/demo/image/upload/a.jpg');
-  });
-
-  test('save works without a photo — image is optional', () async {
-    cubit.medicineSelected(_catalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-
-    await cubit.save();
-
-    expect(cubit.state, isA<AddMedicineSuccess>());
-    expect(repository.lastImageUrl, isNull);
-  });
-
-  test('save surfaces a repository failure', () async {
-    cubit.medicineSelected(_catalogItem);
-    cubit.quantityChanged('20');
-    cubit.priceChanged('25.00');
-    repository.addResult = const ApiError(ApiFailure(message: 'فشل الحفظ'));
-
-    await cubit.save();
-
-    final state = cubit.state as AddMedicineFailure;
-    expect(state.message, 'فشل الحفظ');
-  });
-
-  group('manual entry (POST /pharmacy/medicines/by-name)', () {
-    test('manualEntryToggled switches off the catalog requirement', () {
-      cubit.nameQueryChanged('Some Unlisted Drug');
-      cubit.manualEntryToggled();
+  group('image', () {
+    test('imageSelected uploads to Cloudinary and stores the resulting url', () async {
+      await cubit.imageSelected(File('medicine.jpg'));
 
       final formData = cubit.state.formData;
-      expect(formData.isManualEntry, isTrue);
-      expect(formData.selectedMedicine, isNull);
-      // Entering manual entry keeps whatever was already typed as the name.
-      expect(formData.nameQuery, 'Some Unlisted Drug');
+      expect(formData.imageUrl, 'https://res.cloudinary.com/demo/image/upload/a.jpg');
+      expect(formData.isUploadingImage, isFalse);
     });
 
-    test('typing while in manual entry does not trigger a catalog search', () async {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Some Unlisted Drug');
+    test('imageSelected surfaces an upload failure', () async {
+      imageRepository.result = const ApiError(UnknownFailure('تعذر رفع الصورة'));
 
-      await Future.delayed(const Duration(milliseconds: 400));
-
-      expect(cubit.state.formData.suggestions, isEmpty);
-      expect(cubit.state.formData.isSearching, isFalse);
-    });
-
-    test('toggling manual entry off clears the typed name/name_ar/active ingredient', () {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Some Unlisted Drug');
-      cubit.nameArChanged('اسم عربي');
-      cubit.activeIngredientChanged('Some Active Ingredient');
-
-      cubit.manualEntryToggled();
+      await cubit.imageSelected(File('medicine.jpg'));
 
       final formData = cubit.state.formData;
-      expect(formData.isManualEntry, isFalse);
-      expect(formData.nameQuery, isEmpty);
-      expect(formData.nameAr, isEmpty);
-      expect(formData.activeIngredient, isEmpty);
+      expect(formData.imageUrl, isNull);
+      expect(formData.imageError, 'تعذر رفع الصورة');
     });
 
+    test('canSubmit is false while an image upload is in flight', () async {
+      final gate = Completer<void>();
+      imageRepository.uploadGate = gate;
+      cubit.medicineSelected(_catalogItem);
+      fillStock();
+
+      final uploadFuture = cubit.imageSelected(File('medicine.jpg'));
+      expect(cubit.state.formData.canSubmit, isFalse);
+
+      gate.complete();
+      await uploadFuture;
+      expect(cubit.state.formData.canSubmit, isTrue);
+    });
+
+    test('picking a second image while the first upload is in flight keeps the newer result',
+        () async {
+      final firstGate = Completer<void>();
+      imageRepository.uploadGate = firstGate;
+      final firstUpload = cubit.imageSelected(File('first.jpg'));
+
+      // Second pick starts its own (already-resolved) upload before the first
+      // one's gate opens.
+      imageRepository
+        ..uploadGate = null
+        ..result = const Success('https://res.cloudinary.com/demo/image/upload/second.jpg');
+      await cubit.imageSelected(File('second.jpg'));
+
+      firstGate.complete();
+      await firstUpload;
+
+      expect(
+        cubit.state.formData.imageUrl,
+        'https://res.cloudinary.com/demo/image/upload/second.jpg',
+      );
+    });
+
+    test('a failed re-upload does not leave the previous photo silently attached', () async {
+      await cubit.imageSelected(File('first.jpg'));
+      expect(cubit.state.formData.imageUrl, isNotNull);
+
+      imageRepository.result = const ApiError(UnknownFailure('تعذر رفع الصورة'));
+      await cubit.imageSelected(File('second.jpg'));
+
+      final formData = cubit.state.formData;
+      expect(formData.imageLocalPath, 'second.jpg');
+      expect(formData.imageUrl, isNull);
+      expect(formData.imageError, 'تعذر رفع الصورة');
+    });
+  });
+
+  group('adding by name (POST /pharmacy/medicines/by-name)', () {
     test('canSubmit rejects an Arabic trade name (backend requires English)', () {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('بانادول');
-      cubit.quantityChanged('20');
-      cubit.priceChanged('25.00');
+      cubit.nameChanged('بانادول');
+      cubit.categorySelected(3);
+      fillStock();
 
       expect(cubit.state.formData.nameHasArabicChars, isTrue);
       expect(cubit.state.formData.canSubmit, isFalse);
     });
 
-    test('canSubmit only requires the English trade name, not name_ar or active ingredient', () {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Some Unlisted Drug');
-      cubit.quantityChanged('20');
-      cubit.priceChanged('25.00');
+    test('canSubmit needs the English name and a category, not name_ar or the ingredient', () {
+      cubit.nameChanged('Some Unlisted Drug');
+      fillStock();
+      expect(cubit.state.formData.canSubmit, isFalse);
 
+      cubit.categorySelected(3);
       expect(cubit.state.formData.canSubmit, isTrue);
     });
 
-    test('save calls addMedicineByName with trade_name/trade_name_ar/active_ingredient', () async {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Abod panadol');
+    test('save sends the names, the ingredient and the category', () async {
+      cubit.nameChanged('Abod panadol');
       cubit.nameArChanged('بانادول أبو');
       cubit.activeIngredientChanged('Paracetamol');
+      cubit.categorySelected(3);
       cubit.quantityChanged('40');
       cubit.priceChanged('12.5');
 
@@ -535,6 +565,7 @@ void main() {
       expect(repository.lastTradeName, 'Abod panadol');
       expect(repository.lastTradeNameAr, 'بانادول أبو');
       expect(repository.lastActiveIngredient, 'Paracetamol');
+      expect(repository.lastCategoryId, 3);
       expect(repository.lastQuantity, 40);
       expect(repository.lastPrice, 12.5);
       // Must not also hit the by-ID endpoint.
@@ -543,10 +574,9 @@ void main() {
     });
 
     test('save omits trade_name_ar/active_ingredient when left blank', () async {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Abod panadol');
-      cubit.quantityChanged('40');
-      cubit.priceChanged('12.5');
+      cubit.nameChanged('Abod panadol');
+      cubit.categorySelected(3);
+      fillStock();
 
       await cubit.save();
 
@@ -555,10 +585,9 @@ void main() {
     });
 
     test('save surfaces a by-name repository failure', () async {
-      cubit.manualEntryToggled();
-      cubit.nameQueryChanged('Abod panadol');
-      cubit.quantityChanged('40');
-      cubit.priceChanged('12.5');
+      cubit.nameChanged('Abod panadol');
+      cubit.categorySelected(3);
+      fillStock();
       repository.addByNameResult = const ApiError(ApiFailure(message: 'فشل الحفظ'));
 
       await cubit.save();
