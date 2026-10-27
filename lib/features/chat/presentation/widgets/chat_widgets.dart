@@ -50,7 +50,16 @@ class ChatMessagesList extends StatelessWidget {
   final List<ChatMessage> messages;
   final ScrollController controller;
 
-  const ChatMessagesList({super.key, required this.messages, required this.controller});
+  /// Something to show under a message's bubble (the assistant's results). A
+  /// message with no text and extras shows the extras alone.
+  final Widget? Function(ChatMessage message)? extrasFor;
+
+  const ChatMessagesList({
+    super.key,
+    required this.messages,
+    required this.controller,
+    this.extrasFor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +71,13 @@ class ChatMessagesList extends StatelessWidget {
         final message = messages[index];
         final previous = index == 0 ? null : messages[index - 1];
         final newDay = previous == null || !_sameDay(previous.createdAt, message.createdAt);
+        final extras = extrasFor?.call(message);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (newDay) _DayChip(date: message.createdAt),
-            ChatBubble(message: message),
+            if (message.text.isNotEmpty || extras == null) ChatBubble(message: message),
+            if (extras != null) ...[extras, SizedBox(height: 16.h)],
           ],
         );
       },
