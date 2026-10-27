@@ -7,6 +7,7 @@ import '../../domain/usecases/analyze_inventory_import_usecase.dart';
 import '../../domain/usecases/cancel_inventory_import_usecase.dart';
 import '../../domain/usecases/commit_inventory_import_usecase.dart';
 import '../../domain/usecases/download_inventory_import_template_usecase.dart';
+import '../../domain/usecases/export_current_inventory_usecase.dart';
 import 'pharmacy_stock_import_state.dart';
 
 class PharmacyStockImportCubit extends Cubit<PharmacyStockImportState> {
@@ -15,16 +16,21 @@ class PharmacyStockImportCubit extends Cubit<PharmacyStockImportState> {
   final CancelInventoryImportUseCase _cancelUseCase;
 
   final DownloadInventoryImportTemplateUseCase _downloadTemplateUseCase;
+  final ExportCurrentInventoryUseCase _exportCurrentUseCase;
 
   PharmacyStockImportCubit(
     this._analyzeUseCase,
     this._commitUseCase,
     this._cancelUseCase,
     this._downloadTemplateUseCase,
+    this._exportCurrentUseCase,
   ) : super(const StockImportIdle(null));
 
   /// The template's bytes, for the screen to hand to the system's save dialog.
   Future<ApiResult<Uint8List>> downloadTemplate() => _downloadTemplateUseCase();
+
+  /// The pharmacy's current stock as a spreadsheet, for the same save dialog.
+  Future<ApiResult<Uint8List>> exportCurrentInventory() => _exportCurrentUseCase();
 
   /// Picking (or replacing) a file. An analysis the previous file already has
   /// is dropped on the backend, best effort.

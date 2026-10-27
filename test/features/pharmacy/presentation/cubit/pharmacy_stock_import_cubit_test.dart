@@ -11,6 +11,9 @@ import 'package:daway_app/features/pharmacy/domain/usecases/analyze_inventory_im
 import 'package:daway_app/features/pharmacy/domain/usecases/cancel_inventory_import_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/commit_inventory_import_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/download_inventory_import_template_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_medicine_repository.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/export_current_inventory_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,6 +60,11 @@ class _FakeImportRepository implements PharmacyInventoryImportRepository {
   }
 }
 
+class _FakeMedicineRepository implements PharmacyMedicineRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
 class _FakeSessionRepository implements SessionRepository {
   @override
   Future<void> saveSession(UserSession session) async {}
@@ -81,6 +89,7 @@ void main() {
       CommitInventoryImportUseCase(repository, session),
       CancelInventoryImportUseCase(repository, session),
       DownloadInventoryImportTemplateUseCase(repository, session),
+      ExportCurrentInventoryUseCase(GetPharmacyMedicinesUseCase(_FakeMedicineRepository(), session)),
     );
   });
 

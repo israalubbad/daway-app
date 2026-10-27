@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../core/helpers/api_result.dart';
 import '../../../../core/theming/app_colors.dart';
+import '../../../../core/theming/app_fonts.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../../../core/widgets/app_snackbar.dart';
@@ -34,20 +37,24 @@ class PharmacyStockImportScreen extends StatelessWidget {
     cubit.fileSelected(PickedStockFile(path: path, name: picked.name, sizeBytes: size));
   }
 
-  Future<void> _downloadTemplate(BuildContext context) async {
-    final cubit = context.read<PharmacyStockImportCubit>();
-    final result = await cubit.downloadTemplate();
+  /// Fetches a spreadsheet and hands it to the system's save dialog.
+  Future<void> _saveSpreadsheet(
+    BuildContext context, {
+    required Future<ApiResult<Uint8List>> Function() fetch,
+    required String fileName,
+  }) async {
+    final result = await fetch();
     if (!context.mounted) return;
 
     switch (result) {
       case Success(:final data):
         final saved = await FilePicker.saveFile(
-          dialogTitle: 'حفظ قالب Excel',
-          fileName: 'products-template.xlsx',
+          dialogTitle: 'حفظ ملف Excel',
+          fileName: fileName,
           bytes: data,
         );
         if (saved != null && context.mounted) {
-          AppSnackbar.show(context, 'تم حفظ القالب');
+          AppSnackbar.show(context, 'تم حفظ الملف');
         }
       case ApiError(:final failure):
         AppSnackbar.show(context, failure.message);
@@ -69,8 +76,17 @@ class PharmacyStockImportScreen extends StatelessWidget {
     }
   }
 
+  static String _todayStamp() {
+    final now = DateTime.now();
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '${now.year}$month$day';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<PharmacyStockImportCubit>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -106,12 +122,52 @@ class PharmacyStockImportScreen extends StatelessWidget {
                           onPick: () => _pickFile(context),
                           isBusy: state is StockImportAnalyzing || state is StockImportUpdating,
                         ),
-                        SizedBox(height: 16.h),
-                        _TemplateCard(onTap: () => _downloadTemplate(context)),
+                        SizedBox(height: 24.h),
+                        _DownloadCard(
+                          title: 'تنزيل قالب Excel',
+                          subtitle: 'استخدم القالب لإضافة منتجاتك بالصيغة المطلوبة.',
+                          leading: _DownloadCardIcon(
+                            background: AppColors.accountIconBg,
+                            size: 40,
+                            child: SvgPicture.asset(
+                              'assets/icons/file_text_blue_icon.svg',
+                              width: 24.w,
+                              height: 24.w,
+                            ),
+                          ),
+                          onTap: () => _saveSpreadsheet(
+                            context,
+                            fetch: cubit.downloadTemplate,
+                            fileName: 'products-template.xlsx',
+                          ),
+                        ),
+                        SizedBox(height: 24.h),
+                        Text('ملف المنتجات الحالي', style: AppTextStyles.pharmacySearchText),
+                        SizedBox(height: 12.h),
+                        _DownloadCard(
+                          title: 'inventory-current-${_todayStamp()}.xlsx',
+                          subtitle: 'كل منتجاتك الحالية مع الأسعار والكميات',
+                          ltrTitle: true,
+                          leading: _DownloadCardIcon(
+                            background: const Color(0xFFEBF8F2),
+                            size: 43,
+                            child: SvgPicture.asset(
+                              'assets/icons/excel_file_icon.svg',
+                              width: 26.w,
+                              height: 26.w,
+                            ),
+                          ),
+                          onTap: () => _saveSpreadsheet(
+                            context,
+                            fetch: cubit.exportCurrentInventory,
+                            fileName: 'inventory-current-${_todayStamp()}.xlsx',
+                          ),
+                        ),
                         if (state case StockImportAnalyzed(:final preview) ||
                             StockImportUpdating(:final preview)) ...[
-                          SizedBox(height: 24.h),
+                          SizedBox(height: 16.h),
                           _AnalysisCard(preview: preview),
+                          SizedBox(height: 16.h),
                         ],
                       ],
                     ),
@@ -153,7 +209,7 @@ class _UploadBox extends StatelessWidget {
     final file = this.file;
     return DashedBorderBox(
       color: AppColors.mainTeal,
-      backgroundColor: file == null ? AppColors.permissionIconBg : Colors.white,
+      backgroundColor: AppColors.permissionIconBg,
       radius: 8.r,
       dashLength: 8.w,
       gapLength: 8.w,
@@ -164,7 +220,15 @@ class _UploadBox extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _IconTile(
+            Container(
+              width: 52.w,
+              height: 52.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: const Color(0xFFB9DFED), width: 0.8),
+              ),
               child: SvgPicture.asset(
                 file == null
                     ? 'assets/icons/upload_icon.svg'
@@ -176,7 +240,7 @@ class _UploadBox extends StatelessWidget {
             SizedBox(height: 13.h),
             if (file == null) ...[
               Text(
-                'رفع ملف المنتجات',
+                'رفع ملف منتجاتك',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.pharmacyUploadTitle,
               ),
@@ -193,7 +257,7 @@ class _UploadBox extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.pharmacyUploadTitle.copyWith(fontSize: 15.sp),
+                  style: AppTextStyles.pharmacyUploadTitle,
                 ),
               ),
               Text(
@@ -203,9 +267,24 @@ class _UploadBox extends StatelessWidget {
               ),
             ],
             SizedBox(height: 14.h),
-            _OutlinedPill(
-              label: file == null ? 'اختيار ملف' : 'استبدال الملف',
+            GestureDetector(
               onTap: isBusy ? null : onPick,
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                constraints: BoxConstraints(minWidth: 142.w),
+                height: 43.h,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 18.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: AppColors.iconBlueBorder, width: 0.8),
+                ),
+                child: Text(
+                  file == null ? 'اختيار ملف' : 'استبدال الملف',
+                  style: AppTextStyles.pharmacyUploadButton,
+                ),
+              ),
             ),
             if (file != null) ...[
               SizedBox(height: 8.h),
@@ -227,112 +306,88 @@ class _UploadBox extends StatelessWidget {
   }
 }
 
-class _IconTile extends StatelessWidget {
-  final Widget child;
-
-  const _IconTile({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 52.w,
-      height: 52.w,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: AppColors.iconBlueBorder, width: 0.8),
-      ),
-      child: child,
-    );
-  }
-}
-
-class _OutlinedPill extends StatelessWidget {
-  final String label;
-  final VoidCallback? onTap;
-
-  const _OutlinedPill({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 142.w,
-        height: 44.h,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(color: AppColors.mainTeal),
-        ),
-        child: Text(label, style: AppTextStyles.pharmacyUploadButton),
-      ),
-    );
-  }
-}
-
-/// "تنزيل قالب Excel": saves the backend's template spreadsheet.
-class _TemplateCard extends StatelessWidget {
+/// A 392x75.6 outlined row: a [leading] tile, a title and a line under it, and
+/// a download button at the far end. The whole row saves its file when tapped.
+class _DownloadCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget leading;
+  final bool ltrTitle;
   final VoidCallback onTap;
 
-  const _TemplateCard({required this.onTap});
+  const _DownloadCard({
+    required this.title,
+    required this.subtitle,
+    required this.leading,
+    this.ltrTitle = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final titleText = Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.pharmacySearchText,
+    );
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8.r),
       child: Container(
-        padding: EdgeInsets.all(12.w),
+        constraints: BoxConstraints(minHeight: 75.6.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.cardBorder),
         ),
         child: Row(
           children: [
-            Container(
-              width: 40.w,
-              height: 40.w,
-              decoration: BoxDecoration(
-                color: AppColors.accountIconBg,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: SvgPicture.asset(
-                'assets/icons/file_text_blue_icon.svg',
-                width: 22.w,
-                height: 22.w,
-                fit: BoxFit.scaleDown,
-              ),
-            ),
+            leading,
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('تنزيل قالب Excel', style: AppTextStyles.pharmacySearchText),
+                  ltrTitle
+                      ? Directionality(textDirection: TextDirection.ltr, child: titleText)
+                      : titleText,
                   Text(
-                    'استخدم القالب لإضافة منتجاتك بالصيغة المطلوبة.',
+                    subtitle,
                     style: AppTextStyles.pharmacyUploadSubtitle.copyWith(fontSize: 11.sp),
                   ),
                 ],
               ),
             ),
             SizedBox(width: 12.w),
-            Container(
-              width: 40.w,
-              height: 40.w,
-              decoration: BoxDecoration(
-                color: AppColors.accountIconBg,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Icon(Icons.file_download_outlined, size: 22.sp, color: AppColors.mainTeal),
+            _DownloadCardIcon(
+              background: AppColors.accountIconBg,
+              size: 40,
+              child: SvgPicture.asset('assets/icons/download_icon.svg', width: 24.w, height: 24.w),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DownloadCardIcon extends StatelessWidget {
+  final Color background;
+  final double size;
+  final Widget child;
+
+  const _DownloadCardIcon({required this.background, required this.size, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size.w,
+      height: size.w,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(8.r)),
+      child: child,
     );
   }
 }
@@ -348,9 +403,9 @@ class _AnalysisCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FCFB),
+        color: const Color(0xFFFBFEFD),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xFFCFE9E1)),
+        border: Border.all(color: const Color(0xFFBFE6D6), width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -360,9 +415,9 @@ class _AnalysisCard extends StatelessWidget {
               Container(
                 width: 40.w,
                 height: 40.w,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFE6F5EF),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEBF8F2),
+                  borderRadius: BorderRadius.circular(19.r),
                 ),
                 child: Icon(Icons.check, size: 22.sp, color: AppColors.productAvailableText),
               ),
@@ -371,7 +426,17 @@ class _AnalysisCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('تم تحليل الملف بنجاح', style: AppTextStyles.pharmacyUploadTitle),
+                    Text(
+                      'تم تحليل الملف بنجاح',
+                      style: AppFonts.tajawal(
+                        TextStyle(
+                          fontSize: 15.sp,
+                          height: 22.5 / 15,
+                          color: AppColors.onboardingText,
+                        ),
+                        FontWeight.w700,
+                      ),
+                    ),
                     Text(
                       'تم العثور على ${preview.totalCount} منتجًا ويمكنك تحديث قائمة منتجاتك.',
                       style: AppTextStyles.pharmacyUploadSubtitle.copyWith(fontSize: 11.sp),
@@ -381,7 +446,7 @@ class _AnalysisCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
           Row(
             children: [
               Expanded(child: _StatTile(value: preview.totalCount, label: 'عدد المنتجات')),
@@ -412,18 +477,21 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(color: AppColors.cardBorder, width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '$value',
-            style: AppTextStyles.pharmacyUploadTitle.copyWith(color: AppColors.mainTeal),
+            style: AppFonts.tajawal(
+              TextStyle(fontSize: 17.sp, height: 25.5 / 17, color: AppColors.mainTeal),
+              FontWeight.w700,
+            ),
           ),
           Text(label, style: AppTextStyles.pharmacyUploadSubtitle.copyWith(fontSize: 11.sp)),
         ],
