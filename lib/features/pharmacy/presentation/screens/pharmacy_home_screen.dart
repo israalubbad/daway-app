@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import '../../../auth/presentation/cubit/logout_state.dart';
@@ -94,7 +93,12 @@ class _HomeContent extends StatelessWidget {
 
   const _HomeContent({required this.stats, required this.orders});
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  Future<void> _openStockImport(BuildContext context) async {
+    final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
+    if (updated == true && context.mounted) {
+      context.read<PharmacyDashboardCubit>().refresh();
+    }
+  }
 
   void _goToTab(BuildContext context, PharmacyDashboardTab tab) {
     PharmacyDashboardTabScope.switchToTabOrShowComingSoon(context, tab);
@@ -106,8 +110,7 @@ class _HomeContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!stats.hasMedicines) ...[
-          // Importing a file has no endpoint yet.
-          AddMedicinesFileCard(onPickFile: () => _comingSoon(context)),
+          AddMedicinesFileCard(onPickFile: () => _openStockImport(context)),
           SizedBox(height: 16.h),
         ],
         PharmacySummaryCards(

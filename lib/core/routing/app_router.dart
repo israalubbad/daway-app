@@ -41,6 +41,8 @@ import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_cubit.d
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/notifications_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_ratings_cubit.dart';
+import '../../features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
+import '../../features/pharmacy/presentation/screens/pharmacy_stock_import_screen.dart';
 import '../constants/app_constants.dart';
 import '../di/dependency_injection.dart';
 import 'routes.dart';
@@ -153,6 +155,14 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (context) => getIt<PharmacyRatingsCubit>(),
             child: const PharmacyRatingsScreen(),
+          ),
+        );
+
+      case Routes.pharmacyStockImportScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => getIt<PharmacyStockImportCubit>(),
+            child: const PharmacyStockImportScreen(),
           ),
         );
 

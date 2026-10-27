@@ -121,6 +121,13 @@ class _Controls extends StatelessWidget {
     }
   }
 
+  Future<void> _openStockImport(BuildContext context) async {
+    final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
+    if (updated == true && context.mounted) {
+      context.read<PharmacyMedicinesCubit>().refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<PharmacyMedicinesCubit>();
@@ -164,11 +171,7 @@ class _Controls extends StatelessWidget {
             Expanded(
               child: ProductActionCard(
                 label: 'تحديث المنتجات',
-                // Updating stock in bulk is what the inventory page does.
-                onTap: () => PharmacyDashboardTabScope.switchToTabOrShowComingSoon(
-                  context,
-                  PharmacyDashboardTab.inventory,
-                ),
+                onTap: () => _openStockImport(context),
               ),
             ),
           ],

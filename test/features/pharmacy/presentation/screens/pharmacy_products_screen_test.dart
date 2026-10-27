@@ -427,12 +427,21 @@ void main() {
       expect(switchedTabs, [PharmacyDashboardTab.home]);
     });
 
-    testWidgets('تحديث المنتجات goes to the inventory page', (tester) async {
+    testWidgets('تحديث المنتجات opens the stock import page, and an update there reloads the list', (
+      tester,
+    ) async {
       await pumpScreen(tester);
+      routeResult = true;
+      final fetchesBefore = medicineRepository.fetches;
 
       await tester.tap(find.text('تحديث المنتجات'));
+      await tester.pumpAndSettle();
+      expect(pushedRoutes.last.name, Routes.pharmacyStockImportScreen);
 
-      expect(switchedTabs, [PharmacyDashboardTab.inventory]);
+      await tester.tap(find.text('page ${Routes.pharmacyStockImportScreen}'));
+      await tester.pumpAndSettle();
+
+      expect(medicineRepository.fetches, fetchesBefore + 1);
     });
 
     testWidgets('أضف منتج جديد opens the add page, and a medicine added there reloads the list', (

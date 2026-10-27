@@ -193,10 +193,6 @@ void main() {
     await tester.pump();
   }
 
-  Finder appBarTitle(String title) {
-    return find.descendant(of: find.byType(AppBar), matching: find.text(title));
-  }
-
   testWidgets('lands on the settings tab', (tester) async {
     await pumpShell(tester);
 
@@ -383,18 +379,6 @@ void main() {
       // page's own header is offstage.
       expect(find.text('اجمالي المنتجات'), findsNothing);
       expect(find.textContaining('أهلا بك'), findsOneWidget);
-    });
-
-    testWidgets('تحديث المنتجات opens the inventory tab', (tester) async {
-      await pumpShell(tester);
-      await openProductsPage(tester);
-      medicinesCubits.last.show(const PharmacyMedicinesLoaded(medicines: []));
-      await tester.pump();
-
-      await tester.tap(find.text('تحديث المنتجات'));
-      await tester.pump();
-
-      expect(appBarTitle('إدارة المخزون'), findsOneWidget);
     });
   });
 }

@@ -323,15 +323,15 @@ void main() {
       expect(find.text('-'), findsNWidgets(2));
     });
 
-    testWidgets('tapping the prompt says the import is coming soon', (tester) async {
+    testWidgets('tapping the prompt opens the stock import page', (tester) async {
       await setDesignViewport(tester);
       await tester.pumpWidget(buildTestableScreen());
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('اختيار ملف'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('قريباً'), findsOneWidget);
+      expect(visitedRoutes, contains(Routes.pharmacyStockImportScreen));
     });
   });
 

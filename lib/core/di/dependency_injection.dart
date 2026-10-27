@@ -190,7 +190,14 @@ import '../../features/pharmacy/data/repositories/notifications_repository_impl.
 import '../../features/pharmacy/data/repositories/pharmacy_alternatives_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_dashboard_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inquiries_repository_impl.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_inventory_import_remote_data_source.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_inventory_import_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inventory_repository_impl.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_inventory_import_repository.dart';
+import '../../features/pharmacy/domain/usecases/analyze_inventory_import_usecase.dart';
+import '../../features/pharmacy/domain/usecases/cancel_inventory_import_usecase.dart';
+import '../../features/pharmacy/domain/usecases/commit_inventory_import_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_medicine_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_profile_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_ratings_repository_impl.dart';
@@ -621,6 +628,16 @@ Future<void> setupGetIt() async {
   getIt.registerFactoryParam<EditMedicineCubit, Medicine, void>(
     (medicine, _) => EditMedicineCubit(getIt(), medicine),
   );
+
+  // ---------------- Pharmacy Stock Import ----------------
+  getIt.registerLazySingleton(() => PharmacyInventoryImportRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyInventoryImportRepository>(
+    () => PharmacyInventoryImportRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => AnalyzeInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CommitInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CancelInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => PharmacyStockImportCubit(getIt(), getIt(), getIt()));
 
   // ---------------- Pharmacy Inventory ----------------
   getIt.registerLazySingleton(() => PharmacyInventoryRemoteDataSource(getIt()));
