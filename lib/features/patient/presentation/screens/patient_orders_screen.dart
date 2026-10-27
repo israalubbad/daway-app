@@ -14,9 +14,13 @@ import '../../domain/entities/order.dart';
 import '../cubit/orders_cubit.dart';
 import '../cubit/orders_state.dart';
 import '../widgets/order_card.dart';
+import 'payment_method_screen.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
 enum _StatusFilter { completed, inProgress, cancelled }
+
+/// What the patient chose in an order's sheet.
+enum _OrderAction { cancel, continueOrder }
 
 bool _matches(Order order, _StatusFilter? filter) => switch (filter) {
       null => true,
@@ -60,11 +64,21 @@ class _OrdersViewState extends State<_OrdersView> {
 
   Future<void> _viewOrder(Order order) async {
     final cubit = context.read<OrdersCubit>();
-    final cancel = await showModalBottomSheet<bool>(
+    final action = await showModalBottomSheet<_OrderAction>(
       context: context,
       builder: (sheetContext) => _OrderSheet(order: order),
     );
-    if (cancel != true) return;
+    if (!mounted) return;
+    if (action == _OrderAction.continueOrder) {
+      final orderId = int.tryParse(order.orderNumber);
+      if (orderId == null) return;
+      await Navigator.of(context).push(
+        PaymentMethodScreen.route(orderId: orderId, pharmacyName: order.pharmacyName),
+      );
+      if (mounted) cubit.load();
+      return;
+    }
+    if (action != _OrderAction.cancel) return;
     final error = await cubit.cancel(order);
     if (!mounted) return;
     AppSnackbar.show(context, error ?? 'تم إلغاء الطلب');
@@ -156,11 +170,18 @@ class _OrderSheet extends StatelessWidget {
               style: TextStyle(fontSize: 14.sp, height: 1.6),
             ),
             SizedBox(height: 24.h),
+            if (order.status.isInProgress) ...[
+              AppCustomButton(
+                text: 'متابعة الطلب والدفع',
+                onPressed: () => Navigator.of(context).pop(_OrderAction.continueOrder),
+              ),
+              SizedBox(height: 8.h),
+            ],
             if (order.status.canCancel)
               AppCustomButton(
                 text: 'إلغاء الطلب',
                 backgroundColor: AppColors.logoutRed,
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () => Navigator.of(context).pop(_OrderAction.cancel),
               ),
           ],
         ),

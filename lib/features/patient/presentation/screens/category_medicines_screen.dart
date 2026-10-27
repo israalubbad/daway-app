@@ -19,8 +19,6 @@ import '../cubit/medicine_images_cubit.dart';
 import 'category_filter_screen.dart';
 import '../widgets/category_medicine_card.dart';
 import '../widgets/category_symptom_grid.dart';
-import '../widgets/patient_bottom_nav_bar.dart';
-import '../widgets/patient_dashboard_tab_scope.dart';
 
 class CategoryMedicinesScreen extends StatelessWidget {
   final Category category;
@@ -114,13 +112,6 @@ class _CategoryMedicinesViewState extends State<_CategoryMedicinesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: PatientBottomNavBar(
-        selectedTab: PatientDashboardTab.home,
-        onTabSelected: (tab) {
-          Navigator.of(context).pop();
-          PatientDashboardTabScope.maybeOf(context)?.switchToTab(tab);
-        },
-      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),

@@ -93,6 +93,10 @@ abstract class AppColors {
 
   // Patient chatbot floating button
   static const Color chatbotButtonBackground = Color(0xFF0D2538);
+
+  // Checkout / payment
+  static const Color paymentLabelText = Color(0xFF6B8A9A);
+  static const Color uploadIconCircle = Color(0xFFE8F3F9);
   static const Color sheetTitleText = Color(0xFF1B3D5F);
   static const Color sheetSubtitleText = Color(0xFF9CA3AF);
   static const Color sheetOutlineBorder = Color(0xFFCBD9DD);

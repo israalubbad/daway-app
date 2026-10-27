@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/networking/session_expired_interceptor.dart';
 
 class AuthRemoteDataSource {
   final Dio _dio;
@@ -79,7 +80,10 @@ class AuthRemoteDataSource {
   Future<Response<dynamic>> logout({required String token}) {
     return _dio.post(
       ApiConstants.logout,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: Options(
+        headers: {'Authorization': 'Bearer $token'},
+        extra: {skipSessionExpiryKey: true},
+      ),
     );
   }
 }

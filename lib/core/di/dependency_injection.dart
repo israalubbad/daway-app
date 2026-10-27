@@ -39,6 +39,12 @@ import '../../features/onboarding/domain/repositories/onboarding_repository.dart
 import '../../features/onboarding/domain/usecases/get_onboarding_seen_usecase.dart';
 import '../../features/onboarding/domain/usecases/set_onboarding_seen_usecase.dart';
 import '../../features/patient/data/datasources/cart_remote_data_source.dart';
+import '../../features/patient/data/datasources/checkout_flow_remote_data_source.dart';
+import '../../features/patient/data/repositories/checkout_flow_repository_impl.dart';
+import '../../features/patient/domain/repositories/checkout_flow_repository.dart';
+import '../../features/patient/domain/usecases/checkout_flow_usecases.dart';
+import '../../features/patient/presentation/cubit/order_tracking_cubit.dart';
+import '../../features/patient/presentation/cubit/payment_cubit.dart';
 import '../../features/patient/data/datasources/category_remote_data_source.dart';
 import '../../features/patient/data/datasources/device_settings_data_source.dart';
 import '../../features/patient/data/datasources/favorites_remote_data_source.dart';
@@ -423,8 +429,24 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => CheckoutUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => CancelOrderUseCase(getIt(), getIt()));
   getIt.registerFactory(() => OrdersCubit(getIt(), getIt()));
-  getIt.registerFactory(
-    () => CheckoutCubit(getIt(), getIt(), getIt(), getIt()),
+  getIt.registerLazySingleton(() => CheckoutFlowRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<CheckoutFlowRepository>(
+    () => CheckoutFlowRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => ValidateCouponUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetOrderPaymentUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => SubmitPaymentReceiptUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => ReportPaymentProblemUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetOrderTrackingUseCase(getIt(), getIt()));
+  // The subtotal of the cart being ordered (the coupon is checked against it).
+  getIt.registerFactoryParam<CheckoutCubit, double, void>(
+    (subtotal, _) => CheckoutCubit(subtotal, getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerFactoryParam<PaymentCubit, int, void>(
+    (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerFactoryParam<OrderTrackingCubit, int, void>(
+    (orderId, _) => OrderTrackingCubit(orderId, getIt(), getIt()),
   );
 
   // ---------------- Medicine Detail ----------------
@@ -437,6 +459,8 @@ Future<void> setupGetIt() async {
   getIt.registerFactoryParam<MedicineDetailCubit, int, void>(
     (medicineId, _) => MedicineDetailCubit(
       medicineId,
+      getIt(),
+      getIt(),
       getIt(),
       getIt(),
       getIt(),
