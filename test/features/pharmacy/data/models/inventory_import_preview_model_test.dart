@@ -29,6 +29,21 @@ void main() {
     expect(model.errorCount, 2);
   });
 
+  test('finds the id and counts nested deeper, and sums a missing total', () {
+    final model = InventoryImportPreviewModel.fromJson({
+      'data': {
+        'import': {'id': '5'},
+        'summary': {'new_count': 2, 'updated_count': 3, 'error_count': 1},
+      },
+    });
+
+    expect(model.importId, 5);
+    expect(model.totalCount, 6);
+    expect(model.newCount, 2);
+    expect(model.updatedCount, 3);
+    expect(model.errorCount, 1);
+  });
+
   test('a response without an id has none, and missing counts are 0', () {
     final model = InventoryImportPreviewModel.fromJson({'data': <String, dynamic>{}});
 
