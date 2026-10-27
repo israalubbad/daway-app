@@ -1,3 +1,4 @@
+import 'package:daway_app/core/widgets/app_back_button.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
@@ -152,13 +153,10 @@ void main() {
     await tester.pumpWidget(buildTestableScreen());
     await tester.pumpAndSettle();
 
-    final chip = find.ancestor(
-      of: find.text('المخزون'),
-      matching: find.byWidgetPredicate(
-        (w) => w.runtimeType.toString() == 'AppFilterChip',
-      ),
-    );
-    await tester.tap(chip);
+    // The tabs scroll sideways, so this one may start off screen.
+    await tester.ensureVisible(find.text('المخزون (1)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('المخزون (1)'));
     await tester.pumpAndSettle();
 
     expect(find.text('تنبيه نقص مخزون دواء Panadol'), findsOneWidget);
@@ -224,7 +222,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(BackButton), findsOneWidget);
+      expect(find.byType(AppBackButton), findsOneWidget);
       expect(find.byIcon(Icons.menu), findsNothing);
     },
   );

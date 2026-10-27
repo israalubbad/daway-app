@@ -98,12 +98,16 @@ class PharmacyOrderModel {
   }
 
   static PharmacyOrderStatus _status(String? raw) {
-    return switch (raw?.toLowerCase()) {
-      'pending' || 'new' || 'awaiting' || null => PharmacyOrderStatus.pending,
-      'accepted' || 'confirmed' || 'approved' => PharmacyOrderStatus.accepted,
-      'rejected' || 'declined' || 'cancelled' => PharmacyOrderStatus.rejected,
-      _ => PharmacyOrderStatus.other,
-    };
+    final status = raw?.toLowerCase();
+    if (status == null) return PharmacyOrderStatus.pending;
+    bool has(List<String> words) => words.any(status.contains);
+    // Checked first: "pending_confirmation" is waiting, not confirmed.
+    if (has(['pending', 'await', 'new', 'wait'])) return PharmacyOrderStatus.pending;
+    if (has(['reject', 'declin', 'cancel', 'refus'])) return PharmacyOrderStatus.rejected;
+    if (has(['accept', 'confirm', 'approv', 'prepar', 'ready', 'deliver', 'complet'])) {
+      return PharmacyOrderStatus.accepted;
+    }
+    return PharmacyOrderStatus.other;
   }
 
   static Map<String, dynamic>? _map(Object? value) =>

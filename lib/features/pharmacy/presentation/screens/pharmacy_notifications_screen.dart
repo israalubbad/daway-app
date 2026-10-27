@@ -3,18 +3,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
-import '../../../../core/theming/app_text_styles.dart';
-import '../../../../core/widgets/app_filter_chip.dart';
+import '../../../../core/theming/app_fonts.dart';
 import '../../../../core/widgets/app_snackbar.dart';
+import '../../../../core/widgets/empty_state_view.dart';
+import '../../../../core/widgets/filter_tabs_row.dart';
 import '../../../../core/widgets/profile_load_error.dart';
+import '../../../patient/presentation/widgets/patient_sub_screen_header.dart';
 import '../../domain/entities/notification.dart';
 import '../cubit/notifications_cubit.dart';
 import '../cubit/notifications_state.dart';
-import '../widgets/notification_card.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
+import '../widgets/pharmacy_notification_item.dart';
 
-/// Pushed on top of the shell rather than being one of its tabs, so an
-/// action button that should jump to a specific tab (e.g. "تحديث المخزون")
+/// "الإشعارات", laid out like the patient's: a back chip, the title, filter
+/// tabs with counts, then one row per notification.
+///
+/// Pushed on top of the shell rather than being one of its tabs, so tapping a
+/// notification that belongs to a tab (stock → المخزون, inquiry → المراسلات)
 /// pops this screen with that [PharmacyDashboardTab] as the result — the
 /// caller (the bell icon that pushed this screen, itself inside the shell)
 /// is what actually switches tabs, since it's the one with
@@ -22,16 +27,7 @@ import '../widgets/pharmacy_dashboard_tab_scope.dart';
 class PharmacyNotificationsScreen extends StatelessWidget {
   const PharmacyNotificationsScreen({super.key});
 
-  void _handleTap(BuildContext context, AppNotification notification) {
-    if (!notification.isRead) {
-      context.read<NotificationsCubit>().markAsRead(notification.id);
-    }
-  }
-
-  Future<void> _handleAction(
-    BuildContext context,
-    AppNotification notification,
-  ) async {
+  Future<void> _handleTap(BuildContext context, AppNotification notification) async {
     if (!notification.isRead) {
       await context.read<NotificationsCubit>().markAsRead(notification.id);
     }
@@ -55,33 +51,35 @@ class PharmacyNotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        title: Text(
-          'الإشعارات',
-          style: AppTextStyles.screenTitle.copyWith(
-            color: AppColors.mainTeal,
-            fontSize: 20.sp,
-          ),
-        ),
-      ),
       body: SafeArea(
         child: BlocBuilder<NotificationsCubit, NotificationsState>(
           builder: (context, state) {
-            return switch (state) {
-              NotificationsLoading() => const Center(
-                child: CircularProgressIndicator(),
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: const PatientSubScreenHeader(
+                      title: 'الإشعارات',
+                      description: 'تابع مخزونك واستفسارات عملائك',
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                  switch (state) {
+                    NotificationsLoading() => Padding(
+                      padding: EdgeInsets.only(top: 48.h),
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    NotificationsLoadFailure(:final message) => ProfileLoadError(
+                      message: message,
+                      onRetry: () => context.read<NotificationsCubit>().load(),
+                    ),
+                    NotificationsLoaded() => _buildLoaded(context, state),
+                  },
+                ],
               ),
-              NotificationsLoadFailure(:final message) => ProfileLoadError(
-                message: message,
-                onRetry: () => context.read<NotificationsCubit>().load(),
-              ),
-              NotificationsLoaded() => _buildLoaded(context, state),
-            };
+            );
           },
         ),
       ),
@@ -89,97 +87,73 @@ class PharmacyNotificationsScreen extends StatelessWidget {
   }
 
   Widget _buildLoaded(BuildContext context, NotificationsLoaded state) {
-    final filtered = state.filteredNotifications;
+    final cubit = context.read<NotificationsCubit>();
+    final all = state.notifications;
+    int count(NotificationFilter filter) => NotificationsLoaded(
+      notifications: all,
+      unreadCount: state.unreadCount,
+      filter: filter,
+    ).filteredNotifications.length;
+    final visible = state.filteredNotifications;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 12.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (state.unreadCount > 0)
-                Center(
-                  child: TextButton(
-                    onPressed: state.markingAllAsRead
-                        ? null
-                        : () => _handleMarkAllAsRead(context),
-                    child: Text(
-                      'تحديد الكل كمقروء',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTeal,
-                      ),
-                    ),
+        FilterTabsRow<NotificationFilter>(
+          selected: state.filter,
+          onSelected: cubit.filterChanged,
+          tabs: [
+            FilterTabItem(
+              value: NotificationFilter.all,
+              label: 'الكل (${count(NotificationFilter.all)})',
+            ),
+            FilterTabItem(
+              value: NotificationFilter.unread,
+              label: 'غير مقروءة (${count(NotificationFilter.unread)})',
+            ),
+            FilterTabItem(
+              value: NotificationFilter.inventory,
+              label: 'المخزون (${count(NotificationFilter.inventory)})',
+            ),
+            FilterTabItem(
+              value: NotificationFilter.inquiries,
+              label: 'الاستفسارات (${count(NotificationFilter.inquiries)})',
+            ),
+          ],
+        ),
+        if (state.unreadCount > 0)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 0),
+              child: TextButton(
+                onPressed: state.markingAllAsRead ? null : () => _handleMarkAllAsRead(context),
+                child: Text(
+                  'تحديد الكل كمقروء',
+                  style: AppFonts.tajawal(
+                    TextStyle(fontSize: 13.sp, color: AppColors.mainTeal),
+                    FontWeight.w500,
                   ),
-                ),
-              SizedBox(height: 8.h),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    AppFilterChip(
-                      label: 'الكل',
-                      selected: state.filter == NotificationFilter.all,
-                      onTap: () => context
-                          .read<NotificationsCubit>()
-                          .filterChanged(NotificationFilter.all),
-                    ),
-                    SizedBox(width: 8.w),
-                    AppFilterChip(
-                      label: 'غير مقروءة',
-                      color: AppColors.primaryTeal,
-                      selected: state.filter == NotificationFilter.unread,
-                      onTap: () => context
-                          .read<NotificationsCubit>()
-                          .filterChanged(NotificationFilter.unread),
-                    ),
-                    SizedBox(width: 8.w),
-                    AppFilterChip(
-                      label: 'المخزون',
-                      color: AppColors.warning,
-                      selected: state.filter == NotificationFilter.inventory,
-                      onTap: () => context
-                          .read<NotificationsCubit>()
-                          .filterChanged(NotificationFilter.inventory),
-                    ),
-                    SizedBox(width: 8.w),
-                    AppFilterChip(
-                      label: 'الاستفسارات',
-                      color: AppColors.mainTeal,
-                      selected: state.filter == NotificationFilter.inquiries,
-                      onTap: () => context
-                          .read<NotificationsCubit>()
-                          .filterChanged(NotificationFilter.inquiries),
-                    ),
-                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        Expanded(
-          child: filtered.isEmpty
-              ? Center(
-                  child: Text(
-                    'لا توجد إشعارات',
-                    style: AppTextStyles.cardDescription,
-                  ),
-                )
-              : ListView.separated(
-                  padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 24.h),
-                  itemCount: filtered.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    final notification = filtered[index];
-                    return NotificationCard(
-                      notification: notification,
-                      onTap: () => _handleTap(context, notification),
-                      onAction: () => _handleAction(context, notification),
-                    );
-                  },
-                ),
-        ),
+        SizedBox(height: 16.h),
+        if (visible.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: const EmptyStateView(
+              imageAsset: 'assets/images/empty_notifications.png',
+              title: 'لا توجد إشعارات',
+              topSpacing: 64,
+            ),
+          )
+        else
+          for (final notification in visible)
+            PharmacyNotificationItem(
+              notification: notification,
+              onTap: () => _handleTap(context, notification),
+            ),
       ],
     );
   }
