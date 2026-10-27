@@ -124,7 +124,11 @@ class _PatientNotificationsScreenState extends State<PatientNotificationsScreen>
           )
         else
           for (final notification in visible)
-            NotificationItem(notification: notification, onDismissTap: _dismiss),
+            NotificationItem(
+              notification: notification,
+              onDismissTap: _dismiss,
+              onTap: () => context.read<PatientNotificationsCubit>().markAsRead(notification),
+            ),
       ],
     );
   }

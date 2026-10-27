@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/open_support_chat.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_logo.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/logout_confirmation_sheet.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import 'pharmacy_dashboard_tab_scope.dart';
@@ -24,9 +24,9 @@ class PharmacySideMenu extends StatelessWidget {
     PharmacyDashboardTabScope.switchToTabOrShowComingSoon(context, tab);
   }
 
-  void _handleComingSoon(BuildContext context) {
+  void _openSupport(BuildContext context) {
     Navigator.of(context).pop();
-    AppSnackbar.show(context, 'قريباً');
+    openSupportChat(context);
   }
 
   void _openAlternatives(BuildContext context) {
@@ -91,7 +91,7 @@ class PharmacySideMenu extends StatelessWidget {
             _MenuItem(
               icon: Icons.support_agent_outlined,
               label: 'المساعدة والدعم',
-              onTap: () => _handleComingSoon(context),
+              onTap: () => _openSupport(context),
             ),
             const Spacer(),
             Divider(color: AppColors.borderGrey, height: 1),

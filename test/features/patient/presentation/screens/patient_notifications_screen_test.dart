@@ -6,6 +6,7 @@ import 'package:daway_app/features/auth/domain/repositories/session_repository.d
 import 'package:daway_app/features/patient/domain/entities/patient_notification.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_notifications_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_notifications_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/mark_patient_notification_read_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_notifications_cubit.dart';
 import 'package:daway_app/features/patient/presentation/screens/patient_notifications_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 class _FakeRepository implements PatientNotificationsRepository {
   ApiResult<List<PatientNotification>> result = const Success([]);
+
+  final List<int> markedIds = [];
+
+  @override
+  Future<ApiResult<void>> markAsRead({required String token, required int notificationId}) async {
+    markedIds.add(notificationId);
+    return const Success(null);
+  }
 
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async =>
@@ -65,6 +74,7 @@ void main() {
   Widget buildTestableScreen(_FakeRepository repository) {
     final cubit = PatientNotificationsCubit(
       GetPatientNotificationsUseCase(repository, _FakeSessionRepository()),
+      MarkPatientNotificationReadUseCase(repository, _FakeSessionRepository()),
     );
     addTearDown(cubit.close);
 

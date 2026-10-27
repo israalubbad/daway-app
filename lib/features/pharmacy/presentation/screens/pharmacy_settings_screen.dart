@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/helpers/open_location_picker.dart';
+import '../../../../core/helpers/open_support_chat.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/account_row_card.dart';
@@ -265,6 +266,13 @@ class _SettingsBodyState extends State<_SettingsBody>
             label: 'الشروط والأحكام',
             trailing: const AccountRowChevron(),
             onTap: () => _push(const TermsScreen()),
+          ),
+          SizedBox(height: 16.h),
+          AccountRowCard(
+            leading: const AccountRowIcon('assets/icons/headphones_icon.svg'),
+            label: 'المساعدة والدعم',
+            trailing: const AccountRowChevron(),
+            onTap: () => openSupportChat(context),
           ),
           SizedBox(height: 24.h),
           const SettingsSectionLabel('الحساب'),

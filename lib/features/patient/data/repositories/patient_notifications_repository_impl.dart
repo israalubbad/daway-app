@@ -12,6 +12,19 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
 
   const PatientNotificationsRepositoryImpl(this._remoteDataSource);
 
+  @override
+  Future<ApiResult<void>> markAsRead({
+    required String token,
+    required int notificationId,
+  }) async {
+    try {
+      await _remoteDataSource.markAsRead(token: token, notificationId: notificationId);
+      return const Success(null);
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
   /// One malformed notification record is skipped rather than failing the
   /// whole list; the rest are shown newest first. But a response whose
   /// records ALL fail to parse is a changed API contract, not an empty inbox,

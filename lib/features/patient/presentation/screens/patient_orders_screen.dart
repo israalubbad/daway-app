@@ -20,7 +20,7 @@ import '../widgets/patient_sub_screen_header.dart';
 enum _StatusFilter { completed, inProgress, cancelled }
 
 /// What the patient chose in an order's sheet.
-enum _OrderAction { cancel, continueOrder }
+enum _OrderAction { cancel, continueOrder, ratePharmacy }
 
 bool _matches(Order order, _StatusFilter? filter) => switch (filter) {
       null => true,
@@ -76,6 +76,15 @@ class _OrdersViewState extends State<_OrdersView> {
         PaymentMethodScreen.route(orderId: orderId, pharmacyName: order.pharmacyName),
       );
       if (mounted) cubit.load();
+      return;
+    }
+    if (action == _OrderAction.ratePharmacy) {
+      final pharmacyId = order.pharmacyId;
+      if (pharmacyId == null) return;
+      await Navigator.of(context).pushNamed(
+        Routes.rateExperienceScreen,
+        arguments: {'pharmacyId': pharmacyId, 'pharmacyName': order.pharmacyName},
+      );
       return;
     }
     if (action != _OrderAction.cancel) return;
@@ -177,6 +186,11 @@ class _OrderSheet extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
             ],
+            if (order.status.isCompleted && order.pharmacyId != null)
+              AppCustomButton(
+                text: 'قيّم الصيدلية',
+                onPressed: () => Navigator.of(context).pop(_OrderAction.ratePharmacy),
+              ),
             if (order.status.canCancel)
               AppCustomButton(
                 text: 'إلغاء الطلب',

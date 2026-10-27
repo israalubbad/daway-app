@@ -13,6 +13,10 @@ class _FakeRepository implements PatientNotificationsRepository {
   String? lastToken;
 
   @override
+  Future<ApiResult<void>> markAsRead({required String token, required int notificationId}) async =>
+      const Success(null);
+
+  @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async {
     lastToken = token;
     return result;

@@ -66,6 +66,13 @@ class _PharmaciesMapViewState extends State<_PharmaciesMapView> {
     );
   }
 
+  void _rate(BuildContext context, NearbyPharmacy pharmacy) {
+    Navigator.of(context).pushNamed(
+      Routes.rateExperienceScreen,
+      arguments: {'pharmacyId': pharmacy.id, 'pharmacyName': pharmacy.name},
+    );
+  }
+
   Future<void> _call(BuildContext context, String? phoneNumber) async {
     if (phoneNumber == null || phoneNumber.isEmpty) {
       AppSnackbar.show(context, 'رقم الهاتف غير متوفر');
@@ -104,6 +111,7 @@ class _PharmaciesMapViewState extends State<_PharmaciesMapView> {
                 onMessageTap: (pharmacy) => _openChat(context, pharmacy),
                 onCallTap: (phone) => _call(context, phone),
                 onDirectionsTap: (pharmacy) => _openDirections(context, pharmacy),
+                onRateTap: (pharmacy) => _rate(context, pharmacy),
               ),
           };
         },
@@ -119,6 +127,7 @@ class _MapContent extends StatefulWidget {
   final ValueChanged<NearbyPharmacy> onMessageTap;
   final ValueChanged<String?> onCallTap;
   final ValueChanged<NearbyPharmacy> onDirectionsTap;
+  final ValueChanged<NearbyPharmacy> onRateTap;
 
   const _MapContent({
     required this.state,
@@ -127,6 +136,7 @@ class _MapContent extends StatefulWidget {
     required this.onMessageTap,
     required this.onCallTap,
     required this.onDirectionsTap,
+    required this.onRateTap,
   });
 
   @override
@@ -282,6 +292,7 @@ class _MapContentState extends State<_MapContent> {
               onMessageTap: () => widget.onMessageTap(selected),
               onCallTap: () => widget.onCallTap(selected.phoneNumber),
               onDirectionsTap: () => widget.onDirectionsTap(selected),
+              onRateTap: () => widget.onRateTap(selected),
             ),
           ),
       ],
@@ -295,6 +306,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
   final String? workingHoursLabel;
   final VoidCallback onMessageTap;
   final VoidCallback onCallTap;
+  final VoidCallback onRateTap;
   final VoidCallback onDirectionsTap;
 
   const _PharmacyDetailSheet({
@@ -303,6 +315,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
     required this.workingHoursLabel,
     required this.onMessageTap,
     required this.onCallTap,
+    required this.onRateTap,
     required this.onDirectionsTap,
   });
 
@@ -408,6 +421,12 @@ class _PharmacyDetailSheet extends StatelessWidget {
           ),
           SizedBox(height: 24.h),
           AppCustomButton(text: 'عرض الاتجاهات', onPressed: onDirectionsTap),
+          SizedBox(height: 12.h),
+          _OutlineActionButton(
+            icon: Icons.star_outline_rounded,
+            label: 'قيّم الصيدلية',
+            onTap: onRateTap,
+          ),
         ],
       ),
     );

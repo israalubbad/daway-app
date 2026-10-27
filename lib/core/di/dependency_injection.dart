@@ -150,6 +150,7 @@ import '../../features/patient/domain/usecases/get_patient_inquiries_usecase.dar
 import '../../features/patient/domain/usecases/get_patient_profile_usecase.dart';
 import '../../features/patient/domain/usecases/update_patient_address_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_notifications_usecase.dart';
+import '../../features/patient/domain/usecases/mark_patient_notification_read_usecase.dart';
 import '../../features/patient/domain/usecases/get_pharmacy_conversations_usecase.dart';
 import '../../features/patient/domain/usecases/get_pharmacy_working_hours_usecase.dart';
 import '../../features/patient/domain/usecases/open_device_settings_usecase.dart';
@@ -576,7 +577,8 @@ Future<void> setupGetIt() async {
     () => PatientNotificationsRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton(() => GetPatientNotificationsUseCase(getIt(), getIt()));
-  getIt.registerFactory(() => PatientNotificationsCubit(getIt()));
+  getIt.registerLazySingleton(() => MarkPatientNotificationReadUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => PatientNotificationsCubit(getIt(), getIt()));
 
   // ---------------- Account Settings ----------------
   getIt.registerLazySingleton(() => const DeviceSettingsDataSource());

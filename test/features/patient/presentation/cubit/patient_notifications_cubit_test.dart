@@ -6,6 +6,7 @@ import 'package:daway_app/features/auth/domain/repositories/session_repository.d
 import 'package:daway_app/features/patient/domain/entities/patient_notification.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_notifications_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_notifications_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/mark_patient_notification_read_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_notifications_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_notifications_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,15 @@ final _notifications = [
 
 class _FakeRepository implements PatientNotificationsRepository {
   late ApiResult<List<PatientNotification>> result = Success(_notifications);
+
+  ApiResult<void> markResult = const Success(null);
+  final List<int> markedIds = [];
+
+  @override
+  Future<ApiResult<void>> markAsRead({required String token, required int notificationId}) async {
+    markedIds.add(notificationId);
+    return markResult;
+  }
 
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async =>
@@ -56,6 +66,7 @@ void main() {
   PatientNotificationsCubit buildCubit() {
     final cubit = PatientNotificationsCubit(
       GetPatientNotificationsUseCase(repository, _FakeSessionRepository()),
+      MarkPatientNotificationReadUseCase(repository, _FakeSessionRepository()),
     );
     addTearDown(cubit.close);
     return cubit;
@@ -90,5 +101,27 @@ void main() {
     await cubit.load();
 
     expect(cubit.state, isA<PatientNotificationsLoaded>());
+  });
+
+  test('markAsRead shows the notification as read and tells the backend', () async {
+    final cubit = buildCubit();
+    await Future<void>.delayed(Duration.zero);
+
+    await cubit.markAsRead(_notifications.first);
+
+    final loaded = cubit.state as PatientNotificationsLoaded;
+    expect(loaded.notifications.single.isRead, isTrue);
+    expect(repository.markedIds, [1]);
+  });
+
+  test('markAsRead puts the notification back as unread when the backend refuses', () async {
+    repository.markResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+    final cubit = buildCubit();
+    await Future<void>.delayed(Duration.zero);
+
+    await cubit.markAsRead(_notifications.first);
+
+    final loaded = cubit.state as PatientNotificationsLoaded;
+    expect(loaded.notifications.single.isRead, isFalse);
   });
 }

@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/helpers/open_support_chat.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import '../cubit/favorite_medicines_cubit.dart';
 import '../cubit/patient_notifications_cubit.dart';
@@ -84,8 +84,6 @@ class PatientAccountScreen extends StatelessWidget {
     );
   }
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,7 +149,7 @@ class PatientAccountScreen extends StatelessWidget {
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/headphones_icon.svg'),
                 label: 'الدعم الفني',
-                onTap: () => _comingSoon(context),
+                onTap: () => openSupportChat(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
