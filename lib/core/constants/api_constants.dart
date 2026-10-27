@@ -20,6 +20,8 @@ abstract class ApiConstants {
   static const String pharmacyRatings = '/pharmacy/ratings';
   static const String pharmacyInquiries = '/pharmacy/inquiries';
   static const String pharmacyAlternatives = '/pharmacy/alternatives';
+  static const String deviceTokens = '/device-tokens';
+  static const String deviceTokensCurrent = '/device-tokens/current';
   static const String notifications = '/notifications';
   static const String notificationsCount = '/notifications/count';
   static const String notificationsMarkAllAsRead =
