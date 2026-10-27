@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../../../core/helpers/api_result.dart';
 import '../entities/inventory_import_preview.dart';
 
@@ -9,7 +11,10 @@ abstract class PharmacyInventoryImportRepository {
     required String filePath,
   });
 
-  Future<ApiResult<void>> commit({required String token, required int importId});
+  /// The import spreadsheet template (`GET /pharmacy/inventory/import/template`), as bytes.
+  Future<ApiResult<Uint8List>> downloadTemplate({required String token});
 
-  Future<ApiResult<void>> cancel({required String token, required int importId});
+  Future<ApiResult<void>> commit({required String token, required String importId});
+
+  Future<ApiResult<void>> cancel({required String token, required String importId});
 }

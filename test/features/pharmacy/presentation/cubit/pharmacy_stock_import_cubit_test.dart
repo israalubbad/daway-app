@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
@@ -8,12 +10,13 @@ import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_invento
 import 'package:daway_app/features/pharmacy/domain/usecases/analyze_inventory_import_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/cancel_inventory_import_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/commit_inventory_import_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/download_inventory_import_template_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _preview = InventoryImportPreview(
-  importId: 7,
+  importId: 'uuid-7',
   totalCount: 128,
   newCount: 24,
   updatedCount: 104,
@@ -25,8 +28,8 @@ class _FakeImportRepository implements PharmacyInventoryImportRepository {
   ApiResult<InventoryImportPreview> previewResult = const Success(_preview);
   ApiResult<void> commitResult = const Success(null);
   String? lastFilePath;
-  final List<int> committed = [];
-  final List<int> cancelled = [];
+  final List<String> committed = [];
+  final List<String> cancelled = [];
 
   @override
   Future<ApiResult<InventoryImportPreview>> preview({
@@ -38,13 +41,17 @@ class _FakeImportRepository implements PharmacyInventoryImportRepository {
   }
 
   @override
-  Future<ApiResult<void>> commit({required String token, required int importId}) async {
+  Future<ApiResult<Uint8List>> downloadTemplate({required String token}) async =>
+      Success(Uint8List.fromList([1, 2, 3]));
+
+  @override
+  Future<ApiResult<void>> commit({required String token, required String importId}) async {
     committed.add(importId);
     return commitResult;
   }
 
   @override
-  Future<ApiResult<void>> cancel({required String token, required int importId}) async {
+  Future<ApiResult<void>> cancel({required String token, required String importId}) async {
     cancelled.add(importId);
     return const Success(null);
   }
@@ -73,6 +80,7 @@ void main() {
       AnalyzeInventoryImportUseCase(repository, session),
       CommitInventoryImportUseCase(repository, session),
       CancelInventoryImportUseCase(repository, session),
+      DownloadInventoryImportTemplateUseCase(repository, session),
     );
   });
 
@@ -118,7 +126,7 @@ void main() {
 
     await cubit.update();
 
-    expect(repository.committed, [7]);
+    expect(repository.committed, ['uuid-7']);
     expect(cubit.state, isA<StockImportUpdated>());
   });
 
@@ -149,7 +157,7 @@ void main() {
     cubit.fileSelected(_file);
     await Future<void>.delayed(Duration.zero);
 
-    expect(repository.cancelled, [7]);
+    expect(repository.cancelled, ['uuid-7']);
     expect(cubit.state, isA<StockImportIdle>());
   });
 }

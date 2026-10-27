@@ -1,9 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/usecases/analyze_inventory_import_usecase.dart';
 import '../../domain/usecases/cancel_inventory_import_usecase.dart';
 import '../../domain/usecases/commit_inventory_import_usecase.dart';
+import '../../domain/usecases/download_inventory_import_template_usecase.dart';
 import 'pharmacy_stock_import_state.dart';
 
 class PharmacyStockImportCubit extends Cubit<PharmacyStockImportState> {
@@ -11,8 +14,17 @@ class PharmacyStockImportCubit extends Cubit<PharmacyStockImportState> {
   final CommitInventoryImportUseCase _commitUseCase;
   final CancelInventoryImportUseCase _cancelUseCase;
 
-  PharmacyStockImportCubit(this._analyzeUseCase, this._commitUseCase, this._cancelUseCase)
-      : super(const StockImportIdle(null));
+  final DownloadInventoryImportTemplateUseCase _downloadTemplateUseCase;
+
+  PharmacyStockImportCubit(
+    this._analyzeUseCase,
+    this._commitUseCase,
+    this._cancelUseCase,
+    this._downloadTemplateUseCase,
+  ) : super(const StockImportIdle(null));
+
+  /// The template's bytes, for the screen to hand to the system's save dialog.
+  Future<ApiResult<Uint8List>> downloadTemplate() => _downloadTemplateUseCase();
 
   /// Picking (or replacing) a file. An analysis the previous file already has
   /// is dropped on the backend, best effort.

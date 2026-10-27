@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
@@ -34,7 +36,21 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
   }
 
   @override
-  Future<ApiResult<void>> commit({required String token, required int importId}) async {
+  Future<ApiResult<Uint8List>> downloadTemplate({required String token}) async {
+    try {
+      final response = await _remoteDataSource.downloadTemplate(token: token);
+      final bytes = response.data;
+      if (bytes is! List<int> || bytes.isEmpty) {
+        return const ApiError(ApiFailure(message: 'تعذر تنزيل القالب'));
+      }
+      return Success(Uint8List.fromList(bytes));
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<ApiResult<void>> commit({required String token, required String importId}) async {
     try {
       await _remoteDataSource.commit(token: token, importId: importId);
       return const Success(null);
@@ -44,7 +60,7 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
   }
 
   @override
-  Future<ApiResult<void>> cancel({required String token, required int importId}) async {
+  Future<ApiResult<void>> cancel({required String token, required String importId}) async {
     try {
       await _remoteDataSource.cancel(token: token, importId: importId);
       return const Success(null);

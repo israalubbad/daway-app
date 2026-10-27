@@ -18,11 +18,18 @@ class PharmacyInventoryImportRemoteDataSource {
     );
   }
 
-  Future<Response<dynamic>> commit({required String token, required int importId}) {
+  Future<Response<dynamic>> downloadTemplate({required String token}) {
+    return _dio.get(
+      '${ApiConstants.pharmacyInventoryImport}/template',
+      options: Options(headers: {'Authorization': 'Bearer $token'}, responseType: ResponseType.bytes),
+    );
+  }
+
+  Future<Response<dynamic>> commit({required String token, required String importId}) {
     return _dio.post('${ApiConstants.pharmacyInventoryImport}/$importId/commit', options: _auth(token));
   }
 
-  Future<Response<dynamic>> cancel({required String token, required int importId}) {
+  Future<Response<dynamic>> cancel({required String token, required String importId}) {
     return _dio.post('${ApiConstants.pharmacyInventoryImport}/$importId/cancel', options: _auth(token));
   }
 }

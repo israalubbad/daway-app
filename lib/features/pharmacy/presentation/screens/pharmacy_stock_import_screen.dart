@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../../core/helpers/api_result.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -33,6 +34,26 @@ class PharmacyStockImportScreen extends StatelessWidget {
     cubit.fileSelected(PickedStockFile(path: path, name: picked.name, sizeBytes: size));
   }
 
+  Future<void> _downloadTemplate(BuildContext context) async {
+    final cubit = context.read<PharmacyStockImportCubit>();
+    final result = await cubit.downloadTemplate();
+    if (!context.mounted) return;
+
+    switch (result) {
+      case Success(:final data):
+        final saved = await FilePicker.saveFile(
+          dialogTitle: 'حفظ قالب Excel',
+          fileName: 'products-template.xlsx',
+          bytes: data,
+        );
+        if (saved != null && context.mounted) {
+          AppSnackbar.show(context, 'تم حفظ القالب');
+        }
+      case ApiError(:final failure):
+        AppSnackbar.show(context, failure.message);
+    }
+  }
+
   void _onPrimaryTap(BuildContext context, PharmacyStockImportState state) {
     final cubit = context.read<PharmacyStockImportCubit>();
     switch (state) {
@@ -40,6 +61,8 @@ class PharmacyStockImportScreen extends StatelessWidget {
         AppSnackbar.show(context, 'اختر ملف المنتجات أولاً');
       case StockImportIdle():
         cubit.analyze();
+      case StockImportAnalyzed(:final preview) when !preview.canCommit:
+        AppSnackbar.show(context, 'لا يمكن تحديث المنتجات من هذا الملف، راجع الأخطاء فيه');
       case StockImportAnalyzed():
         cubit.update();
       case StockImportAnalyzing() || StockImportUpdating() || StockImportUpdated():
@@ -84,7 +107,7 @@ class PharmacyStockImportScreen extends StatelessWidget {
                           isBusy: state is StockImportAnalyzing || state is StockImportUpdating,
                         ),
                         SizedBox(height: 16.h),
-                        _TemplateCard(onTap: () => AppSnackbar.show(context, 'قريباً')),
+                        _TemplateCard(onTap: () => _downloadTemplate(context)),
                         if (state case StockImportAnalyzed(:final preview) ||
                             StockImportUpdating(:final preview)) ...[
                           SizedBox(height: 24.h),
@@ -251,7 +274,7 @@ class _OutlinedPill extends StatelessWidget {
   }
 }
 
-/// "تنزيل قالب Excel". Downloading the template is not built yet.
+/// "تنزيل قالب Excel": saves the backend's template spreadsheet.
 class _TemplateCard extends StatelessWidget {
   final VoidCallback onTap;
 

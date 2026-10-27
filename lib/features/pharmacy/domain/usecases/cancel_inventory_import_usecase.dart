@@ -9,7 +9,7 @@ class CancelInventoryImportUseCase {
 
   const CancelInventoryImportUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<void>> call(int importId) async {
+  Future<ApiResult<void>> call(String importId) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
       return const ApiError(

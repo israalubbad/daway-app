@@ -2,49 +2,50 @@ import 'package:daway_app/features/pharmacy/data/models/inventory_import_preview
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('reads the id and the four counts from data', () {
+  test('reads a live preview response', () {
+    // Shape confirmed against a live POST /pharmacy/inventory/import.
     final model = InventoryImportPreviewModel.fromJson({
-      'data': {'import_id': 7, 'total': 128, 'new': 24, 'updated': 104, 'errors': 0},
+      'success': true,
+      'message': 'ملخّص المعاينة',
+      'data': {
+        'uuid': 'eb302757-7012-43c1-850b-3512d5f718d9',
+        'status': 'previewed',
+        'can_commit': true,
+        'summary': {
+          'total': 12,
+          'matched': 12,
+          'review': 0,
+          'unmatched': 0,
+          'duplicate': 0,
+          'error': 0,
+        },
+        'decisions': {'pending': 0, 'to_link': 12, 'to_create': 0, 'to_skip': 0, 'ready': true},
+      },
     });
 
-    expect(model.importId, 7);
-    expect(model.totalCount, 128);
-    expect(model.newCount, 24);
-    expect(model.updatedCount, 104);
+    expect(model.importId, 'eb302757-7012-43c1-850b-3512d5f718d9');
+    expect(model.totalCount, 12);
+    expect(model.matchedCount, 12);
+    expect(model.unmatchedCount, 0);
     expect(model.errorCount, 0);
+    expect(model.canCommit, isTrue);
   });
 
-  test('counts a list of errors by its length', () {
+  test('rows to review count as new, duplicates as errors', () {
     final model = InventoryImportPreviewModel.fromJson({
       'data': {
-        'id': 3,
-        'errors': [
-          {'row': 2},
-          {'row': 5},
-        ],
+        'uuid': 'u-1',
+        'can_commit': false,
+        'summary': {'total': 10, 'matched': 4, 'review': 2, 'unmatched': 1, 'duplicate': 2, 'error': 1},
       },
     });
 
-    expect(model.importId, 3);
-    expect(model.errorCount, 2);
+    expect(model.unmatchedCount, 3);
+    expect(model.errorCount, 3);
+    expect(model.canCommit, isFalse);
   });
 
-  test('finds the id and counts nested deeper, and sums a missing total', () {
-    final model = InventoryImportPreviewModel.fromJson({
-      'data': {
-        'import': {'id': '5'},
-        'summary': {'new_count': 2, 'updated_count': 3, 'error_count': 1},
-      },
-    });
-
-    expect(model.importId, 5);
-    expect(model.totalCount, 6);
-    expect(model.newCount, 2);
-    expect(model.updatedCount, 3);
-    expect(model.errorCount, 1);
-  });
-
-  test('a response without an id has none, and missing counts are 0', () {
+  test('a response without a uuid has no id, and missing counts are 0', () {
     final model = InventoryImportPreviewModel.fromJson({'data': <String, dynamic>{}});
 
     expect(model.importId, isNull);
