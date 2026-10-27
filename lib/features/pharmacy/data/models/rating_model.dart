@@ -22,6 +22,14 @@ class RatingModel {
     required this.patientName,
   });
 
+  /// The star count of a record: `stars`, or `stars_rating` (the name the
+  /// patient side sends it under), or `rating`. Throws when none is a number.
+  static int starsOf(Map<String, dynamic> json) {
+    final value = json['stars'] ?? json['stars_rating'] ?? json['rating'];
+    if (value is num) return value.toInt();
+    return int.parse('$value');
+  }
+
   factory RatingModel.fromJson(Map<String, dynamic> json) {
     final reviewer =
         json['patient'] as Map<String, dynamic>? ??
@@ -31,7 +39,7 @@ class RatingModel {
       // Required, unlike id/comment/name below: a rating with no valid star
       // count isn't a real review, and letting it default would silently
       // pollute the average while staying invisible in the 1-5 histogram.
-      stars: (json['stars'] as num).toInt(),
+      stars: starsOf(json),
       comment: json['comment'] as String?,
       // Required too: this repository sorts by createdAt to show the newest
       // reviews first, so a fallback like DateTime.now() would wrongly sort

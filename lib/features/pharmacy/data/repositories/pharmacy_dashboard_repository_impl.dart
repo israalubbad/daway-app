@@ -149,7 +149,10 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
       // record with an unexpected `stars` type instead of throwing and
       // losing the average for every other, well-formed record.
       final stars = ratingsJson
-          .map((json) => (json as Map<String, dynamic>)['stars'])
+          .map((json) {
+            final map = json as Map<String, dynamic>;
+            return map['stars'] ?? map['stars_rating'] ?? map['rating'];
+          })
           .whereType<num>()
           .map((stars) => stars.toDouble())
           .toList();
