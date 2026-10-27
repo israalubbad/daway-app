@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../../core/widgets/coming_soon_tab_screen.dart';
+import '../../../chat/presentation/screens/chatbot_screen.dart';
+import '../widgets/chatbot_button.dart';
 import '../widgets/patient_bottom_nav_bar.dart';
 import '../widgets/patient_dashboard_tab_scope.dart';
 import '../widgets/patient_side_menu.dart';
@@ -41,6 +45,19 @@ class _PatientDashboardShellScreenState extends State<PatientDashboardShellScree
       switchToTab: (tab) => setState(() => _selectedTab = tab),
       child: Scaffold(
         body: IndexedStack(index: _selectedTab.index, children: tabs),
+        // The app is RTL, so "end" is the left edge — where the design puts it.
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        // Only on the messages tab, next to the pharmacy conversations.
+        floatingActionButton: _selectedTab == PatientDashboardTab.messages
+            ? Padding(
+                padding: EdgeInsets.only(left: 8.w),
+                child: Builder(
+                  builder: (context) => ChatbotButton(
+                    onTap: () => Navigator.of(context).push(ChatbotScreen.route()),
+                  ),
+                ),
+              )
+            : null,
         bottomNavigationBar: PatientBottomNavBar(
           selectedTab: _selectedTab,
           onTabSelected: (tab) => setState(() => _selectedTab = tab),

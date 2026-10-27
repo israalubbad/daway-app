@@ -99,6 +99,11 @@ import '../../features/patient/domain/repositories/health_profile_repository.dar
 import '../../features/patient/domain/usecases/health_profile_usecases.dart';
 import '../../features/patient/presentation/cubit/health_profile_cubit.dart';
 import '../../features/chat/data/datasources/chat_remote_data_source.dart';
+import '../../features/chat/data/datasources/chatbot_remote_data_source.dart';
+import '../../features/chat/data/repositories/chatbot_repository_impl.dart';
+import '../../features/chat/domain/repositories/chatbot_repository.dart';
+import '../../features/chat/domain/usecases/chatbot_usecases.dart';
+import '../../features/chat/presentation/cubit/chatbot_cubit.dart';
 import '../../features/chat/domain/chat_activity.dart';
 import '../../features/chat/data/repositories/chat_repository_impl.dart';
 import '../../features/chat/data/repositories/cloudinary_chat_image_uploader.dart';
@@ -219,6 +224,7 @@ import '../../features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_ratings_cubit.dart';
 import '../local_storage/secure_storage_service.dart';
 import '../networking/dio_factory.dart';
+import '../services/session_expiry_handler.dart';
 
 const String _cloudinaryDioInstanceName = 'cloudinaryDio';
 
@@ -226,7 +232,12 @@ final getIt = GetIt.instance;
 
 Future<void> setupGetIt() async {
   // ---------------- Networking ----------------
-  getIt.registerLazySingleton(() => DioFactory.getDio());
+  getIt.registerLazySingleton(
+    () => DioFactory.getDio(
+      onSessionExpired: () => getIt<SessionExpiryHandler>().handle(),
+    ),
+  );
+  getIt.registerLazySingleton(() => SessionExpiryHandler(getIt()));
 
   // ---------------- Local Storage ----------------
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
@@ -439,6 +450,10 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<InquiryThreadResolver>(
     () => PatientInquiryThreadResolver(getIt(), getIt()),
   );
+  getIt.registerLazySingleton(() => ChatbotRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<ChatbotRepository>(() => ChatbotRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => SendChatbotMessageUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => ChatbotCubit(getIt()));
   getIt.registerFactoryParam<ChatCubit, ChatArgs, void>(
     (args, _) => ChatCubit(
       inquiryIds: args.inquiryIds,

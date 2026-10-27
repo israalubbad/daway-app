@@ -90,6 +90,9 @@ abstract class AppColors {
   // Account settings screen + its bottom sheets (language, logout)
   static const Color logoutRed = Color(0xFFDC2626);
   static const Color logoutRedTint = Color(0xFFFEF2F2);
+
+  // Patient chatbot floating button
+  static const Color chatbotButtonBackground = Color(0xFF0D2538);
   static const Color sheetTitleText = Color(0xFF1B3D5F);
   static const Color sheetSubtitleText = Color(0xFF9CA3AF);
   static const Color sheetOutlineBorder = Color(0xFFCBD9DD);
