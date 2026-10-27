@@ -1,11 +1,8 @@
 import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/helpers/api_result.dart';
+import '../../domain/entities/chatbot_reply.dart';
 import '../../domain/repositories/chatbot_repository.dart';
 import '../datasources/chatbot_remote_data_source.dart';
-
-/// Shown when the assistant answers but there is no text to show (for
-/// example `success: false` for a greeting that is not a medicine search).
-const _noAnswerMessage = 'لم أفهم سؤالك. جرّب أن تكتب اسم الدواء الذي تبحث عنه.';
 
 class ChatbotRepositoryImpl implements ChatbotRepository {
   final ChatbotRemoteDataSource _remoteDataSource;
@@ -13,31 +10,96 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
   const ChatbotRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<String>> send({required String token, required String message}) async {
+  Future<ApiResult<ChatbotReply>> send({required String token, required String message}) async {
     try {
       final response = await _remoteDataSource.chat(token: token, message: message);
-      return Success(replyText(response.data) ?? _noAnswerMessage);
+      return Success(parseReply(response.data));
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
     }
   }
 
-  /// The assistant's text from a response body. The reply field is not
-  /// documented, so the usual names are tried at the top level and under
-  /// `data`; null when none holds text.
-  static String? replyText(Object? body) {
-    const keys = ['reply', 'message', 'answer', 'response', 'text'];
-    String? fromNode(Object? node) {
-      if (node is String && node.trim().isNotEmpty) return node.trim();
-      if (node is! Map) return null;
-      for (final key in keys) {
-        final value = node[key];
-        if (value is String && value.trim().isNotEmpty) return value.trim();
-      }
-      return null;
-    }
+  /// What the assistant answered, exactly as the API sent it: its words
+  /// ([replyText]) and the medicine / pharmacies / alternatives it found.
+  static ChatbotReply parseReply(Object? body) {
+    if (body is! Map) return ChatbotReply(text: replyText(body));
 
-    if (body is! Map) return fromNode(body);
-    return fromNode(body) ?? fromNode(body['data']);
+    final medicine = _medicine(body['medicine']);
+    return ChatbotReply(
+      text: replyText(body),
+      medicine: medicine,
+      pharmacies: [
+        for (final raw in (body['pharmacies'] as List?) ?? const [])
+          if (raw is Map) _pharmacy(raw),
+      ],
+      alternatives: [
+        for (final raw in (body['alternatives'] as List?) ?? const []) ?_medicine(raw),
+      ],
+      totalFound: (body['total_found'] as num?)?.toInt(),
+    );
+  }
+
+  static ChatbotMedicine? _medicine(Object? raw) {
+    if (raw is! Map) return null;
+    final id = (raw['id'] as num?)?.toInt();
+    if (id == null) return null;
+    return ChatbotMedicine(
+      id: id,
+      name: _text(raw['name']) ?? _text(raw['trade_name']) ?? '',
+      nameAr: _text(raw['trade_name_ar']),
+      activeIngredient: _text(raw['active_ingredient']),
+      imageUrl: _text(raw['image_url']),
+      isAvailable: raw['is_available'] as bool?,
+    );
+  }
+
+  static ChatbotPharmacy _pharmacy(Map raw) {
+    return ChatbotPharmacy(
+      pharmacyId: (raw['pharmacy_id'] as num?)?.toInt() ?? (raw['id'] as num?)?.toInt() ?? 0,
+      name: _text(raw['name']) ?? '',
+      price: (raw['price'] as num?)?.toDouble(),
+      quantity: (raw['quantity'] as num?)?.toInt(),
+      availability: _text(raw['availability']),
+      distanceKm: (raw['distance_km'] as num?)?.toDouble(),
+      isOpenNow: raw['is_open_now'] as bool?,
+      address: _text(raw['address']),
+    );
+  }
+
+  /// The assistant's own words from a response body, exactly as the API sent
+  /// them; null when the response carries none (the app then shows nothing
+  /// rather than inventing a reply).
+  ///
+  /// The assistant's `reply` sits in the analysis object (`analysis.reply`) or
+  /// at the top level; the endpoint's own `message` (for example "could not
+  /// identify the medicine") is only used when there is no `reply`. A
+  /// `guidance` text, when present, follows the reply.
+  static String? replyText(Object? body) {
+    if (body is! Map) return _text(body);
+
+    final sources = <Object?>[body['analysis'], body, body['data']];
+    final reply = _firstText(sources, const ['reply']) ??
+        _firstText(sources, const ['message', 'answer', 'response', 'text']);
+    if (reply == null) return null;
+
+    final guidance = _firstText(sources, const ['guidance']);
+    return guidance == null || guidance == reply ? reply : '$reply\n\n$guidance';
+  }
+
+  static String? _firstText(List<Object?> nodes, List<String> keys) {
+    for (final node in nodes) {
+      if (node is! Map) continue;
+      for (final key in keys) {
+        final text = _text(node[key]);
+        if (text != null) return text;
+      }
+    }
+    return null;
+  }
+
+  static String? _text(Object? value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 }

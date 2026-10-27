@@ -1,6 +1,7 @@
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
+import '../entities/chatbot_reply.dart';
 import '../repositories/chatbot_repository.dart';
 
 class SendChatbotMessageUseCase {
@@ -9,10 +10,12 @@ class SendChatbotMessageUseCase {
 
   const SendChatbotMessageUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<String>> call(String message) async {
+  Future<ApiResult<ChatbotReply>> call(String message) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'));
+      return const ApiError(
+        ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
+      );
     }
     return _repository.send(token: session.token, message: message);
   }

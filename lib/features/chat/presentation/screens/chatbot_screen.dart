@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../cubit/chatbot_cubit.dart';
 import '../cubit/chatbot_state.dart';
 import '../widgets/chat_widgets.dart';
+import '../widgets/chatbot_result_widgets.dart';
 
 /// The patient's conversation with the assistant — same look as the pharmacy
 /// inquiry chat, without pictures.
@@ -92,6 +93,10 @@ class _ChatbotViewState extends State<_ChatbotView> {
                 builder: (context, state) => ChatMessagesList(
                   messages: state.messages,
                   controller: _scrollController,
+                  extrasFor: (message) {
+                    final reply = state.results[message.id];
+                    return reply == null ? null : ChatbotResults(reply: reply);
+                  },
                 ),
               ),
             ),
