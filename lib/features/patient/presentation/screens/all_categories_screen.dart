@@ -11,8 +11,6 @@ import '../../domain/entities/category.dart';
 import '../cubit/categories_cubit.dart';
 import '../cubit/categories_state.dart';
 import '../widgets/category_icon.dart';
-import '../widgets/patient_bottom_nav_bar.dart';
-import '../widgets/patient_dashboard_tab_scope.dart';
 
 class AllCategoriesScreen extends StatelessWidget {
   const AllCategoriesScreen({super.key});
@@ -32,13 +30,6 @@ class _AllCategoriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: PatientBottomNavBar(
-        selectedTab: PatientDashboardTab.home,
-        onTabSelected: (tab) {
-          Navigator.of(context).pop();
-          PatientDashboardTabScope.maybeOf(context)?.switchToTab(tab);
-        },
-      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

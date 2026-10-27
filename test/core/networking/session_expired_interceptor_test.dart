@@ -30,6 +30,23 @@ void main() {
     expect(calls, 0);
   });
 
+  test('401 on a request marked as ending the session is not an expiry', () async {
+    var calls = 0;
+    final dio = buildDio(401, onExpired: () => calls++);
+
+    await expectLater(
+      dio.get(
+        '/x',
+        options: Options(
+          headers: {'Authorization': 'Bearer t'},
+          extra: {skipSessionExpiryKey: true},
+        ),
+      ),
+      throwsA(isA<DioException>()),
+    );
+    expect(calls, 0);
+  });
+
   test('other errors with a token are not a session expiry', () async {
     var calls = 0;
     final dio = buildDio(500, onExpired: () => calls++);

@@ -15,6 +15,8 @@ import 'package:daway_app/features/patient/domain/repositories/favorites_reposit
 import 'package:daway_app/features/patient/domain/repositories/location_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/medicine_detail_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/add_cart_item_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/clear_cart_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_cart_items_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/subscribe_availability_alert_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/availability_alert_cubit.dart';
 import 'package:daway_app/features/patient/domain/usecases/add_favorite_medicine_usecase.dart';
@@ -184,6 +186,8 @@ void main() {
         AddFavoriteMedicineUseCase(favoritesRepository, sessionRepository),
         RemoveFavoriteMedicineUseCase(favoritesRepository, sessionRepository),
         AddCartItemUseCase(_FakeCartRepository(), sessionRepository),
+        GetCartItemsUseCase(_FakeCartRepository(), sessionRepository),
+        ClearCartUseCase(_FakeCartRepository(), sessionRepository),
       ),
     );
   });

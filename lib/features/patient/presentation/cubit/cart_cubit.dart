@@ -65,6 +65,30 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
+  /// Drops every line that is not from [pharmacyId] — the patient picked the
+  /// one pharmacy to order from. Returns null on success, or an error
+  /// message (the lines that were removed stay removed).
+  Future<String?> keepOnlyPharmacy(int pharmacyId) async {
+    final current = state;
+    if (current is! CartLoaded) return null;
+
+    var items = current.items;
+    for (final item in current.items.where((i) => i.pharmacyId != pharmacyId)) {
+      final result = await _deleteCartItemUseCase(item.id);
+      if (isClosed) return null;
+      if (result case ApiError(:final failure)) {
+        emit(CartLoaded(items));
+        return failure.message;
+      }
+      items = [
+        for (final i in items)
+          if (i.id != item.id) i,
+      ];
+    }
+    emit(CartLoaded(items));
+    return null;
+  }
+
   /// Empties the cart. Returns null on success, or an error message.
   Future<String?> clear() async {
     final current = state;

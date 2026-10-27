@@ -5,6 +5,8 @@ import '../../domain/entities/medicine_detail.dart';
 import '../../domain/entities/medicine_pharmacy_offer.dart';
 import '../../domain/usecases/add_cart_item_usecase.dart';
 import '../../domain/usecases/add_favorite_medicine_usecase.dart';
+import '../../domain/usecases/clear_cart_usecase.dart';
+import '../../domain/usecases/get_cart_items_usecase.dart';
 import '../../domain/usecases/get_current_location_usecase.dart';
 import '../../domain/usecases/get_favorite_medicines_usecase.dart';
 import '../../domain/usecases/get_medicine_detail_usecase.dart';
@@ -21,6 +23,8 @@ class MedicineDetailCubit extends Cubit<MedicineDetailState> {
   final AddFavoriteMedicineUseCase _addFavoriteMedicineUseCase;
   final RemoveFavoriteMedicineUseCase _removeFavoriteMedicineUseCase;
   final AddCartItemUseCase _addCartItemUseCase;
+  final GetCartItemsUseCase _getCartItemsUseCase;
+  final ClearCartUseCase _clearCartUseCase;
 
   MedicineDetailCubit(
     this.medicineId,
@@ -31,6 +35,8 @@ class MedicineDetailCubit extends Cubit<MedicineDetailState> {
     this._addFavoriteMedicineUseCase,
     this._removeFavoriteMedicineUseCase,
     this._addCartItemUseCase,
+    this._getCartItemsUseCase,
+    this._clearCartUseCase,
   ) : super(const MedicineDetailLoading()) {
     load();
   }
@@ -104,6 +110,30 @@ class MedicineDetailCubit extends Cubit<MedicineDetailState> {
     };
 
     emit(MedicineDetailLoaded(medicine: medicine, pharmacies: pharmacies, isFavorite: isFavorite));
+  }
+
+  /// An order can only be placed with one pharmacy (they are too far apart to
+  /// serve one delivery). Returns the name of the pharmacy the cart already
+  /// holds items from when it is not [offer]'s, or null when adding is fine
+  /// (empty cart, same pharmacy, or the cart could not be read — the server
+  /// still has the last word on the add).
+  Future<String?> otherPharmacyInCart(MedicinePharmacyOffer offer) async {
+    final result = await _getCartItemsUseCase();
+    return switch (result) {
+      Success(:final data) =>
+        data.isEmpty || data.every((i) => i.pharmacyId == offer.pharmacyId)
+            ? null
+            : data.first.pharmacyName,
+      ApiError() => null,
+    };
+  }
+
+  /// Empties the cart, then adds [offer] — the answer to
+  /// [otherPharmacyInCart]. Returns null on success, or an error message.
+  Future<String?> replaceCartWith(MedicinePharmacyOffer offer) async {
+    final cleared = await _clearCartUseCase();
+    if (cleared case ApiError(:final failure)) return failure.message;
+    return addToCart(offer);
   }
 
   /// Adds one of [offer] to the cart. Returns null on success, or a

@@ -1,16 +1,28 @@
+
 enum OrderStatus {
   pending,
   confirmed,
   preparing,
+  outForDelivery,
   delivered,
   cancelled;
 
-  static OrderStatus fromApi(String value) => switch (value) {
+  /// The backend's status word. Several spellings of "on the way" and
+  /// "delivered" are accepted, since the exact words are the backend's to
+  /// choose; anything unknown is treated as a new, unreviewed order.
+  static OrderStatus fromApi(String value) => switch (value.toLowerCase()) {
         'pending' => OrderStatus.pending,
         'confirmed' => OrderStatus.confirmed,
-        'preparing' => OrderStatus.preparing,
-        'delivered' => OrderStatus.delivered,
-        'cancelled' => OrderStatus.cancelled,
+        'preparing' || 'processing' => OrderStatus.preparing,
+        'out_for_delivery' ||
+        'on_the_way' ||
+        'in_transit' ||
+        'in_delivery' ||
+        'delivering' ||
+        'shipped' =>
+          OrderStatus.outForDelivery,
+        'delivered' || 'completed' || 'received' => OrderStatus.delivered,
+        'cancelled' || 'canceled' => OrderStatus.cancelled,
         _ => OrderStatus.pending,
       };
 

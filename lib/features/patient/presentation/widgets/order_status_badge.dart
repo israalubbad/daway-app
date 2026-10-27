@@ -8,6 +8,7 @@ import '../../domain/entities/order.dart';
       OrderStatus.pending => ('قيد الانتظار', AppColors.orderInProgressColor),
       OrderStatus.confirmed => ('تم التأكيد', AppColors.orderInProgressColor),
       OrderStatus.preparing => ('قيد التحضير', AppColors.orderInProgressColor),
+      OrderStatus.outForDelivery => ('في الطريق', AppColors.orderInProgressColor),
       OrderStatus.delivered => ('تم التوصيل', AppColors.orderCompletedColor),
       OrderStatus.cancelled => ('ملغي', AppColors.orderCancelledColor),
     };

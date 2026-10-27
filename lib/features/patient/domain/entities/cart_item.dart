@@ -3,6 +3,16 @@
 /// line), not a locally-synthesized key — the backend now owns the cart
 /// (merging duplicate `pharmacy_medicine_id` adds server-side), so nothing
 /// here is persisted on-device anymore.
+extension CartItems on List<CartItem> {
+  /// Pharmacy id → name of every pharmacy in the cart, in order of first
+  /// appearance. An order can only be placed with one of them.
+  Map<int, String> get pharmacies => {
+    for (final item in this) item.pharmacyId: item.pharmacyName,
+  };
+
+  double get total => fold(0, (sum, item) => sum + item.lineTotal);
+}
+
 class CartItem {
   final int id;
   final int pharmacyId;

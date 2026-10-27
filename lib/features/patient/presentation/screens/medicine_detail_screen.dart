@@ -17,6 +17,7 @@ import '../cubit/availability_alert_state.dart';
 import '../cubit/medicine_detail_cubit.dart';
 import '../cubit/medicine_detail_state.dart';
 import '../widgets/medicine_pharmacy_option_card.dart';
+import '../widgets/single_pharmacy_dialogs.dart';
 
 /// "صفحة المنتج" — a medicine's detail: its image, name, use tags, and the
 /// pharmacies stocking it (radio-selectable — the current pick is what
@@ -53,7 +54,23 @@ class _MedicineDetailView extends StatelessWidget {
       AppSnackbar.show(context, 'لا توجد صيدلية متوفرة للإضافة إلى السلة');
       return;
     }
-    final error = await context.read<MedicineDetailCubit>().addToCart(offer);
+    final cubit = context.read<MedicineDetailCubit>();
+    // One order = one pharmacy: a different pharmacy than the cart's needs the
+    // patient's say-so before the old items are dropped.
+    final otherPharmacy = await cubit.otherPharmacyInCart(offer);
+    if (!context.mounted) return;
+    var replaceCart = false;
+    if (otherPharmacy != null) {
+      replaceCart = await confirmReplaceCart(
+        context,
+        currentPharmacy: otherPharmacy,
+        newPharmacy: offer.pharmacyName,
+      );
+      if (!replaceCart || !context.mounted) return;
+    }
+    final error = replaceCart
+        ? await cubit.replaceCartWith(offer)
+        : await cubit.addToCart(offer);
     if (!context.mounted) return;
     if (error != null) {
       AppSnackbar.show(context, error);
