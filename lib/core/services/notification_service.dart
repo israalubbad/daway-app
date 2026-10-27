@@ -9,6 +9,17 @@ class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
+  /// Channel for server pushes (FCM). Its id is also the manifest's
+  /// default_notification_channel_id, so pushes that arrive while the app is
+  /// in the background use it too.
+  static const pushChannelId = 'push_default';
+  static const _pushChannel = AndroidNotificationChannel(
+    pushChannelId,
+    'الإشعارات',
+    description: 'إشعارات من دواي',
+    importance: Importance.high,
+  );
+
   static Future<void> init() async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
@@ -36,6 +47,7 @@ class NotificationService {
     final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await androidPlugin?.requestNotificationsPermission();
+    await androidPlugin?.createNotificationChannel(_pushChannel);
     // Android 12+ (S): exact alarms need this granted separately from the
     // notification permission above — opens the system "alarms & reminders"
     // settings screen. scheduleReminder() falls back to an inexact alarm if
@@ -43,6 +55,25 @@ class NotificationService {
     // silently dropping the reminder.
     await androidPlugin?.requestExactAlarmsPermission();
     _initialized = true;
+  }
+
+  /// Android does not draw an FCM notification while the app is in the
+  /// foreground, so the push is shown by hand.
+  static Future<void> showPush({required int id, String? title, String? body}) {
+    return _plugin.show(
+      id,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _pushChannel.id,
+          _pushChannel.name,
+          channelDescription: _pushChannel.description,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
   }
 
   /// The most time-of-day slots any [ReminderFrequency] uses (every 6

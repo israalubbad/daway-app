@@ -4,6 +4,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/datasources/device_tokens_remote_data_source.dart';
+import '../../features/auth/data/repositories/device_token_syncing_session_repository.dart';
+import '../../features/auth/data/repositories/device_tokens_repository_impl.dart';
+import '../../features/auth/data/repositories/firebase_push_token_source.dart';
+import '../../features/auth/domain/repositories/device_tokens_repository.dart';
+import '../../features/auth/domain/repositories/push_token_source.dart';
+import '../../features/auth/domain/usecases/register_device_token_usecase.dart';
+import '../../features/auth/domain/usecases/unregister_device_token_usecase.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/data/repositories/coming_soon_password_reset_repository.dart';
 import '../../features/auth/data/repositories/session_repository_impl.dart';
@@ -99,6 +107,11 @@ import '../../features/patient/domain/repositories/health_profile_repository.dar
 import '../../features/patient/domain/usecases/health_profile_usecases.dart';
 import '../../features/patient/presentation/cubit/health_profile_cubit.dart';
 import '../../features/chat/data/datasources/chat_remote_data_source.dart';
+import '../../features/chat/data/datasources/chatbot_remote_data_source.dart';
+import '../../features/chat/data/repositories/chatbot_repository_impl.dart';
+import '../../features/chat/domain/repositories/chatbot_repository.dart';
+import '../../features/chat/domain/usecases/chatbot_usecases.dart';
+import '../../features/chat/presentation/cubit/chatbot_cubit.dart';
 import '../../features/chat/domain/chat_activity.dart';
 import '../../features/chat/data/repositories/chat_repository_impl.dart';
 import '../../features/chat/data/repositories/cloudinary_chat_image_uploader.dart';
@@ -218,7 +231,9 @@ import '../../features/pharmacy/presentation/cubit/pharmacy_medicines_cubit.dart
 import '../../features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_ratings_cubit.dart';
 import '../local_storage/secure_storage_service.dart';
+import '../services/push_notification_service.dart';
 import '../networking/dio_factory.dart';
+import '../services/session_expiry_handler.dart';
 
 const String _cloudinaryDioInstanceName = 'cloudinaryDio';
 
@@ -226,7 +241,12 @@ final getIt = GetIt.instance;
 
 Future<void> setupGetIt() async {
   // ---------------- Networking ----------------
-  getIt.registerLazySingleton(() => DioFactory.getDio());
+  getIt.registerLazySingleton(
+    () => DioFactory.getDio(
+      onSessionExpired: () => getIt<SessionExpiryHandler>().handle(),
+    ),
+  );
+  getIt.registerLazySingleton(() => SessionExpiryHandler(getIt()));
 
   // ---------------- Local Storage ----------------
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
@@ -237,8 +257,26 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
   );
+  // Push (FCM) device token: registered with the backend when a session starts,
+  // removed when it ends — see DeviceTokenSyncingSessionRepository.
+  getIt.registerLazySingleton(() => DeviceTokensRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<DeviceTokensRepository>(
+    () => DeviceTokensRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<PushTokenSource>(
+    () => FirebasePushTokenSource(getIt()),
+  );
+  getIt.registerLazySingleton(() => RegisterDeviceTokenUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => UnregisterDeviceTokenUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(
+    () => PushNotificationService(getIt(), getIt(), getIt()),
+  );
   getIt.registerLazySingleton<SessionRepository>(
-    () => SessionRepositoryImpl(getIt()),
+    () => DeviceTokenSyncingSessionRepository(
+      SessionRepositoryImpl(getIt()),
+      getIt(),
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton(() => SendOtpUseCase(getIt()));
   getIt.registerLazySingleton(() => VerifyOtpUseCase(getIt()));
@@ -439,6 +477,10 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<InquiryThreadResolver>(
     () => PatientInquiryThreadResolver(getIt(), getIt()),
   );
+  getIt.registerLazySingleton(() => ChatbotRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<ChatbotRepository>(() => ChatbotRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => SendChatbotMessageUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => ChatbotCubit(getIt()));
   getIt.registerFactoryParam<ChatCubit, ChatArgs, void>(
     (args, _) => ChatCubit(
       inquiryIds: args.inquiryIds,

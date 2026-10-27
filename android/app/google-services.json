@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "836873109647",
+    "project_id": "daway-7",
+    "storage_bucket": "daway-7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836873109647:android:e5be3cf9f7df943bcd70fa",
+        "android_client_info": {
+          "package_name": "com.daway.daway_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEUdpjfMyvN-u050yPLBSrtp1L6Za0amc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

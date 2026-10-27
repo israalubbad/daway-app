@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'core/routing/app_navigator.dart';
 import 'core/routing/app_router.dart';
 import 'core/theming/app_theme.dart';
 
@@ -23,6 +24,7 @@ class DawayApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
+          navigatorKey: appNavigatorKey,
           title: 'Dawak',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,

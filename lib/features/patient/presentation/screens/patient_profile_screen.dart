@@ -6,13 +6,15 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../../../core/widgets/app_snackbar.dart';
-import '../../../../core/widgets/profile_field_row.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
 import '../widgets/patient_profile_avatar.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
+/// "معلومات الحساب": the name and birth date are inputs you simply tap and
+/// change (no "edit" mode to enter first), the phone number is shown locked,
+/// and "حفظ التعديلات" only lights up once something has changed.
 class PatientProfileScreen extends StatefulWidget {
   const PatientProfileScreen({super.key});
 
@@ -21,21 +23,6 @@ class PatientProfileScreen extends StatefulWidget {
 }
 
 class _PatientProfileScreenState extends State<PatientProfileScreen> {
-  late final TextEditingController _nameController;
-  String _controllerBoundTo = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
   Future<void> _pickBirthDate(BuildContext context, String? current) async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -56,15 +43,13 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<PatientProfileCubit, PatientProfileState>(
+          listenWhen: (previous, current) =>
+              current is PatientProfileLoaded &&
+              current.saveError != null &&
+              (previous is! PatientProfileLoaded || previous.saveError != current.saveError),
           listener: (context, state) {
             if (state is PatientProfileLoaded && state.saveError != null) {
               AppSnackbar.show(context, state.saveError!);
-            }
-            if (state is PatientProfileLoaded && !state.isEditing) {
-              if (_controllerBoundTo != state.name) {
-                _nameController.text = state.name;
-                _controllerBoundTo = state.name;
-              }
             }
           },
           builder: (context, state) {
@@ -84,6 +69,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
   Widget _buildLoaded(BuildContext context, PatientProfileLoaded state) {
     final cubit = context.read<PatientProfileCubit>();
+    final canSave = state.canSave && state.hasChanges && !state.isSaving;
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -92,7 +78,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
         children: [
           const PatientSubScreenHeader(
             title: 'معلومات الحساب',
-            description: 'إدارة معلوماتك الشخصية وتفاصيل حسابك',
+            description: 'اضغط على أي حقل لتغييره، ثم احفظ التعديلات.',
           ),
           SizedBox(height: 32.h),
           Center(
@@ -106,71 +92,156 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
               onImagePicked: (file) => cubit.avatarSelected(file),
             ),
           ),
-          SizedBox(height: 16.h),
-          Center(
-            child: Text(
-              state.name,
-              style: AppTextStyles.profileFieldLabel,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 32.h),
           Text('الاسم', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
-          ProfileFieldRow(
-            onEditTap: () => cubit.toggleEdit(),
-            child: state.isEditing
-                ? TextField(
-                    controller: _nameController,
-                    textAlign: TextAlign.right,
-                    onChanged: (value) => cubit.nameChanged(value),
-                    style: AppTextStyles.profileFieldValue,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  )
-                : Text(
-                    state.name,
-                    textAlign: TextAlign.right,
-                    style: AppTextStyles.profileFieldValue,
-                  ),
+          _FieldBox(
+            icon: Icons.edit_outlined,
+            // Re-created (and so reset to the saved name) whenever the saved
+            // profile changes, e.g. after saving; typing never rebuilds it.
+            child: _NameInput(
+              key: ValueKey(state.profile),
+              initialName: state.name,
+              onChanged: cubit.nameChanged,
+            ),
+          ),
+          if (state.name.trim().isEmpty)
+            Padding(
+              padding: EdgeInsets.only(top: 6.h),
+              child: Text(
+                'الاسم مطلوب',
+                textAlign: TextAlign.right,
+                style: AppTextStyles.authFieldError,
+              ),
+            ),
+          SizedBox(height: 24.h),
+          Text('تاريخ الميلاد', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          SizedBox(height: 8.h),
+          _FieldBox(
+            icon: Icons.calendar_today_outlined,
+            onTap: () => _pickBirthDate(context, state.birthDate),
+            child: Text(
+              state.birthDate ?? 'اختر تاريخ ميلادك',
+              textAlign: TextAlign.right,
+              style: AppTextStyles.profileFieldValue.copyWith(
+                color: state.birthDate == null ? AppColors.grey : null,
+              ),
+            ),
           ),
           SizedBox(height: 24.h),
           Text('رقم الهاتف', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
-          ProfileFieldRow(
-            onEditTap: () => cubit.toggleEdit(),
+          _FieldBox(
+            icon: Icons.lock_outline,
+            locked: true,
             child: Text(
               state.profile.phone,
               textAlign: TextAlign.right,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
-          SizedBox(height: 24.h),
-          Text('تاريخ الميلاد', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
-          SizedBox(height: 8.h),
-          ProfileFieldRow(
-            onEditTap: () => cubit.toggleEdit(),
-            child: GestureDetector(
-              onTap: state.isEditing ? () => _pickBirthDate(context, state.birthDate) : null,
-              child: Text(
-                state.birthDate ?? 'اختر تاريخ ميلادك',
-                textAlign: TextAlign.right,
-                style: AppTextStyles.profileFieldValue,
-              ),
+          Padding(
+            padding: EdgeInsets.only(top: 6.h),
+            child: Text(
+              'رقم الهاتف مرتبط بحسابك ولا يمكن تغييره من هنا.',
+              textAlign: TextAlign.right,
+              style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
             ),
           ),
-          SizedBox(height: 48.h),
+          SizedBox(height: 40.h),
           AppCustomButton(
             text: 'حفظ التعديلات',
             isLoading: state.isSaving,
-            backgroundColor: state.canSave ? AppColors.mainTeal : AppColors.borderGrey,
-            onPressed: state.canSave ? () => cubit.save() : () {},
+            backgroundColor: canSave ? AppColors.mainTeal : AppColors.borderGrey,
+            onPressed: canSave ? cubit.save : () {},
           ),
           SizedBox(height: 24.h),
         ],
+      ),
+    );
+  }
+}
+
+/// A bordered field: the value on the right, and a small icon at the left that
+/// says what the box does — a pencil (type here), a calendar (pick a date) or
+/// a lock (read only).
+class _FieldBox extends StatelessWidget {
+  final Widget child;
+  final IconData icon;
+  final VoidCallback? onTap;
+  final bool locked;
+
+  const _FieldBox({
+    required this.child,
+    required this.icon,
+    this.onTap,
+    this.locked = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 62.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: locked ? AppColors.permissionIconBg : Colors.white,
+          border: Border.all(color: AppColors.cardBorder),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          children: [
+            Expanded(child: child),
+            SizedBox(width: 8.w),
+            Icon(icon, size: 20.sp, color: locked ? AppColors.grey : AppColors.mainTeal),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NameInput extends StatefulWidget {
+  final String initialName;
+  final ValueChanged<String> onChanged;
+
+  const _NameInput({super.key, required this.initialName, required this.onChanged});
+
+  @override
+  State<_NameInput> createState() => _NameInputState();
+}
+
+class _NameInputState extends State<_NameInput> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      textAlign: TextAlign.right,
+      textInputAction: TextInputAction.done,
+      onChanged: widget.onChanged,
+      style: AppTextStyles.profileFieldValue,
+      decoration: InputDecoration(
+        isDense: true,
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+        hintText: 'اكتب اسمك',
+        hintStyle: AppTextStyles.profileFieldValue.copyWith(color: AppColors.grey),
       ),
     );
   }

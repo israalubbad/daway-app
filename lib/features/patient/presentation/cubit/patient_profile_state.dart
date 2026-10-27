@@ -77,6 +77,16 @@ class PatientProfileLoaded extends PatientProfileState {
 
   bool get canSave => name.trim().isNotEmpty && hasLocation && !isUploadingAvatar;
 
+  /// Whether anything differs from the saved [profile] — the save button is
+  /// only live then, so it never reads as "save" when there is nothing to save.
+  bool get hasChanges =>
+      name.trim() != profile.name ||
+      birthDate != profile.birthDate ||
+      avatarUrl != profile.avatarUrl ||
+      latitude != profile.latitude ||
+      longitude != profile.longitude ||
+      address != profile.address;
+
   PatientProfileLoaded copyWith({
     bool? isEditing,
     String? name,
