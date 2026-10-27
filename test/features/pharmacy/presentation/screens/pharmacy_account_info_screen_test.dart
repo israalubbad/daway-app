@@ -178,14 +178,10 @@ void main() {
     },
   );
 
-  testWidgets('the phone and password have no edit flow yet', (tester) async {
+  testWidgets('the phone has no edit flow yet', (tester) async {
     await pumpScreen(tester);
 
     await tester.tap(editChipOf('رقم الهاتف'));
-    await tester.pump();
-    expect(find.text('قريباً'), findsOneWidget);
-
-    await tester.tap(editChipOf('كلمة المرور'));
     await tester.pump();
     expect(find.text('قريباً'), findsOneWidget);
     expect(cubit.loaded.hasChanges, isFalse);

@@ -14,6 +14,7 @@ import '../../../patient/presentation/widgets/patient_sub_screen_header.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../cubit/pharmacy_profile_state.dart';
 import '../helpers/working_hours_format.dart';
+import '../widgets/change_password_sheet.dart';
 import '../widgets/working_hours_dialog.dart';
 
 /// "معلومات الحساب": the pharmacy's logo, name, phone, address, working hours
@@ -220,7 +221,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
           SizedBox(height: 24.h),
           _FieldLabel('كلمة المرور'),
           ProfileFieldRow(
-            onEditTap: _comingSoon,
+            onEditTap: () => ChangePasswordSheet.show(context),
             child: Text(
               '*******',
               textAlign: TextAlign.right,

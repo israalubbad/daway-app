@@ -40,6 +40,8 @@ import '../../features/pharmacy/presentation/cubit/edit_medicine_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/notifications_cubit.dart';
+import '../../features/patient/presentation/cubit/patient_notifications_cubit.dart';
+import '../../features/patient/presentation/screens/patient_notifications_screen.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_ratings_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import '../../features/pharmacy/presentation/screens/pharmacy_stock_import_screen.dart';
@@ -171,6 +173,14 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (context) => getIt<NotificationsCubit>(),
             child: const PharmacyNotificationsScreen(),
+          ),
+        );
+
+      case Routes.patientNotificationsScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => getIt<PatientNotificationsCubit>(),
+            child: const PatientNotificationsScreen(),
           ),
         );
 

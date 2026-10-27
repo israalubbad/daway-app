@@ -192,7 +192,12 @@ import '../../features/pharmacy/data/repositories/pharmacy_dashboard_repository_
 import '../../features/pharmacy/data/repositories/pharmacy_inquiries_repository_impl.dart';
 import '../../features/pharmacy/data/datasources/pharmacy_inventory_import_remote_data_source.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inventory_import_repository_impl.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_password_remote_data_source.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inventory_repository_impl.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_password_repository_impl.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_password_repository.dart';
+import '../../features/pharmacy/domain/usecases/change_pharmacy_password_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/change_pharmacy_password_cubit.dart';
 import '../../features/pharmacy/domain/repositories/pharmacy_inventory_import_repository.dart';
 import '../../features/pharmacy/domain/usecases/analyze_inventory_import_usecase.dart';
 import '../../features/pharmacy/domain/usecases/cancel_inventory_import_usecase.dart';
@@ -599,6 +604,14 @@ Future<void> setupGetIt() async {
     () => UpdatePharmacyProfileUseCase(getIt(), getIt()),
   );
   getIt.registerFactory(() => PharmacyProfileCubit(getIt(), getIt(), getIt()));
+
+  // ---------------- Pharmacy Password ----------------
+  getIt.registerLazySingleton(() => PharmacyPasswordRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyPasswordRepository>(
+    () => PharmacyPasswordRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => ChangePharmacyPasswordUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => ChangePharmacyPasswordCubit(getIt()));
 
   // ---------------- Pharmacy Medicines ----------------
   getIt.registerLazySingleton(() => PharmacyMedicineRemoteDataSource(getIt()));

@@ -62,7 +62,8 @@ class _PatientHomeView extends StatelessWidget {
             children: [
               HomeHeader(
                 onCartTap: () => Navigator.of(context).pushNamed(Routes.patientCartScreen),
-                onNotificationsTap: () => _comingSoon(context),
+                onNotificationsTap: () =>
+                    Navigator.of(context).pushNamed(Routes.patientNotificationsScreen),
                 onLocationTap: () => _comingSoon(context),
               ),
               SizedBox(height: 24.h),
