@@ -26,7 +26,6 @@ import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_dashbo
 import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_home_screen.dart';
 import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_products_screen.dart';
 import 'package:daway_app/features/pharmacy/presentation/widgets/pharmacy_dashboard_tab_scope.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
