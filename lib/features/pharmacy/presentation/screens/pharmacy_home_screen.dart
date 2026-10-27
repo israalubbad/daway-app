@@ -26,13 +26,14 @@ import '../widgets/pharmacy_summary_cards.dart';
 /// Expects a [PharmacyDashboardCubit], a [PharmacyProfileCubit] (for the
 /// header) and a [LogoutCubit] above it.
 class PharmacyHomeScreen extends StatelessWidget {
-  /// The pharmacy's newest orders. There is no orders API yet, so the shell
-  /// opens the screen with none and the section stays hidden; this is what
-  /// lets the populated state be built and tested now, and have real orders
-  /// handed in once an API exists.
+  /// The pharmacy's newest orders, handed in by the shell from its orders
+  /// cubit; the section stays hidden while there are none.
   final List<PharmacyOrder> orders;
 
-  const PharmacyHomeScreen({super.key, this.orders = const []});
+  /// Takes a decision made from an order's details screen.
+  final PharmacyOrderDecision? onDecide;
+
+  const PharmacyHomeScreen({super.key, this.orders = const [], this.onDecide});
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +75,7 @@ class PharmacyHomeScreen extends StatelessWidget {
                       PharmacyDashboardLoaded(:final stats) => _HomeContent(
                         stats: stats,
                         orders: orders,
+                        onDecide: onDecide,
                       ),
                     };
                   },
@@ -90,8 +92,9 @@ class PharmacyHomeScreen extends StatelessWidget {
 class _HomeContent extends StatelessWidget {
   final PharmacyDashboardStats stats;
   final List<PharmacyOrder> orders;
+  final PharmacyOrderDecision? onDecide;
 
-  const _HomeContent({required this.stats, required this.orders});
+  const _HomeContent({required this.stats, required this.orders, this.onDecide});
 
   Future<void> _openStockImport(BuildContext context) async {
     final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
@@ -115,8 +118,7 @@ class _HomeContent extends StatelessWidget {
         ],
         PharmacySummaryCards(
           totalProducts: stats.totalMedicines,
-          // The mobile API has no monthly-sales figure yet.
-          monthlySales: null,
+          monthlySales: stats.monthlySales,
           onProductsTap: () => _goToTab(context, PharmacyDashboardTab.products),
         ),
         SizedBox(height: 8.h),
@@ -133,7 +135,8 @@ class _HomeContent extends StatelessWidget {
           PharmacyOrdersSection(
             orders: orders,
             onViewAllTap: () => _goToTab(context, PharmacyDashboardTab.orders),
-            onOrderTap: (order) => PharmacyOrderDetailsScreen.open(context, order),
+            onOrderTap: (order) =>
+                PharmacyOrderDetailsScreen.open(context, order, onDecide: onDecide),
           ),
         ],
       ],

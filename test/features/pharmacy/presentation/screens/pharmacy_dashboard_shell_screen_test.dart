@@ -18,6 +18,8 @@ import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_inventor
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_inventory_state.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_state.dart';
+import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
+import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_state.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_state.dart';
 import 'package:daway_app/core/widgets/header_icon_button.dart';
@@ -58,6 +60,17 @@ class _FakeMedicinesCubit extends Cubit<PharmacyMedicinesState>
 
   /// Moves the cubit on from loading, to show the page's loaded state.
   void show(PharmacyMedicinesState state) => emit(state);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeOrdersCubit extends Cubit<PharmacyOrdersState>
+    implements PharmacyOrdersCubit {
+  _FakeOrdersCubit() : super(const PharmacyOrdersLoaded([]));
+
+  @override
+  Future<void> refresh() async {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -161,6 +174,7 @@ void main() {
         medicinesCubits.add(cubit);
         return cubit;
       })
+      ..registerFactory<PharmacyOrdersCubit>(_FakeOrdersCubit.new)
       ..registerFactory<PharmacyInventoryCubit>(_FakeInventoryCubit.new)
       ..registerFactory<ConversationsCubit>(
         _FakeConversationsCubit.new,

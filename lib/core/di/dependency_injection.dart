@@ -232,7 +232,13 @@ import '../../features/pharmacy/domain/usecases/update_inquiry_status_usecase.da
 import '../../features/pharmacy/domain/usecases/update_pharmacy_inventory_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_notifications_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_orders_remote_data_source.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_orders_repository_impl.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
+import '../../features/pharmacy/domain/usecases/decide_pharmacy_order_usecase.dart';
+import '../../features/pharmacy/domain/usecases/get_pharmacy_orders_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_ratings_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
 import '../../features/pharmacy/domain/usecases/mark_all_notifications_read_usecase.dart';
 import '../../features/pharmacy/domain/usecases/mark_notification_read_usecase.dart';
 import '../../features/pharmacy/domain/usecases/search_medicine_catalog_usecase.dart';
@@ -680,6 +686,15 @@ Future<void> setupGetIt() async {
     () => GetPharmacyDashboardStatsUseCase(getIt(), getIt()),
   );
   getIt.registerFactory(() => PharmacyDashboardCubit(getIt()));
+
+  // ---------------- Pharmacy Orders ----------------
+  getIt.registerLazySingleton(() => PharmacyOrdersRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyOrdersRepository>(
+    () => PharmacyOrdersRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => GetPharmacyOrdersUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => DecidePharmacyOrderUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => PharmacyOrdersCubit(getIt(), getIt()));
 
   // ---------------- Pharmacy Inquiries ----------------
   getIt.registerLazySingleton(() => PharmacyInquiriesRemoteDataSource(getIt()));

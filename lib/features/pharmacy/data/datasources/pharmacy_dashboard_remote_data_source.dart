@@ -14,6 +14,13 @@ class PharmacyDashboardRemoteDataSource {
     );
   }
 
+  Future<Response<dynamic>> getSalesSummary({required String token}) {
+    return _dio.get(
+      ApiConstants.pharmacySalesSummary,
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
   Future<Response<dynamic>> getRatings({required String token}) {
     return _dio.get(
       ApiConstants.pharmacyRatings,

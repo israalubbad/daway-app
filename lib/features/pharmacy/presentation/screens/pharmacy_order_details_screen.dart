@@ -14,35 +14,63 @@ import '../../domain/entities/pharmacy_order.dart';
 import '../widgets/pharmacy_products_header.dart';
 import '../widgets/product_status_badge.dart';
 
-/// "تفاصيل الطلب": one order in full — its number, strip and time, each
-/// medicine, where it goes, how it is paid — and the two decisions, "قبول
-/// الطلب" and "رفض الطلب".
-///
-/// There is no orders API yet, so accepting and rejecting go to [onAccept] and
-/// [onReject], and without them answer "قريباً".
-class PharmacyOrderDetailsScreen extends StatelessWidget {
-  final PharmacyOrder order;
-  final VoidCallback? onAccept;
-  final VoidCallback? onReject;
+/// Takes the pharmacy's decision on [order]; returns an error message, or null
+/// once the backend has accepted it.
+typedef PharmacyOrderDecision =
+    Future<String?> Function(PharmacyOrder order, {required bool accept});
 
-  const PharmacyOrderDetailsScreen({
-    super.key,
-    required this.order,
-    this.onAccept,
-    this.onReject,
-  });
+/// "تفاصيل الطلب": one order in full — its number, strip and time, each
+/// medicine, where it goes, how it is paid — and, while it is still pending,
+/// the two decisions, "قبول الطلب" and "رفض الطلب", which go to [onDecide]
+/// (without it they answer "قريباً").
+class PharmacyOrderDetailsScreen extends StatefulWidget {
+  final PharmacyOrder order;
+  final PharmacyOrderDecision? onDecide;
+
+  const PharmacyOrderDetailsScreen({super.key, required this.order, this.onDecide});
 
   /// Pushes the screen for [order] above the dashboard.
-  static Future<void> open(BuildContext context, PharmacyOrder order) {
+  static Future<void> open(
+    BuildContext context,
+    PharmacyOrder order, {
+    PharmacyOrderDecision? onDecide,
+  }) {
     return Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => PharmacyOrderDetailsScreen(order: order)),
+      MaterialPageRoute<void>(
+        builder: (_) => PharmacyOrderDetailsScreen(order: order, onDecide: onDecide),
+      ),
     );
   }
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  @override
+  State<PharmacyOrderDetailsScreen> createState() => _PharmacyOrderDetailsScreenState();
+}
+
+class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen> {
+  bool _isDeciding = false;
+
+  Future<void> _decide(bool accept) async {
+    final onDecide = widget.onDecide;
+    if (onDecide == null) {
+      AppSnackbar.show(context, 'قريباً');
+      return;
+    }
+    if (_isDeciding) return;
+    setState(() => _isDeciding = true);
+    final error = await onDecide(widget.order, accept: accept);
+    if (!mounted) return;
+    setState(() => _isDeciding = false);
+    if (error != null) {
+      AppSnackbar.show(context, error);
+      return;
+    }
+    AppSnackbar.show(context, accept ? 'تم قبول الطلب' : 'تم رفض الطلب');
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final order = widget.order;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,19 +95,22 @@ class PharmacyOrderDetailsScreen extends StatelessWidget {
                 SizedBox(height: 16.h),
                 _PaymentCard(payment: payment),
               ],
-              SizedBox(height: 16.h),
-              AppCustomButton(
-                text: 'قبول الطلب',
-                onPressed: onAccept ?? () => _comingSoon(context),
-              ),
-              SizedBox(height: 16.h),
-              AppCustomButton(
-                text: 'رفض الطلب',
-                backgroundColor: Colors.white,
-                textColor: AppColors.authError,
-                borderColor: AppColors.cardBorder,
-                onPressed: onReject ?? () => _comingSoon(context),
-              ),
+              if (order.status == PharmacyOrderStatus.pending) ...[
+                SizedBox(height: 16.h),
+                AppCustomButton(
+                  text: 'قبول الطلب',
+                  isLoading: _isDeciding,
+                  onPressed: () => _decide(true),
+                ),
+                SizedBox(height: 16.h),
+                AppCustomButton(
+                  text: 'رفض الطلب',
+                  backgroundColor: Colors.white,
+                  textColor: AppColors.authError,
+                  borderColor: AppColors.cardBorder,
+                  onPressed: () => _decide(false),
+                ),
+              ],
             ],
           ),
         ),

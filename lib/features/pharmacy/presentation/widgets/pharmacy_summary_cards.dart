@@ -11,9 +11,8 @@ import '../../../../core/theming/app_text_styles.dart';
 class PharmacySummaryCards extends StatelessWidget {
   final int totalProducts;
 
-  /// In shekels, or null while there is no figure to show — the mobile API
-  /// has no sales endpoint yet, so the home passes null and the card shows a
-  /// dash rather than a made-up 0.
+  /// In shekels, or null while there is no figure to show — the card then
+  /// shows a dash rather than a made-up 0.
   final double? monthlySales;
   final VoidCallback onProductsTap;
 

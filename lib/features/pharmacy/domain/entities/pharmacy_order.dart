@@ -1,9 +1,13 @@
-/// An order a patient placed with the pharmacy, as the home screen's "الطلبات"
-/// cards and the order-details screen show it. There is no orders API yet (the
-/// pharmacy endpoints stop at inventory, inquiries and ratings), so nothing
-/// constructs a real one — this exists so the populated screens are built and
-/// tested ahead of that backend, the same way the patient side's `Order` is.
+/// Where a sub-order stands with the pharmacy.
+enum PharmacyOrderStatus { pending, accepted, rejected, other }
+
+/// An order a patient placed with the pharmacy (`GET /pharmacy/sub-orders`),
+/// as the home screen's "الطلبات" cards and the order-details screen show it.
 class PharmacyOrder {
+  /// The sub-order's id, what the decision is sent against.
+  final int id;
+  final PharmacyOrderStatus status;
+
   /// Without the leading "#" ("DW-1021").
   final String orderNumber;
 
@@ -30,6 +34,8 @@ class PharmacyOrder {
   final PharmacyOrderPayment? payment;
 
   const PharmacyOrder({
+    this.id = 0,
+    this.status = PharmacyOrderStatus.pending,
     required this.orderNumber,
     required this.createdAt,
     required this.itemsCount,

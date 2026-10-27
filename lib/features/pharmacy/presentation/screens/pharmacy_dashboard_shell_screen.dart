@@ -5,6 +5,8 @@ import '../../../../core/di/dependency_injection.dart';
 import '../cubit/pharmacy_dashboard_cubit.dart';
 import '../cubit/pharmacy_inventory_cubit.dart';
 import '../cubit/pharmacy_medicines_cubit.dart';
+import '../cubit/pharmacy_orders_cubit.dart';
+import '../cubit/pharmacy_orders_state.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../widgets/pharmacy_bottom_nav_bar.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
@@ -46,9 +48,14 @@ class _PharmacyDashboardShellScreenState
   // (see [_selectTab]).
   PharmacyMedicinesCubit? _productsCubit;
 
+  // The orders, shared by the home's "الطلبات" section and the orders tab, so
+  // a decision taken on either is seen by both.
+  final PharmacyOrdersCubit _ordersCubit = getIt<PharmacyOrdersCubit>();
+
   @override
   void dispose() {
     _dashboardCubit.close();
+    _ordersCubit.close();
     _productsCubit?.close();
     super.dispose();
   }
@@ -61,6 +68,9 @@ class _PharmacyDashboardShellScreenState
         // fetched again on the way back.
         case PharmacyDashboardTab.home:
           _dashboardCubit.refresh();
+          _ordersCubit.refresh();
+        case PharmacyDashboardTab.orders:
+          _ordersCubit.refresh();
         // Likewise the products list: stock is also edited from the inventory.
         case PharmacyDashboardTab.products || PharmacyDashboardTab.medicines:
           final productsCubit = _productsCubit;
@@ -82,7 +92,17 @@ class _PharmacyDashboardShellScreenState
     final tabs = <PharmacyDashboardTab, Widget>{
       PharmacyDashboardTab.home: BlocProvider.value(
         value: _dashboardCubit,
-        child: const PharmacyHomeScreen(),
+        child: BlocBuilder<PharmacyOrdersCubit, PharmacyOrdersState>(
+          bloc: _ordersCubit,
+          builder: (context, state) => PharmacyHomeScreen(
+            orders: switch (state) {
+              PharmacyOrdersLoaded(:final orders) => orders.take(3).toList(),
+              _ => const [],
+            },
+            onDecide: (order, {required accept}) =>
+                _ordersCubit.decide(order, accept: accept),
+          ),
+        ),
       ),
       PharmacyDashboardTab.products: switch (_productsCubit) {
         final cubit? => BlocProvider.value(
@@ -101,8 +121,17 @@ class _PharmacyDashboardShellScreenState
         ),
         null => const SizedBox.shrink(),
       },
-      // There is no orders API yet, so the tab has no orders to show.
-      PharmacyDashboardTab.orders: const PharmacyOrdersScreen(),
+      PharmacyDashboardTab.orders: BlocBuilder<PharmacyOrdersCubit, PharmacyOrdersState>(
+        bloc: _ordersCubit,
+        builder: (context, state) => PharmacyOrdersScreen(
+          orders: state is PharmacyOrdersLoaded ? state.orders : const [],
+          isLoading: state is PharmacyOrdersLoading,
+          errorMessage: state is PharmacyOrdersLoadFailure ? state.message : null,
+          onRetry: _ordersCubit.load,
+          onDecide: (order, {required accept}) =>
+              _ordersCubit.decide(order, accept: accept),
+        ),
+      ),
       PharmacyDashboardTab.inventory: BlocProvider(
         create: (_) => getIt<PharmacyInventoryCubit>(),
         child: const PharmacyInventoryScreen(),

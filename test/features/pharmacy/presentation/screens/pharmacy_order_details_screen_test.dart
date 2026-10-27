@@ -26,8 +26,7 @@ void main() {
   Future<void> pumpScreen(
     WidgetTester tester, {
     PharmacyOrder? order,
-    VoidCallback? onAccept,
-    VoidCallback? onReject,
+    PharmacyOrderDecision? onDecide,
   }) async {
     await setDesignViewport(tester);
     await tester.pumpWidget(
@@ -39,8 +38,7 @@ void main() {
                 MaterialPageRoute<void>(
                   builder: (_) => PharmacyOrderDetailsScreen(
                     order: order ?? _order,
-                    onAccept: onAccept,
-                    onReject: onReject,
+                    onDecide: onDecide,
                   ),
                 ),
               ),
@@ -137,18 +135,67 @@ void main() {
     expect(find.text('طريقة الدفع'), findsNothing);
   });
 
-  testWidgets('قبول الطلب and رفض الطلب call back', (tester) async {
-    var accepted = 0;
-    var rejected = 0;
-    await pumpScreen(tester, onAccept: () => accepted++, onReject: () => rejected++);
+  testWidgets('قبول الطلب sends the decision and closes the screen', (tester) async {
+    final decisions = <bool>[];
+    await pumpScreen(
+      tester,
+      onDecide: (order, {required accept}) async {
+        decisions.add(accept);
+        return null;
+      },
+    );
 
     await tester.ensureVisible(find.text('قبول الطلب'));
     await tester.tap(find.text('قبول الطلب'));
+    await tester.pumpAndSettle();
+
+    expect(decisions, [true]);
+    expect(find.text('تفاصيل الطلب'), findsNothing);
+  });
+
+  testWidgets('رفض الطلب sends a rejection', (tester) async {
+    final decisions = <bool>[];
+    await pumpScreen(
+      tester,
+      onDecide: (order, {required accept}) async {
+        decisions.add(accept);
+        return null;
+      },
+    );
+
     await tester.ensureVisible(find.text('رفض الطلب'));
     await tester.tap(find.text('رفض الطلب'));
+    await tester.pumpAndSettle();
 
-    expect(accepted, 1);
-    expect(rejected, 1);
+    expect(decisions, [false]);
+  });
+
+  testWidgets('a failed decision shows the error and stays on the screen', (tester) async {
+    await pumpScreen(tester, onDecide: (order, {required accept}) async => 'تعذر الاتصال');
+
+    await tester.ensureVisible(find.text('قبول الطلب'));
+    await tester.tap(find.text('قبول الطلب'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('تعذر الاتصال'), findsOneWidget);
+    expect(find.text('تفاصيل الطلب'), findsOneWidget);
+  });
+
+  testWidgets('an order already decided has no decision buttons', (tester) async {
+    await pumpScreen(
+      tester,
+      order: PharmacyOrder(
+        orderNumber: 'DW-9',
+        status: PharmacyOrderStatus.accepted,
+        createdAt: DateTime.now(),
+        itemsCount: 1,
+        total: 5,
+        area: 'غزة',
+      ),
+    );
+
+    expect(find.text('قبول الطلب'), findsNothing);
+    expect(find.text('رفض الطلب'), findsNothing);
   });
 
   testWidgets('without handlers both buttons say قريباً', (tester) async {

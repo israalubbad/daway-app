@@ -39,6 +39,7 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
       final statsResponseFuture = _remoteDataSource.getStats(token: token);
       final averageRatingFuture = _averageRating(token: token);
       final recentInquiriesFuture = _recentInquiries(token: token);
+      final monthlySalesFuture = _monthlySales(token: token);
 
       final statsResponse = await statsResponseFuture;
       final stats = PharmacyDashboardStatsModel.fromJson(
@@ -58,11 +59,53 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
           ratingsCount: ratingsCount,
           lowStockItems: stats.lowStockItems,
           recentInquiries: recentInquiries,
+          monthlySales: await monthlySalesFuture,
         ),
       );
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
     }
+  }
+
+  /// Best-effort like the other enrichments: a failure leaves the card on its
+  /// dash. The response has not been seen, so the figure is looked for under
+  /// the names a sales summary most likely uses, on `data` or one level in.
+  Future<double?> _monthlySales({required String token}) async {
+    try {
+      final response = await _remoteDataSource.getSalesSummary(token: token);
+      final body = response.data;
+      if (body is! Map<String, dynamic>) return null;
+      final data = body['data'];
+      return _salesFigure(data is Map<String, dynamic> ? data : body);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static const _salesKeys = [
+    'monthly_sales',
+    'month_sales',
+    'this_month',
+    'month_total',
+    'total_sales',
+    'sales_total',
+    'total',
+  ];
+
+  double? _salesFigure(Map<String, dynamic> map) {
+    for (final key in _salesKeys) {
+      final value = map[key];
+      if (value is num) return value.toDouble();
+      if (value is String) {
+        final parsed = double.tryParse(value);
+        if (parsed != null) return parsed;
+      }
+      if (value is Map<String, dynamic>) {
+        final nested = _salesFigure(value);
+        if (nested != null) return nested;
+      }
+    }
+    return null;
   }
 
   /// Same fault-isolation reasoning as [_averageRating]: the home screen's
