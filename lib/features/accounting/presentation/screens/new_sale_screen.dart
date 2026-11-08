@@ -13,6 +13,7 @@ import '../cubit/new_sale_state.dart';
 import '../helpers/accounting_styles.dart';
 import '../widgets/accounting_card.dart';
 import '../widgets/sale_summary_sheet.dart';
+import 'barcode_scanner_screen.dart';
 
 /// "فاتورة بيع جديدة": scan or search medicines into the cart, then complete the
 /// sale from the summary sheet. Pops with true once a sale was saved, so the
@@ -60,6 +61,14 @@ class _NewSaleViewState extends State<_NewSaleView> {
     _barcodeController.clear();
   }
 
+  /// Opens the camera; a scanned code goes through the same lookup as a typed
+  /// one, and its medicine lands in the cart.
+  Future<void> _scan(BuildContext context, NewSaleCubit cubit) async {
+    final code = await BarcodeScannerScreen.scan(context);
+    if (code == null || code.isEmpty) return;
+    await cubit.barcodeSubmitted(code);
+  }
+
   Future<void> _openSummary(BuildContext context) async {
     final cubit = context.read<NewSaleCubit>();
     final saved = await SaleSummarySheet.show(context, cubit);
@@ -91,7 +100,7 @@ class _NewSaleViewState extends State<_NewSaleView> {
                         barcodeController: _barcodeController,
                         searchController: _searchController,
                         state: state,
-                        onScanTap: () => AppSnackbar.show(context, 'قريباً'),
+                        onScanTap: () => _scan(context, cubit),
                         onBarcodeSubmitted: () => _submitBarcode(cubit),
                         onQueryChanged: cubit.queryChanged,
                         onItemTap: (item) {
