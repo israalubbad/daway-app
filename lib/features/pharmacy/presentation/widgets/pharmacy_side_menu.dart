@@ -34,6 +34,11 @@ class PharmacySideMenu extends StatelessWidget {
     Navigator.of(context).pushNamed(Routes.pharmacyAlternativesEntryScreen);
   }
 
+  void _openAccounting(BuildContext context) {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushNamed(Routes.accountingScreen);
+  }
+
   void _openRatings(BuildContext context) {
     Navigator.of(context).pop();
     Navigator.of(context).pushNamed(Routes.pharmacyRatingsScreen);
@@ -82,6 +87,11 @@ class PharmacySideMenu extends StatelessWidget {
               icon: Icons.star_outline_rounded,
               label: 'التقييمات والمراجعات',
               onTap: () => _openRatings(context),
+            ),
+            _MenuItem(
+              icon: Icons.account_balance_wallet_outlined,
+              label: 'المحاسبة',
+              onTap: () => _openAccounting(context),
             ),
             _MenuItem(
               icon: Icons.settings_outlined,

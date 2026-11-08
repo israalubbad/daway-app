@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -233,6 +234,15 @@ import '../../features/pharmacy/domain/usecases/update_inquiry_status_usecase.da
 import '../../features/pharmacy/domain/usecases/update_pharmacy_inventory_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_notifications_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
+import '../../features/accounting/data/repositories/coming_soon_accounting_repository.dart';
+import '../../features/accounting/data/repositories/sample_accounting_repository.dart';
+import '../../features/accounting/domain/repositories/accounting_repository.dart';
+import '../../features/accounting/domain/usecases/accounting_usecases.dart';
+import '../../features/accounting/presentation/cubit/accounting_overview_cubit.dart';
+import '../../features/accounting/presentation/cubit/cash_cubit.dart';
+import '../../features/accounting/presentation/cubit/new_sale_cubit.dart';
+import '../../features/accounting/presentation/cubit/refunds_cubit.dart';
+import '../../features/accounting/presentation/cubit/sales_cubit.dart';
 import '../../features/pharmacy/data/datasources/pharmacy_orders_remote_data_source.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_orders_repository_impl.dart';
 import '../../features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
@@ -688,6 +698,26 @@ Future<void> setupGetIt() async {
     () => GetPharmacyDashboardStatsUseCase(getIt(), getIt()),
   );
   getIt.registerFactory(() => PharmacyDashboardCubit(getIt()));
+
+  // ---------------- Accounting ----------------
+  // Invented figures in a debug build, so the screens can be tried; "قريباً"
+  // in a release build, until the accounting API's responses are known.
+  getIt.registerLazySingleton<AccountingRepository>(
+    () => kDebugMode ? SampleAccountingRepository() : const ComingSoonAccountingRepository(),
+  );
+  getIt.registerLazySingleton(() => GetAccountingOverviewUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetSalesUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetRefundsUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetCashLedgerUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RecordCashMovementUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => SearchSaleItemsUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => FindSaleItemByBarcodeUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CreateSaleUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => AccountingOverviewCubit(getIt()));
+  getIt.registerFactory(() => SalesCubit(getIt()));
+  getIt.registerFactory(() => RefundsCubit(getIt()));
+  getIt.registerFactory(() => CashCubit(getIt(), getIt()));
+  getIt.registerFactory(() => NewSaleCubit(getIt(), getIt(), getIt()));
 
   // ---------------- Pharmacy Orders ----------------
   getIt.registerLazySingleton(() => PharmacyOrdersRemoteDataSource(getIt()));

@@ -12,6 +12,7 @@ import '../cubit/pharmacy_dashboard_cubit.dart';
 import '../cubit/pharmacy_dashboard_state.dart';
 import 'pharmacy_order_details_screen.dart';
 import '../helpers/notifications_navigation.dart';
+import '../widgets/accounting_entry_card.dart';
 import '../widgets/add_medicines_file_card.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
 import '../widgets/pharmacy_home_header.dart';
@@ -129,6 +130,10 @@ class _HomeContent extends StatelessWidget {
           averageRating: stats.averageRating,
           onRatingsTap: () =>
               Navigator.of(context).pushNamed(Routes.pharmacyRatingsScreen),
+        ),
+        SizedBox(height: 16.h),
+        AccountingEntryCard(
+          onTap: () => Navigator.of(context).pushNamed(Routes.accountingScreen),
         ),
         if (orders.isNotEmpty) ...[
           SizedBox(height: 40.h),

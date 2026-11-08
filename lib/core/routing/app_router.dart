@@ -45,6 +45,7 @@ import '../../features/patient/presentation/screens/patient_notifications_screen
 import '../../features/pharmacy/presentation/cubit/pharmacy_ratings_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import '../../features/pharmacy/presentation/screens/pharmacy_stock_import_screen.dart';
+import '../../features/accounting/presentation/screens/accounting_shell_screen.dart';
 import '../constants/app_constants.dart';
 import '../di/dependency_injection.dart';
 import 'routes.dart';
@@ -159,6 +160,9 @@ class AppRouter {
             child: const PharmacyRatingsScreen(),
           ),
         );
+
+      case Routes.accountingScreen:
+        return MaterialPageRoute(builder: (_) => const AccountingShellScreen());
 
       case Routes.pharmacyStockImportScreen:
         return MaterialPageRoute(
