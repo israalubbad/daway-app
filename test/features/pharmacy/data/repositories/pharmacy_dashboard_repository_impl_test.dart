@@ -16,6 +16,7 @@ class _StubRemoteDataSource extends PharmacyDashboardRemoteDataSource {
   bool statsThrows = false;
   bool ratingsThrows = false;
   bool inquiriesThrows = false;
+  Object? nextSalesResponse;
 
   _StubRemoteDataSource() : super(Dio());
 
@@ -27,6 +28,12 @@ class _StubRemoteDataSource extends PharmacyDashboardRemoteDataSource {
       data: nextStatsResponse,
       statusCode: 200,
     );
+  }
+
+  @override
+  Future<Response<dynamic>> getSalesSummary({required String token}) async {
+    if (nextSalesResponse == null) throw DioException(requestOptions: RequestOptions());
+    return Response(requestOptions: RequestOptions(), data: nextSalesResponse, statusCode: 200);
   }
 
   @override
@@ -285,4 +292,28 @@ void main() {
       expect(stats.recentInquiries.single.id, 1);
     },
   );
+
+  group('monthly sales', () {
+    Future<double?> monthlySales(Object? response) async {
+      remoteDataSource.nextSalesResponse = response;
+      final result = await repository.getDashboardStats(token: 'tok-1');
+      return (result as Success).data.monthlySales;
+    }
+
+    test('reads a figure named for the month', () async {
+      expect(await monthlySales({'data': {'monthly_sales': 1250.5}}), 1250.5);
+    });
+
+    test('reads the amount inside a this_month object', () async {
+      expect(await monthlySales({'data': {'this_month': {'total': '300'}}}), 300);
+    });
+
+    test('a bare total is not taken for the month: it may be any period', () async {
+      expect(await monthlySales({'data': {'total': 99999, 'total_sales': 5}}), isNull);
+    });
+
+    test('a failed call leaves the card on its dash without failing the stats', () async {
+      expect(await monthlySales(null), isNull);
+    });
+  });
 }

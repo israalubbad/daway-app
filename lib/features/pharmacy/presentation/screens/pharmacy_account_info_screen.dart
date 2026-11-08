@@ -45,13 +45,8 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
   @override
   void initState() {
     super.initState();
-    final state = context.read<PharmacyProfileCubit>().state;
-    _nameController = TextEditingController(
-      text: state is PharmacyProfileLoaded ? state.name : '',
-    );
-    _phoneController = TextEditingController(
-      text: state is PharmacyProfileLoaded ? state.phone : '',
-    );
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
   }
 
   @override
@@ -63,12 +58,16 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
     super.dispose();
   }
 
-  void _editPhone() {
+  // The field is filled when editing starts, from the profile as it is by then:
+  // the screen can open before the profile has loaded.
+  void _editPhone(PharmacyProfileLoaded state) {
+    _phoneController.text = state.phone;
     setState(() => _editingPhone = true);
     _phoneFocus.requestFocus();
   }
 
-  void _editName() {
+  void _editName(PharmacyProfileLoaded state) {
+    _nameController.text = state.name;
     setState(() => _editingName = true);
     _nameFocus.requestFocus();
   }
@@ -177,7 +176,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
           SizedBox(height: 24.h),
           _FieldLabel('الاسم'),
           ProfileFieldRow(
-            onEditTap: _editName,
+            onEditTap: () => _editName(state),
             child: _editingName
                 ? TextField(
                     controller: _nameController,
@@ -200,7 +199,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
           SizedBox(height: 24.h),
           _FieldLabel('رقم الهاتف'),
           ProfileFieldRow(
-            onEditTap: _editPhone,
+            onEditTap: () => _editPhone(state),
             child: _editingPhone
                 ? TextField(
                     controller: _phoneController,

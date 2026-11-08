@@ -1,3 +1,4 @@
+import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_order.dart';
 
 /// One record of `GET /pharmacy/sub-orders`.
@@ -36,9 +37,11 @@ class PharmacyOrderModel {
         _string(address?['address']) ??
         _string(address?['details']);
 
-    final createdAt = DateTime.tryParse(
-          _string(json['created_at']) ?? _string(parent?['created_at']) ?? '',
-        )?.toLocal() ??
+    // The server's clock is UTC even when the stamp carries no zone, which
+    // tryParseServerTimestamp knows; a missing stamp reads as "now".
+    final createdAt = tryParseServerTimestamp(
+          _string(json['created_at']) ?? _string(parent?['created_at']),
+        ) ??
         DateTime.now();
 
     final total = _double(json['total']) ??
@@ -55,7 +58,8 @@ class PharmacyOrderModel {
             _string(json['number']) ??
             '$id',
         createdAt: createdAt,
-        itemsCount: items.length,
+        // A list response often carries only the count, not the lines.
+        itemsCount: items.isNotEmpty ? items.length : (_int(json['items_count']) ?? 0),
         total: total,
         area: area,
         items: items,

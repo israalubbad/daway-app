@@ -52,4 +52,29 @@ void main() {
   test('a record without an id is refused', () {
     expect(() => PharmacyOrderModel.fromJson({'status': 'pending'}), throwsFormatException);
   });
+
+  test('a list record with only items_count keeps the count', () {
+    final order = PharmacyOrderModel.fromJson({'id': 4, 'items_count': 3, 'total': 60}).order;
+
+    expect(order.itemsCount, 3);
+    expect(order.items, isEmpty);
+  });
+
+  test('lines, when present, win over items_count', () {
+    final order = PharmacyOrderModel.fromJson({
+      'id': 4,
+      'items_count': 9,
+      'items': [
+        {'name': 'a', 'price': 5},
+      ],
+    }).order;
+
+    expect(order.itemsCount, 1);
+  });
+
+  test('a timestamp with no zone is read as the server clock (UTC)', () {
+    final order = PharmacyOrderModel.fromJson({'id': 4, 'created_at': '2026-10-25 12:38:00'}).order;
+
+    expect(order.createdAt, DateTime.utc(2026, 10, 25, 12, 38).toLocal());
+  });
 }

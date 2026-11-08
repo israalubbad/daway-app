@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_custom_button.dart';
+import '../../../../core/widgets/app_filter_chip.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../cubit/cash_state.dart';
 import '../cubit/sales_state.dart';
@@ -213,24 +214,10 @@ class _ChipGroup<T> extends StatelessWidget {
           runSpacing: 8.h,
           children: [
             for (final (value, label) in options)
-              GestureDetector(
+              AppFilterChip(
+                label: label,
+                selected: value == selected,
                 onTap: () => onSelected(value),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: value == selected ? AppColors.mainTeal : AppColors.permissionIconBg,
-                    border: Border.all(
-                      color: value == selected ? AppColors.mainTeal : AppColors.iconBlueBorder,
-                    ),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    label,
-                    style: AccountingStyles.label.copyWith(
-                      color: value == selected ? Colors.white : AppColors.mainTeal,
-                    ),
-                  ),
-                ),
               ),
           ],
         ),

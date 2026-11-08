@@ -26,7 +26,9 @@ class CashCubit extends Cubit<CashState> {
         final current = state;
         emit(current is CashLoaded ? current.copyWith(ledger: data) : CashLoaded(ledger: data));
       case ApiError(:final failure):
-        emit(CashLoadFailure(failure.message));
+        // A failed refresh (also after a saved movement) leaves the ledger
+        // that is already on screen instead of an error view over a saved entry.
+        if (state is! CashLoaded) emit(CashLoadFailure(failure.message));
     }
   }
 

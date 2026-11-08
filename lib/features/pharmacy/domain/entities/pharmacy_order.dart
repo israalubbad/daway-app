@@ -33,6 +33,20 @@ class PharmacyOrder {
   /// Null when the order carries no payment information.
   final PharmacyOrderPayment? payment;
 
+  /// This order with another [status] — what a decision turns it into.
+  PharmacyOrder withStatus(PharmacyOrderStatus status) => PharmacyOrder(
+    id: id,
+    status: status,
+    orderNumber: orderNumber,
+    createdAt: createdAt,
+    itemsCount: itemsCount,
+    total: total,
+    area: area,
+    items: items,
+    deliveryStreet: deliveryStreet,
+    payment: payment,
+  );
+
   const PharmacyOrder({
     this.id = 0,
     this.status = PharmacyOrderStatus.pending,

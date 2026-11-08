@@ -29,7 +29,11 @@ const _profile = PharmacyProfile(
 /// makes, without any repository behind it.
 class _FakeProfileCubit extends Cubit<PharmacyProfileState>
     implements PharmacyProfileCubit {
-  _FakeProfileCubit() : super(PharmacyProfileLoaded.fromProfile(_profile));
+  _FakeProfileCubit({bool loading = false})
+    : super(loading ? const PharmacyProfileLoading() : PharmacyProfileLoaded.fromProfile(_profile));
+
+  /// The profile arrives, for a screen that was opened while it was loading.
+  void finishLoading() => emit(PharmacyProfileLoaded.fromProfile(_profile));
 
   int saves = 0;
   int discards = 0;
@@ -180,6 +184,25 @@ void main() {
       expect(cubit.saves, 1);
     },
   );
+
+  testWidgets('the name and phone fields start from the profile as it is when editing begins', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    // The state moved on after the screen opened (a reload, say).
+    cubit.nameChanged('اسم محدّث');
+    cubit.phoneChanged('0599000111');
+    await tester.pumpAndSettle();
+
+    await tester.tap(editChipOf('الاسم'));
+    await tester.pump();
+    await tester.tap(editChipOf('رقم الهاتف'));
+    await tester.pump();
+
+    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
+    expect(fields.first.controller!.text, 'اسم محدّث');
+    expect(fields.last.controller!.text, '0599000111');
+  });
 
   testWidgets('editing the phone turns its row into a field and keeps the number', (
     tester,

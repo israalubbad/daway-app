@@ -16,26 +16,35 @@ class AccountingOverviewCubit extends Cubit<AccountingLoad<AccountingOverview>> 
 
   Future<void> load() async {
     emit(const AccountingLoading());
-    await _fetch();
+    await _fetch(_period);
   }
 
-  /// Fetches again keeping what is on screen until the new figures arrive.
-  Future<void> refresh() => _fetch();
+  /// Fetches again keeping what is on screen until the new figures arrive, and
+  /// keeping it if the fetch fails.
+  Future<void> refresh() => _fetch(_period);
 
-  Future<void> periodChanged(SalesPeriod period) {
+  /// Shows [period]'s chart. If its fetch fails the previous period stays, so
+  /// the selected button always matches the figures under it.
+  Future<void> periodChanged(SalesPeriod period) async {
+    final previous = _period;
     _period = period;
-    return _fetch();
+    final loaded = await _fetch(period);
+    if (!loaded && _period == period) _period = previous;
   }
 
-  Future<void> _fetch() async {
-    final requested = _period;
+  /// True when [requested]'s figures were fetched and shown.
+  Future<bool> _fetch(SalesPeriod requested) async {
     final result = await _getOverview(requested);
-    if (isClosed || requested != _period) return;
+    if (isClosed || requested != _period) return false;
     switch (result) {
       case Success(:final data):
         emit(AccountingLoaded(data));
+        return true;
       case ApiError(:final failure):
-        emit(AccountingLoadFailure(failure.message));
+        if (state is! AccountingLoaded<AccountingOverview>) {
+          emit(AccountingLoadFailure(failure.message));
+        }
+        return false;
     }
   }
 }

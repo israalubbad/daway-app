@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_custom_button.dart';
-import '../../../../core/widgets/app_snackbar.dart';
+import '../../domain/entities/cash_ledger.dart';
 import '../cubit/cash_cubit.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
@@ -40,9 +40,14 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
 
   double get _amount => double.tryParse(_amountController.text.trim()) ?? 0;
 
-  bool get _canSave => _amount > 0 && _reasonController.text.trim().isNotEmpty && !_isSaving;
+  bool get _canSave =>
+      CashMovementRules.isValid(amount: _amount, reason: _reasonController.text) && !_isSaving;
 
-  bool get _exceedsBalance => !_isDeposit && _amount > widget.balance;
+  bool get _exceedsBalance => CashMovementRules.exceedsBalance(
+    isDeposit: _isDeposit,
+    amount: _amount,
+    balance: widget.balance,
+  );
 
   @override
   void dispose() {
@@ -141,7 +146,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                 textDirection: TextDirection.ltr,
                 textAlign: TextAlign.right,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) => setState(() => _error = null),
                 decoration: _decoration(hint: '0.00', prefix: '₪'),
               ),
               if (_exceedsBalance)
@@ -158,7 +163,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
               TextField(
                 controller: _reasonController,
                 maxLines: 3,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) => setState(() => _error = null),
                 decoration: _decoration(hint: 'اذكر سبب الحركة (إلزامي)'),
               ),
               SizedBox(height: 12.h),
@@ -190,7 +195,10 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                 text: 'تسجيل',
                 isLoading: _isSaving,
                 backgroundColor: _canSave ? AppColors.mainTeal : AppColors.borderGrey,
-                onPressed: _canSave ? _save : () => AppSnackbar.show(context, 'أدخل المبلغ وسبب الحركة'),
+                // Said under the fields: a snackbar would sit behind this sheet.
+                onPressed: _canSave
+                    ? _save
+                    : () => setState(() => _error = 'أدخل المبلغ وسبب الحركة'),
               ),
               SizedBox(height: 8.h),
               TextButton(

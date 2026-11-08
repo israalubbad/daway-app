@@ -1,4 +1,7 @@
+import 'package:daway_app/core/erroring/failure.dart';
+import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/accounting/data/repositories/sample_accounting_repository.dart';
+import 'package:daway_app/features/accounting/domain/entities/cash_ledger.dart';
 import 'package:daway_app/features/accounting/domain/entities/accounting_overview.dart';
 import 'package:daway_app/features/accounting/domain/entities/sale_invoice.dart';
 import 'package:daway_app/features/accounting/domain/usecases/accounting_usecases.dart';
@@ -27,6 +30,27 @@ class _Session implements SessionRepository {
 }
 
 Future<void> _settle() => Future<void>.delayed(Duration.zero);
+
+/// The sample repository, which can be told to fail every read.
+class _FlakyRepository extends SampleAccountingRepository {
+  bool failing = false;
+
+  @override
+  Future<ApiResult<List<SaleInvoice>>> getSales({required String token}) async =>
+      failing ? const ApiError(ApiFailure(message: 'offline')) : super.getSales(token: token);
+
+  @override
+  Future<ApiResult<CashLedger>> getCashLedger({required String token}) async =>
+      failing ? const ApiError(ApiFailure(message: 'offline')) : super.getCashLedger(token: token);
+
+  @override
+  Future<ApiResult<AccountingOverview>> getOverview({
+    required String token,
+    required SalesPeriod period,
+  }) async => failing
+      ? const ApiError(ApiFailure(message: 'offline'))
+      : super.getOverview(token: token, period: period);
+}
 
 void main() {
   late SampleAccountingRepository repository;
@@ -234,6 +258,93 @@ void main() {
 
       expect(cubit.state.completed, isFalse);
       expect(cubit.state.isSaving, isFalse);
+    });
+  });
+
+  group('a failed refresh keeps what is on screen', () {
+    late _FlakyRepository flaky;
+
+    setUp(() => flaky = _FlakyRepository());
+
+    test('sales', () async {
+      final cubit = SalesCubit(GetSalesUseCase(flaky, session));
+      addTearDown(cubit.close);
+      await _settle();
+
+      flaky.failing = true;
+      await cubit.refresh();
+
+      expect((cubit.state as SalesLoaded).visible, hasLength(2));
+    });
+
+    test('sales still fail when there was nothing to keep', () async {
+      flaky.failing = true;
+      final cubit = SalesCubit(GetSalesUseCase(flaky, session));
+      addTearDown(cubit.close);
+      await _settle();
+
+      expect(cubit.state, isA<SalesLoadFailure>());
+    });
+
+    test('cash, also after a movement that was saved', () async {
+      final cubit = CashCubit(
+        GetCashLedgerUseCase(flaky, session),
+        RecordCashMovementUseCase(flaky, session),
+      );
+      addTearDown(cubit.close);
+      await _settle();
+
+      flaky.failing = true;
+      final error = await cubit.record(isDeposit: true, amount: 10, reason: 'x');
+
+      expect(error, isNull);
+      expect(cubit.state, isA<CashLoaded>());
+    });
+
+    test('overview, and a failed period change leaves the previous period selected', () async {
+      final cubit = AccountingOverviewCubit(GetAccountingOverviewUseCase(flaky, session));
+      addTearDown(cubit.close);
+      await _settle();
+
+      flaky.failing = true;
+      await cubit.periodChanged(SalesPeriod.last30Days);
+      flaky.failing = false;
+      await cubit.refresh();
+
+      final state = cubit.state as AccountingLoaded<AccountingOverview>;
+      expect(state.data.period, SalesPeriod.last7Days);
+    });
+  });
+
+  group('selling', () {
+    late NewSaleCubit cubit;
+
+    setUp(() {
+      cubit = NewSaleCubit(
+        SearchSaleItemsUseCase(repository, session),
+        FindSaleItemByBarcodeUseCase(repository, session),
+        CreateSaleUseCase(repository, session),
+      );
+    });
+
+    tearDown(() => cubit.close());
+
+    test('a medicine with no stock is refused and says so', () {
+      const gone = SaleItemOption(id: 9, name: 'Gone', price: 10, stock: 0);
+
+      final added = cubit.addItem(gone);
+
+      expect(added, isFalse);
+      expect(cubit.state.lines, isEmpty);
+      expect(cubit.state.errorMessage, isNotNull);
+    });
+
+    test('the cash rules refuse a zero amount and a blank reason', () {
+      expect(CashMovementRules.isValid(amount: 0, reason: 'x'), isFalse);
+      expect(CashMovementRules.isValid(amount: 5, reason: '  '), isFalse);
+      expect(CashMovementRules.isValid(amount: 5, reason: 'x'), isTrue);
+      expect(CashMovementRules.exceedsBalance(isDeposit: false, amount: 10, balance: 5), isTrue);
+      expect(CashMovementRules.exceedsBalance(isDeposit: true, amount: 10, balance: 5), isFalse);
     });
   });
 }

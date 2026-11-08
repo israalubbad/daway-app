@@ -56,9 +56,12 @@ class _NewSaleViewState extends State<_NewSaleView> {
   }
 
   Future<void> _submitBarcode(NewSaleCubit cubit) async {
+    // Taken and cleared before the lookup: a second Done press cannot add the
+    // same code again, and nothing touches the field after the screen is left.
     final code = _barcodeController.text;
-    await cubit.barcodeSubmitted(code);
+    if (code.trim().isEmpty) return;
     _barcodeController.clear();
+    await cubit.barcodeSubmitted(code);
   }
 
   /// Opens the camera; a scanned code goes through the same lookup as a typed
@@ -203,6 +206,13 @@ class _ScanCard extends StatelessWidget {
             Align(
               alignment: AlignmentDirectional.centerStart,
               child: _Recognized(name: state.recognized!.name),
+            ),
+          ],
+          if (state.errorMessage != null) ...[
+            SizedBox(height: 8.h),
+            Text(
+              state.errorMessage!,
+              style: AccountingStyles.label.copyWith(color: AppColors.logoutRed),
             ),
           ],
           if (state.barcodeMessage != null) ...[

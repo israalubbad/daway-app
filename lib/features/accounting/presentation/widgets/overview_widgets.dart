@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
+import '../../../../core/widgets/app_filter_chip.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
@@ -102,24 +103,10 @@ class SalesPeriodChips extends StatelessWidget {
         children: [
           for (final period in SalesPeriod.values) ...[
             if (period != SalesPeriod.values.first) SizedBox(width: 8.w),
-            GestureDetector(
+            AppFilterChip(
+              label: salesPeriodLabel(period),
+              selected: period == selected,
               onTap: () => onSelected(period),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: period == selected ? AppColors.mainTeal : AppColors.permissionIconBg,
-                  border: Border.all(
-                    color: period == selected ? AppColors.mainTeal : AppColors.iconBlueBorder,
-                  ),
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  salesPeriodLabel(period),
-                  style: AccountingStyles.label.copyWith(
-                    color: period == selected ? Colors.white : AppColors.mainTeal,
-                  ),
-                ),
-              ),
             ),
           ],
         ],

@@ -25,7 +25,8 @@ class SalesCubit extends Cubit<SalesState> {
         final current = state;
         emit(current is SalesLoaded ? current.copyWith(all: data) : SalesLoaded(all: data));
       case ApiError(:final failure):
-        emit(SalesLoadFailure(failure.message));
+        // A failed refresh leaves the list that is already on screen.
+        if (state is! SalesLoaded) emit(SalesLoadFailure(failure.message));
     }
   }
 

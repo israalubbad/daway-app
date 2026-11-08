@@ -25,8 +25,9 @@ class PharmacySideMenu extends StatelessWidget {
   }
 
   void _openSupport(BuildContext context) {
-    Navigator.of(context).pop();
+    // Started before the drawer closes, while its context is still alive.
     openSupportChat(context);
+    Navigator.of(context).pop();
   }
 
   void _openAlternatives(BuildContext context) {

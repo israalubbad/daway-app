@@ -106,4 +106,24 @@ void main() {
     expect(error, 'الطلب تم البت فيه');
     expect(cubit.state, isA<PharmacyOrdersLoaded>());
   });
+
+  test('a decided order shows as decided even when the refetch fails', () async {
+    await cubit.load();
+    repository.orders = const ApiError(ApiFailure(message: 'offline'));
+
+    final error = await cubit.decide(_order(1), accept: true);
+
+    expect(error, isNull);
+    final orders = (cubit.state as PharmacyOrdersLoaded).orders;
+    expect(orders.single.status, PharmacyOrderStatus.accepted);
+  });
+
+  test('a rejection is shown as rejected', () async {
+    await cubit.load();
+    repository.orders = const ApiError(ApiFailure(message: 'offline'));
+
+    await cubit.decide(_order(1), accept: false);
+
+    expect((cubit.state as PharmacyOrdersLoaded).orders.single.status, PharmacyOrderStatus.rejected);
+  });
 }

@@ -76,10 +76,10 @@ class RecordCashMovementUseCase {
     required double amount,
     required String reason,
   }) {
-    if (amount <= 0) {
+    if (!CashMovementRules.isValidAmount(amount)) {
       return Future.value(const ApiError(ApiFailure(message: 'أدخل مبلغاً أكبر من صفر')));
     }
-    if (reason.trim().isEmpty) {
+    if (!CashMovementRules.isValidReason(reason)) {
       return Future.value(const ApiError(ApiFailure(message: 'اذكر سبب الحركة')));
     }
     return _withToken(

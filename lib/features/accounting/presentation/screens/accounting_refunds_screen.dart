@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
+import '../../../../core/widgets/app_filter_chip.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../../../pharmacy/presentation/widgets/pharmacy_products_header.dart';
 import '../../domain/entities/refund_record.dart';
@@ -81,9 +82,9 @@ class AccountingRefundsScreen extends StatelessWidget {
       Wrap(
         spacing: 8.w,
         children: [
-          _StatusChip(label: 'الكل', selected: state.status == null, onTap: () => cubit.statusChanged(null)),
+          AppFilterChip(label: 'الكل', selected: state.status == null, onTap: () => cubit.statusChanged(null)),
           for (final status in RefundStatus.values)
-            _StatusChip(
+            AppFilterChip(
               label: refundStatusLabel(status),
               selected: state.status == status,
               onTap: () => cubit.statusChanged(status),
@@ -105,33 +106,6 @@ class AccountingRefundsScreen extends StatelessWidget {
           SizedBox(height: 8.h),
         ],
     ];
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _StatusChip({required this.label, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.mainTeal : AppColors.permissionIconBg,
-          border: Border.all(color: selected ? AppColors.mainTeal : AppColors.iconBlueBorder),
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Text(
-          label,
-          style: AccountingStyles.label.copyWith(color: selected ? Colors.white : AppColors.mainTeal),
-        ),
-      ),
-    );
   }
 }
 

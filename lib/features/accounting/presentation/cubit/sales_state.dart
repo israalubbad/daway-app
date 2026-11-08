@@ -37,7 +37,7 @@ class SalesLoaded extends SalesState {
   final PaymentMethod? method;
   final PaymentStatus? status;
 
-  const SalesLoaded({
+  SalesLoaded({
     required this.all,
     this.query = '',
     this.range = DateRangeFilter.all,
@@ -50,7 +50,11 @@ class SalesLoaded extends SalesState {
   int get activeFilters =>
       (range != DateRangeFilter.all ? 1 : 0) + (method != null ? 1 : 0) + (status != null ? 1 : 0);
 
-  List<SaleInvoice> get visible {
+  /// The invoices that pass the search and the filters, worked out once per
+  /// state: the list, its count and its totals all read this.
+  late final List<SaleInvoice> visible = _filtered();
+
+  List<SaleInvoice> _filtered() {
     final q = query.trim().toLowerCase();
     final now = DateTime.now();
     return [

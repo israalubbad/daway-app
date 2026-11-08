@@ -35,8 +35,11 @@ class NewSaleCubit extends Cubit<NewSaleState> {
     if (isClosed) return;
     switch (result) {
       case Success(:final data) when data != null:
-        addItem(data);
-        emit(state.copyWith(recognized: data, clearBarcodeMessage: true));
+        if (addItem(data)) {
+          emit(state.copyWith(recognized: data, clearBarcodeMessage: true));
+        } else {
+          emit(state.copyWith(clearRecognized: true, barcodeMessage: _outOfStock));
+        }
       case Success():
         emit(state.copyWith(clearRecognized: true, barcodeMessage: 'لم يتم العثور على دواء بهذا الباركود'));
       case ApiError(:final failure):
@@ -44,9 +47,17 @@ class NewSaleCubit extends Cubit<NewSaleState> {
     }
   }
 
+
+  static const _outOfStock = 'هذا الدواء غير متوفر في المخزون';
+
   /// Puts [item] in the cart; one already there gets one more unit, up to its
-  /// stock.
-  void addItem(SaleItemOption item) {
+  /// stock. A medicine with none in stock is refused (and false returned): the
+  /// pharmacy has nothing to sell.
+  bool addItem(SaleItemOption item) {
+    if (item.stock < 1) {
+      emit(state.copyWith(errorMessage: _outOfStock));
+      return false;
+    }
     final existing = state.lines.indexWhere((line) => line.item.id == item.id);
     final lines = [...state.lines];
     if (existing == -1) {
@@ -56,6 +67,7 @@ class NewSaleCubit extends Cubit<NewSaleState> {
       lines[existing] = line.withQuantity((line.quantity + 1).clamp(1, _maxFor(item)));
     }
     emit(state.copyWith(lines: lines, results: const [], query: '', clearError: true));
+    return true;
   }
 
   void quantityChanged(int itemId, int quantity) {
@@ -108,7 +120,6 @@ class NewSaleCubit extends Cubit<NewSaleState> {
     }
   }
 
-  /// A line cannot go above the stock; an item with no stock count of 0 or
-  /// less is still sold one at a time.
-  int _maxFor(SaleItemOption item) => item.stock < 1 ? 1 : item.stock;
+  /// A line cannot go above the stock (an item in the cart has at least one).
+  int _maxFor(SaleItemOption item) => item.stock;
 }

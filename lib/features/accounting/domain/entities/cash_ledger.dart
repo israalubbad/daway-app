@@ -39,3 +39,21 @@ class CashLedger {
 
   bool get isLow => balance < safeLimit;
 }
+
+/// What a hand-recorded cash movement must satisfy. One place for the rules, so
+/// the form and the use case cannot disagree.
+abstract class CashMovementRules {
+  static bool isValidAmount(double amount) => amount > 0;
+
+  static bool isValidReason(String reason) => reason.trim().isNotEmpty;
+
+  static bool isValid({required double amount, required String reason}) =>
+      isValidAmount(amount) && isValidReason(reason);
+
+  /// A withdrawal of more than the cash balance is allowed but worth a warning.
+  static bool exceedsBalance({
+    required bool isDeposit,
+    required double amount,
+    required double balance,
+  }) => !isDeposit && amount > balance;
+}

@@ -25,7 +25,8 @@ class RefundsCubit extends Cubit<RefundsState> {
         final current = state;
         emit(current is RefundsLoaded ? current.copyWith(all: data) : RefundsLoaded(all: data));
       case ApiError(:final failure):
-        emit(RefundsLoadFailure(failure.message));
+        // A failed refresh leaves the list that is already on screen.
+        if (state is! RefundsLoaded) emit(RefundsLoadFailure(failure.message));
     }
   }
 

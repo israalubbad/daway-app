@@ -39,12 +39,26 @@ class PharmacyOrdersCubit extends Cubit<PharmacyOrdersState> {
     if (result case Success(:final data)) emit(PharmacyOrdersLoaded(data));
   }
 
+  void _markDecided(PharmacyOrder order, {required bool accept}) {
+    final current = state;
+    if (current is! PharmacyOrdersLoaded) return;
+    final status = accept ? PharmacyOrderStatus.accepted : PharmacyOrderStatus.rejected;
+    emit(
+      PharmacyOrdersLoaded([
+        for (final o in current.orders) o.id == order.id ? o.withStatus(status) : o,
+      ]),
+    );
+  }
+
   /// Accepts or rejects [order]; returns the error message, or null once the
   /// backend has taken the decision (the list is refreshed by then).
   Future<String?> decide(PharmacyOrder order, {required bool accept}) async {
     final result = await _decideOrderUseCase(orderId: order.id, accept: accept);
     switch (result) {
       case Success():
+        // Shown as decided at once, so a failed refetch cannot leave the
+        // accept/reject buttons on an order the backend has already taken.
+        _markDecided(order, accept: accept);
         await refresh();
         return null;
       case ApiError(:final failure):

@@ -82,29 +82,39 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
     }
   }
 
-  static const _salesKeys = [
+  /// Only keys that say "this month" are read: a bare `total` or `total_sales`
+  /// may be an all-time or per-period figure, and showing it as the month's
+  /// sales would state a wrong financial number as fact.
+  static const _monthlyKeys = [
     'monthly_sales',
     'month_sales',
+    'sales_this_month',
     'this_month',
     'month_total',
-    'total_sales',
-    'sales_total',
-    'total',
   ];
 
+  /// Inside a `this_month`-style object, the names its amount may carry.
+  static const _amountKeys = ['total', 'sales', 'amount', 'revenue'];
+
   double? _salesFigure(Map<String, dynamic> map) {
-    for (final key in _salesKeys) {
+    for (final key in _monthlyKeys) {
       final value = map[key];
-      if (value is num) return value.toDouble();
-      if (value is String) {
-        final parsed = double.tryParse(value);
-        if (parsed != null) return parsed;
-      }
       if (value is Map<String, dynamic>) {
-        final nested = _salesFigure(value);
-        if (nested != null) return nested;
+        for (final amountKey in _amountKeys) {
+          final nested = _asDouble(value[amountKey]);
+          if (nested != null) return nested;
+        }
+      } else {
+        final figure = _asDouble(value);
+        if (figure != null) return figure;
       }
     }
+    return null;
+  }
+
+  double? _asDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
     return null;
   }
 
