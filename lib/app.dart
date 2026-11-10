@@ -30,6 +30,13 @@ class DawayApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           onGenerateRoute: appRouter.generateRoute,
           initialRoute: initialRoute,
+          // Flutter would also build a route for "/" under the initial one, and
+          // the router answers it with its "No route defined" page: going back
+          // from the home screen (or any `pushAndRemoveUntil(..., isFirst)`)
+          // landed on it. Only the initial route belongs on the stack.
+          onGenerateInitialRoutes: (name) => [
+            appRouter.generateRoute(RouteSettings(name: name))!,
+          ],
           locale: const Locale('ar'),
           supportedLocales: const [Locale('ar')],
           localizationsDelegates: const [

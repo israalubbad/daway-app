@@ -22,10 +22,11 @@ abstract class AccountingStyles {
     FontWeight.w500,
   );
 
-  static TextStyle get muted => TextStyle(
-    fontSize: 12.sp,
-    height: 1.5,
-    color: AppColors.authInputBorder,
+  /// Supporting lines: Medium Tajawal in the app's muted blue-grey, dark enough
+  /// to read on white (the pale #98ADB3 it was made in washed out).
+  static TextStyle get muted => AppFonts.tajawal(
+    TextStyle(fontSize: 12.sp, height: 1.5, color: AppColors.authTextMuted),
+    FontWeight.w500,
   );
 
   static TextStyle get label => AppFonts.tajawal(

@@ -38,4 +38,19 @@ abstract interface class AccountingRepository {
   });
 
   Future<ApiResult<void>> createSale({required String token, required NewSale sale});
+
+  /// Records a payment of [amount] against the invoice.
+  Future<ApiResult<void>> recordInvoicePayment({
+    required String token,
+    required int invoiceId,
+    required double amount,
+    required PaymentMethod method,
+  });
+
+  /// Returns units of an invoice: [quantities] maps item id to units given back.
+  Future<ApiResult<void>> createRefund({
+    required String token,
+    required int invoiceId,
+    required Map<int, int> quantities,
+  });
 }

@@ -8,7 +8,7 @@ enum CashTypeFilter { all, sales, expenses, payments, adjustments }
 extension CashTypeFilterX on CashTypeFilter {
   bool matches(CashMovementType type) => switch (this) {
     CashTypeFilter.all => true,
-    CashTypeFilter.sales => type == CashMovementType.sale,
+    CashTypeFilter.sales => type == CashMovementType.sale || type == CashMovementType.refund,
     CashTypeFilter.expenses => type == CashMovementType.expense,
     CashTypeFilter.payments => type == CashMovementType.payment,
     CashTypeFilter.adjustments =>

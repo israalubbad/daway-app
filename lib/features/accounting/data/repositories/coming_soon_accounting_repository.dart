@@ -53,4 +53,19 @@ class ComingSoonAccountingRepository implements AccountingRepository {
   @override
   Future<ApiResult<void>> createSale({required String token, required NewSale sale}) async =>
       _failure;
+
+  @override
+  Future<ApiResult<void>> recordInvoicePayment({
+    required String token,
+    required int invoiceId,
+    required double amount,
+    required PaymentMethod method,
+  }) async => _failure;
+
+  @override
+  Future<ApiResult<void>> createRefund({
+    required String token,
+    required int invoiceId,
+    required Map<int, int> quantities,
+  }) async => _failure;
 }

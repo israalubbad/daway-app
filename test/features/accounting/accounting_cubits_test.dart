@@ -89,7 +89,11 @@ void main() {
     late SalesCubit cubit;
 
     setUp(() async {
-      cubit = SalesCubit(GetSalesUseCase(repository, session));
+      cubit = SalesCubit(
+        GetSalesUseCase(repository, session),
+        RecordInvoicePaymentUseCase(repository, session),
+        CreateRefundUseCase(repository, session),
+      );
       await _settle();
     });
 
@@ -267,7 +271,11 @@ void main() {
     setUp(() => flaky = _FlakyRepository());
 
     test('sales', () async {
-      final cubit = SalesCubit(GetSalesUseCase(flaky, session));
+      final cubit = SalesCubit(
+        GetSalesUseCase(flaky, session),
+        RecordInvoicePaymentUseCase(flaky, session),
+        CreateRefundUseCase(flaky, session),
+      );
       addTearDown(cubit.close);
       await _settle();
 
@@ -279,7 +287,11 @@ void main() {
 
     test('sales still fail when there was nothing to keep', () async {
       flaky.failing = true;
-      final cubit = SalesCubit(GetSalesUseCase(flaky, session));
+      final cubit = SalesCubit(
+        GetSalesUseCase(flaky, session),
+        RecordInvoicePaymentUseCase(flaky, session),
+        CreateRefundUseCase(flaky, session),
+      );
       addTearDown(cubit.close);
       await _settle();
 
@@ -345,6 +357,70 @@ void main() {
       expect(CashMovementRules.isValid(amount: 5, reason: 'x'), isTrue);
       expect(CashMovementRules.exceedsBalance(isDeposit: false, amount: 10, balance: 5), isTrue);
       expect(CashMovementRules.exceedsBalance(isDeposit: true, amount: 10, balance: 5), isFalse);
+    });
+  });
+
+  group('invoice payments and returns', () {
+    late SalesCubit cubit;
+
+    setUp(() async {
+      cubit = SalesCubit(
+        GetSalesUseCase(repository, session),
+        RecordInvoicePaymentUseCase(repository, session),
+        CreateRefundUseCase(repository, session),
+      );
+      await _settle();
+    });
+
+    tearDown(() => cubit.close());
+
+    SaleInvoice invoice(String number) =>
+        (cubit.state as SalesLoaded).all.firstWhere((s) => s.number == number);
+
+    test('paying what is owed makes the invoice paid', () async {
+      final partlyPaid = invoice('INV-1002');
+
+      final error = await cubit.recordPayment(
+        partlyPaid,
+        amount: partlyPaid.remaining,
+        method: PaymentMethod.cash,
+      );
+
+      expect(error, isNull);
+      expect(invoice('INV-1002').status, PaymentStatus.paid);
+    });
+
+    test('a payment above the remaining amount is refused and changes nothing', () async {
+      final partlyPaid = invoice('INV-1002');
+
+      final error = await cubit.recordPayment(partlyPaid, amount: 500, method: PaymentMethod.cash);
+
+      expect(error, isNotNull);
+      expect(invoice('INV-1002').paid, 90);
+    });
+
+    test('a payment of zero is refused', () async {
+      final error = await cubit.recordPayment(
+        invoice('INV-1002'),
+        amount: 0,
+        method: PaymentMethod.cash,
+      );
+
+      expect(error, isNotNull);
+    });
+
+    test('a return is priced at the sold price and is refused when empty or too large', () async {
+      final sold = invoice('INV-1002');
+
+      expect(await cubit.refund(RefundRequest(invoice: sold, quantities: const {})), isNotNull);
+      expect(await cubit.refund(RefundRequest(invoice: sold, quantities: const {2: 3})), isNotNull);
+      expect(RefundRequest(invoice: sold, quantities: const {2: 1}).amount, 50);
+
+      final error = await cubit.refund(RefundRequest(invoice: sold, quantities: const {2: 1}));
+
+      expect(error, isNull);
+      final refunds = (await GetRefundsUseCase(repository, session)() as dynamic).data as List;
+      expect(refunds.single.amount, 50);
     });
   });
 }

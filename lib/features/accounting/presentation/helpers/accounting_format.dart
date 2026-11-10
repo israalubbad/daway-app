@@ -58,6 +58,7 @@ String cashMovementLabel(CashMovementType type) => switch (type) {
   CashMovementType.sale => 'مبيعات',
   CashMovementType.expense => 'مصروف',
   CashMovementType.payment => 'دفعة',
+  CashMovementType.refund => 'إرجاع',
   CashMovementType.deposit => 'إيداع',
   CashMovementType.withdrawal => 'سحب',
 };

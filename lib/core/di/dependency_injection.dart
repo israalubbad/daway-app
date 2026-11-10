@@ -701,9 +701,12 @@ Future<void> setupGetIt() async {
 
   // ---------------- Accounting ----------------
   // Invented figures in a debug build, so the screens can be tried; "قريباً"
-  // in a release build, until the accounting API's responses are known.
+  // in a release build, until the accounting API's responses are known. A
+  // release build made only to look at the screens can ask for the invented
+  // figures with `--dart-define=ACCOUNTING_SAMPLE=true`.
+  const useSampleAccounting = kDebugMode || bool.fromEnvironment('ACCOUNTING_SAMPLE');
   getIt.registerLazySingleton<AccountingRepository>(
-    () => kDebugMode ? SampleAccountingRepository() : const ComingSoonAccountingRepository(),
+    () => useSampleAccounting ? SampleAccountingRepository() : const ComingSoonAccountingRepository(),
   );
   getIt.registerLazySingleton(() => GetAccountingOverviewUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetSalesUseCase(getIt(), getIt()));
@@ -713,8 +716,10 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => SearchSaleItemsUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => FindSaleItemByBarcodeUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => CreateSaleUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RecordInvoicePaymentUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CreateRefundUseCase(getIt(), getIt()));
   getIt.registerFactory(() => AccountingOverviewCubit(getIt()));
-  getIt.registerFactory(() => SalesCubit(getIt()));
+  getIt.registerFactory(() => SalesCubit(getIt(), getIt(), getIt()));
   getIt.registerFactory(() => RefundsCubit(getIt()));
   getIt.registerFactory(() => CashCubit(getIt(), getIt()));
   getIt.registerFactory(() => NewSaleCubit(getIt(), getIt(), getIt()));

@@ -1,3 +1,4 @@
+import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/cash_ledger.dart';
@@ -24,17 +25,24 @@ class SampleAccountingRepository implements AccountingRepository {
         total: 100,
         paid: 90,
         method: PaymentMethod.bankTransfer,
+        lines: const [
+          InvoiceLine(itemId: 2, name: 'Baby Diaper Cream', quantity: 2, unitPrice: 50),
+        ],
       ),
       SaleInvoice(
         id: 1,
         number: 'INV-1001',
         date: now.subtract(const Duration(days: 10, hours: 3)),
         itemsCount: 2,
-        subtotal: 110,
-        discount: 10,
+        subtotal: 104,
+        discount: 4,
         total: 100,
         paid: 0,
         method: PaymentMethod.cash,
+        lines: const [
+          InvoiceLine(itemId: 2, name: 'Baby Diaper Cream', quantity: 1, unitPrice: 50),
+          InvoiceLine(itemId: 1, name: 'Panadol Extra 500mg', quantity: 3, unitPrice: 18),
+        ],
       ),
     ];
     _movements = [
@@ -64,6 +72,7 @@ class SampleAccountingRepository implements AccountingRepository {
 
   late List<SaleInvoice> _sales;
   late List<CashMovement> _movements;
+  final List<RefundRecord> _refunds = [];
 
   static const _catalog = [
     SaleItemOption(id: 1, name: 'Panadol Extra 500mg', barcode: '6221031234567', price: 18, stock: 40),
@@ -83,10 +92,14 @@ class SampleAccountingRepository implements AccountingRepository {
       SalesPeriod.last30Days => 30,
       SalesPeriod.thisMonth => DateTime.now().day,
     };
+    // Oldest first, labelled with the day of the month, like a real chart.
+    final today = DateTime.now();
     final points = [
       for (var i = 0; i < (days == 1 ? 6 : days); i++)
         SalesPoint(
-          label: '${i + 1}',
+          label: days == 1
+              ? '${8 + 2 * i}:00'
+              : '${today.subtract(Duration(days: days - 1 - i)).day}',
           amount: [40.0, 0.0, 120.0, 85.0, 60.0, 150.0, 90.0][i % 7] + (i ~/ 7) * 10,
         ),
     ];
@@ -145,7 +158,7 @@ class SampleAccountingRepository implements AccountingRepository {
 
   @override
   Future<ApiResult<List<RefundRecord>>> getRefunds({required String token}) async =>
-      const Success(<RefundRecord>[]);
+      Success(List.of(_refunds));
 
   static const _safeLimit = 100.0;
 
@@ -215,6 +228,15 @@ class SampleAccountingRepository implements AccountingRepository {
         total: total,
         paid: sale.paid,
         method: sale.method,
+        lines: [
+          for (final line in sale.lines)
+            InvoiceLine(
+              itemId: line.item.id,
+              name: line.item.name,
+              quantity: line.quantity,
+              unitPrice: line.item.price,
+            ),
+        ],
       ),
     );
     if (sale.paid > 0) {
@@ -229,6 +251,65 @@ class SampleAccountingRepository implements AccountingRepository {
         ),
       );
     }
+    return const Success(null);
+  }
+
+  @override
+  Future<ApiResult<void>> recordInvoicePayment({
+    required String token,
+    required int invoiceId,
+    required double amount,
+    required PaymentMethod method,
+  }) async {
+    final index = _sales.indexWhere((s) => s.id == invoiceId);
+    if (index == -1) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
+    final invoice = _sales[index];
+    _sales[index] = invoice.withPayment(amount, method);
+    _movements.insert(
+      0,
+      CashMovement(
+        id: DateTime.now().millisecondsSinceEpoch,
+        type: CashMovementType.payment,
+        description: 'دفعة على الفاتورة ${invoice.number}',
+        date: DateTime.now(),
+        amount: amount,
+      ),
+    );
+    return const Success(null);
+  }
+
+  @override
+  Future<ApiResult<void>> createRefund({
+    required String token,
+    required int invoiceId,
+    required Map<int, int> quantities,
+  }) async {
+    final invoice = _sales.where((s) => s.id == invoiceId).firstOrNull;
+    if (invoice == null) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
+    final amount = RefundRequest(invoice: invoice, quantities: quantities).amount;
+    final number = 3000 + _refunds.length + 1;
+    _refunds.insert(
+      0,
+      RefundRecord(
+        id: number,
+        number: 'RET-$number',
+        invoiceNumber: invoice.number,
+        date: DateTime.now(),
+        customerName: invoice.customerName,
+        amount: amount,
+        status: RefundStatus.completed,
+      ),
+    );
+    _movements.insert(
+      0,
+      CashMovement(
+        id: DateTime.now().millisecondsSinceEpoch,
+        type: CashMovementType.refund,
+        description: 'إرجاع RET-$number',
+        date: DateTime.now(),
+        amount: -amount,
+      ),
+    );
     return const Success(null);
   }
 }

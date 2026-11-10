@@ -1,6 +1,6 @@
 /// What a cash movement is for. Deposits and withdrawals are the two a pharmacy
 /// records by hand; the others come from invoices and expenses.
-enum CashMovementType { sale, expense, payment, deposit, withdrawal }
+enum CashMovementType { sale, expense, payment, refund, deposit, withdrawal }
 
 /// One entry of the cash book.
 class CashMovement {

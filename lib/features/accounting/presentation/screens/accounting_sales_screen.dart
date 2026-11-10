@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../../../pharmacy/presentation/widgets/pharmacy_products_header.dart';
 import '../cubit/sales_cubit.dart';
 import '../cubit/sales_state.dart';
 import '../helpers/accounting_styles.dart';
+import '../helpers/invoice_actions.dart';
 import '../widgets/accounting_card.dart';
 import '../widgets/accounting_empty_state.dart';
 import '../widgets/accounting_filter_sheets.dart';
@@ -23,7 +23,16 @@ class AccountingSalesScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onNewSale;
 
-  const AccountingSalesScreen({super.key, required this.onBack, required this.onNewSale});
+  /// Called after a payment or a return was saved on an invoice, so the tabs
+  /// that show the same money can fetch again.
+  final VoidCallback onDataChanged;
+
+  const AccountingSalesScreen({
+    super.key,
+    required this.onBack,
+    required this.onNewSale,
+    required this.onDataChanged,
+  });
 
   Future<void> _openFilters(BuildContext context, SalesLoaded state) async {
     final cubit = context.read<SalesCubit>();
@@ -117,7 +126,13 @@ class AccountingSalesScreen extends StatelessWidget {
         for (final invoice in visible) ...[
           InvoiceCard(
             invoice: invoice,
-            onAction: (_) => AppSnackbar.show(context, 'قريباً'),
+            onAction: (action) => runInvoiceAction(
+              context,
+              invoice: invoice,
+              action: action,
+              cubit: context.read<SalesCubit>(),
+              onChanged: onDataChanged,
+            ),
           ),
           SizedBox(height: 8.h),
         ],

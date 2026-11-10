@@ -29,11 +29,13 @@ class InvoiceCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  invoice.number,
-                  textDirection: TextDirection.ltr,
-                  textAlign: TextAlign.start,
-                  style: AccountingStyles.cardTitle,
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    invoice.number,
+                    textDirection: TextDirection.ltr,
+                    style: AccountingStyles.cardTitle,
+                  ),
                 ),
               ),
               PaymentStatusBadge(invoice.status),

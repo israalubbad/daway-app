@@ -97,20 +97,19 @@ class SalesPeriodChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final period in SalesPeriod.values) ...[
-            if (period != SalesPeriod.values.first) SizedBox(width: 8.w),
-            AppFilterChip(
-              label: salesPeriodLabel(period),
-              selected: period == selected,
-              onTap: () => onSelected(period),
-            ),
-          ],
-        ],
-      ),
+    // Wraps onto a second line instead of scrolling sideways, so all four
+    // buttons are always on screen.
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: [
+        for (final period in SalesPeriod.values)
+          AppFilterChip(
+            label: salesPeriodLabel(period),
+            selected: period == selected,
+            onTap: () => onSelected(period),
+          ),
+      ],
     );
   }
 }
@@ -187,11 +186,13 @@ class TransactionCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  transaction.reference,
-                  textDirection: TextDirection.ltr,
-                  textAlign: TextAlign.start,
-                  style: AccountingStyles.cardTitle,
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    transaction.reference,
+                    textDirection: TextDirection.ltr,
+                    style: AccountingStyles.cardTitle,
+                  ),
                 ),
               ),
               PaymentStatusBadge(transaction.status),

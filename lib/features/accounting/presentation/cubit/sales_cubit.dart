@@ -2,13 +2,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/entities/accounting_overview.dart';
+import '../../domain/entities/sale_invoice.dart';
 import '../../domain/usecases/accounting_usecases.dart';
 import 'sales_state.dart';
 
 class SalesCubit extends Cubit<SalesState> {
   final GetSalesUseCase _getSales;
+  final RecordInvoicePaymentUseCase _recordPayment;
+  final CreateRefundUseCase _createRefund;
 
-  SalesCubit(this._getSales) : super(const SalesLoading()) {
+  SalesCubit(this._getSales, this._recordPayment, this._createRefund)
+    : super(const SalesLoading()) {
     load();
   }
 
@@ -53,5 +57,29 @@ class SalesCubit extends Cubit<SalesState> {
         clearStatus: status == null,
       ),
     );
+  }
+
+  /// Records a payment against [invoice]; returns the message to show when it
+  /// fails, or null once it is saved (the list is refreshed by then).
+  Future<String?> recordPayment(
+    SaleInvoice invoice, {
+    required double amount,
+    required PaymentMethod method,
+  }) async {
+    final result = await _recordPayment(invoice: invoice, amount: amount, method: method);
+    return _afterChange(result);
+  }
+
+  /// Returns units of an invoice; the same contract as [recordPayment].
+  Future<String?> refund(RefundRequest request) async => _afterChange(await _createRefund(request));
+
+  Future<String?> _afterChange(ApiResult<void> result) async {
+    switch (result) {
+      case Success():
+        await refresh();
+        return null;
+      case ApiError(:final failure):
+        return failure.message;
+    }
   }
 }

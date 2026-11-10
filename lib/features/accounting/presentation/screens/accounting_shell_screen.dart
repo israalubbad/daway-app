@@ -54,6 +54,14 @@ class _AccountingShellScreenState extends State<AccountingShellScreen> {
     _cashCubit.refresh();
   }
 
+  /// A payment or a return changes the overview, the refunds and the cash
+  /// book as well; the sales list refreshes itself.
+  void _refreshAfterInvoiceChange() {
+    _overviewCubit.refresh();
+    _refundsCubit.refresh();
+    _cashCubit.refresh();
+  }
+
   void _back() => Navigator.of(context).maybePop();
 
   @override
@@ -73,7 +81,11 @@ class _AccountingShellScreenState extends State<AccountingShellScreen> {
           ),
           BlocProvider.value(
             value: _salesCubit,
-            child: AccountingSalesScreen(onBack: _back, onNewSale: _newSale),
+            child: AccountingSalesScreen(
+              onBack: _back,
+              onNewSale: _newSale,
+              onDataChanged: _refreshAfterInvoiceChange,
+            ),
           ),
           BlocProvider.value(
             value: _refundsCubit,

@@ -122,6 +122,63 @@ class FindSaleItemByBarcodeUseCase {
       _withToken(_sessions, (token) => _repository.findByBarcode(token: token, barcode: barcode.trim()));
 }
 
+/// Records a payment against an invoice: more than zero and no more than what
+/// is still owed.
+class RecordInvoicePaymentUseCase {
+  final AccountingRepository _repository;
+  final SessionRepository _sessions;
+
+  const RecordInvoicePaymentUseCase(this._repository, this._sessions);
+
+  Future<ApiResult<void>> call({
+    required SaleInvoice invoice,
+    required double amount,
+    required PaymentMethod method,
+  }) {
+    if (!PaymentRules.isValidAmount(amount, remaining: invoice.remaining)) {
+      return Future.value(
+        const ApiError(ApiFailure(message: 'أدخل مبلغاً أكبر من صفر ولا يزيد عن المتبقي')),
+      );
+    }
+    return _withToken(
+      _sessions,
+      (token) => _repository.recordInvoicePayment(
+        token: token,
+        invoiceId: invoice.id,
+        amount: amount,
+        method: method,
+      ),
+    );
+  }
+}
+
+/// Returns goods from an invoice: at least one unit, none beyond what was sold.
+class CreateRefundUseCase {
+  final AccountingRepository _repository;
+  final SessionRepository _sessions;
+
+  const CreateRefundUseCase(this._repository, this._sessions);
+
+  Future<ApiResult<void>> call(RefundRequest request) {
+    if (!request.isValid) {
+      return Future.value(
+        const ApiError(ApiFailure(message: 'اختر وحدة واحدة على الأقل ولا تتجاوز الكمية المباعة')),
+      );
+    }
+    return _withToken(
+      _sessions,
+      (token) => _repository.createRefund(
+        token: token,
+        invoiceId: request.invoice.id,
+        quantities: {
+          for (final e in request.quantities.entries)
+            if (e.value > 0) e.key: e.value,
+        },
+      ),
+    );
+  }
+}
+
 /// Saves the sale. An empty cart is refused, and a payment above the total is
 /// capped to it: change is not recorded as money received.
 class CreateSaleUseCase {

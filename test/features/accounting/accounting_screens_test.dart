@@ -8,6 +8,7 @@ import 'package:daway_app/features/accounting/presentation/cubit/new_sale_cubit.
 import 'package:daway_app/features/accounting/presentation/cubit/refunds_cubit.dart';
 import 'package:daway_app/features/accounting/presentation/cubit/sales_cubit.dart';
 import 'package:daway_app/features/accounting/presentation/screens/accounting_shell_screen.dart';
+import 'package:daway_app/features/accounting/presentation/widgets/record_payment_sheet.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
@@ -35,7 +36,13 @@ void main() {
     getIt
       ..registerSingleton<AccountingRepository>(repository)
       ..registerFactory(() => AccountingOverviewCubit(GetAccountingOverviewUseCase(repository, session)))
-      ..registerFactory(() => SalesCubit(GetSalesUseCase(repository, session)))
+      ..registerFactory(
+        () => SalesCubit(
+          GetSalesUseCase(repository, session),
+          RecordInvoicePaymentUseCase(repository, session),
+          CreateRefundUseCase(repository, session),
+        ),
+      )
       ..registerFactory(() => RefundsCubit(GetRefundsUseCase(repository, session)))
       ..registerFactory(
         () => CashCubit(
@@ -254,5 +261,94 @@ void main() {
     expect(find.text('أصناف السلة'), findsOneWidget);
     expect(find.text('Vitamin C 1000mg'), findsOneWidget);
     expect(find.text('السلة فارغة'), findsNothing);
+  });
+
+  group('an invoice\'s menu', () {
+    Future<void> openMenuOf(WidgetTester tester, String invoiceNumber) async {
+      final card = find.ancestor(of: find.text(invoiceNumber), matching: find.byType(InkWell)).first;
+      await tester.tap(find.descendant(of: card, matching: find.byIcon(Icons.more_vert_rounded)));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('عرض opens the invoice with its lines and totals', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, 'المبيعات');
+
+      await openMenuOf(tester, 'INV-1001');
+      await tester.tap(find.text('عرض'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('تفاصيل الفاتورة'), findsOneWidget);
+      expect(find.text('Baby Diaper Cream'), findsOneWidget);
+      expect(find.text('Panadol Extra 500mg'), findsOneWidget);
+      expect(find.text('المتبقي'), findsOneWidget);
+    });
+
+    testWidgets('تسجيل دفعة pays the rest of a partly paid invoice', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, 'المبيعات');
+
+      await openMenuOf(tester, 'INV-1002');
+      await tester.tap(find.text('تسجيل دفعة'));
+      await tester.pumpAndSettle();
+      // Starts at what is still owed.
+      expect(find.text('10.00'), findsOneWidget);
+      await tester.tap(find.text('تسجيل').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('تم تسجيل الدفعة'), findsOneWidget);
+      expect(find.text('مدفوع'), findsOneWidget);
+    });
+
+    testWidgets('a payment above what is owed is refused inside the sheet', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, 'المبيعات');
+
+      await openMenuOf(tester, 'INV-1002');
+      await tester.tap(find.text('تسجيل دفعة'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(of: find.byType(RecordPaymentSheet), matching: find.byType(TextField)),
+        '500',
+      );
+      await tester.tap(find.text('تسجيل').last);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('لا يزيد عن المتبقي'), findsOneWidget);
+    });
+
+    testWidgets('إرجاع asks for units, confirms, and lists the return', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, 'المبيعات');
+
+      await openMenuOf(tester, 'INV-1002');
+      await tester.tap(find.text('إرجاع'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('تأكيد الإرجاع'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('تأكيد إرجاع'), findsOneWidget);
+      await tester.tap(find.text('تأكيد'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('تم تسجيل الإرجاع'), findsOneWidget);
+      await openTab(tester, 'الإرجاعات');
+      expect(find.text('RET-3001'), findsOneWidget);
+      expect(find.text('₪50.00'), findsWidgets);
+    });
+
+    testWidgets('إرجاع without choosing a unit says so', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, 'المبيعات');
+
+      await openMenuOf(tester, 'INV-1002');
+      await tester.tap(find.text('إرجاع'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('تأكيد الإرجاع'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('اختر وحدة واحدة على الأقل للإرجاع'), findsOneWidget);
+    });
   });
 }
