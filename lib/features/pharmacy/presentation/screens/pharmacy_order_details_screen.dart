@@ -20,6 +20,10 @@ import '../widgets/product_status_badge.dart';
 typedef PharmacyOrderDecision =
     Future<String?> Function(PharmacyOrder order, {required bool accept});
 
+/// Fetches the full record of an order (medicines, quantities, patient); null
+/// when it cannot be had, and the screen keeps what the list gave it.
+typedef PharmacyOrderLoader = Future<PharmacyOrder?> Function(PharmacyOrder order);
+
 /// "تفاصيل الطلب": one order in full — its number, strip and time, each
 /// medicine, where it goes, how it is paid — and, while it is still pending,
 /// the two decisions, "قبول الطلب" and "رفض الطلب", which go to [onDecide]
@@ -27,18 +31,29 @@ typedef PharmacyOrderDecision =
 class PharmacyOrderDetailsScreen extends StatefulWidget {
   final PharmacyOrder order;
   final PharmacyOrderDecision? onDecide;
+  final PharmacyOrderLoader? onLoadDetails;
 
-  const PharmacyOrderDetailsScreen({super.key, required this.order, this.onDecide});
+  const PharmacyOrderDetailsScreen({
+    super.key,
+    required this.order,
+    this.onDecide,
+    this.onLoadDetails,
+  });
 
   /// Pushes the screen for [order] above the dashboard.
   static Future<void> open(
     BuildContext context,
     PharmacyOrder order, {
     PharmacyOrderDecision? onDecide,
+    PharmacyOrderLoader? onLoadDetails,
   }) {
     return Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => PharmacyOrderDetailsScreen(order: order, onDecide: onDecide),
+        builder: (_) => PharmacyOrderDetailsScreen(
+          order: order,
+          onDecide: onDecide,
+          onLoadDetails: onLoadDetails,
+        ),
       ),
     );
   }
@@ -48,7 +63,24 @@ class PharmacyOrderDetailsScreen extends StatefulWidget {
 }
 
 class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen> {
+  late PharmacyOrder _order = widget.order;
   bool _isDeciding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDetails();
+  }
+
+  /// The list may leave out the lines or the patient; the details route has them.
+  Future<void> _loadDetails() async {
+    final load = widget.onLoadDetails;
+    if (load == null) return;
+    final full = await load(widget.order);
+    if (!mounted || full == null) return;
+    // A decision taken meanwhile must not be undone by an older record.
+    setState(() => _order = _isDeciding ? _order : full);
+  }
 
   Future<void> _decide(bool accept) async {
     final onDecide = widget.onDecide;
@@ -58,7 +90,7 @@ class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen>
     }
     if (_isDeciding) return;
     setState(() => _isDeciding = true);
-    final error = await onDecide(widget.order, accept: accept);
+    final error = await onDecide(_order, accept: accept);
     if (!mounted) return;
     setState(() => _isDeciding = false);
     if (error != null) {
@@ -71,7 +103,7 @@ class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final order = widget.order;
+    final order = _order;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -195,6 +227,10 @@ class _SummaryCard extends StatelessWidget {
             textAlign: TextAlign.end,
             style: AppTextStyles.settingsMutedText,
           ),
+          if (order.patientName case final patient?) ...[
+            SizedBox(height: 8.h),
+            Text('العميل: $patient', style: AppTextStyles.pharmacyOrderNumber),
+          ],
           SizedBox(height: 16.h),
           Container(
             padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -320,7 +356,14 @@ class _ItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.name, style: AppTextStyles.pharmacyOrderNumber),
-                SizedBox(height: 12.h),
+                SizedBox(height: 4.h),
+                Text(
+                  item.unitPrice == null
+                      ? 'الكمية: ${item.quantity}'
+                      : 'الكمية: ${item.quantity} × ${formatPrice(item.unitPrice!)} ₪',
+                  style: AppTextStyles.settingsMutedText,
+                ),
+                SizedBox(height: 8.h),
                 Text(
                   '${formatPrice(item.price)} ₪',
                   textDirection: TextDirection.ltr,

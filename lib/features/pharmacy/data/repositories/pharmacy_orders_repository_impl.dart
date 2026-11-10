@@ -33,6 +33,24 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
   }
 
   @override
+  Future<ApiResult<PharmacyOrder>> getOrder({required String token, required int orderId}) async {
+    try {
+      final response = await _remoteDataSource.getOrder(token: token, orderId: orderId);
+      final body = response.data;
+      // The record may sit under `data` or be the body itself.
+      final record = body is Map<String, dynamic>
+          ? (body['data'] is Map<String, dynamic> ? body['data'] as Map<String, dynamic> : body)
+          : null;
+      if (record == null) {
+        throw FormatException('GET /pharmacy/sub-orders/$orderId: unexpected body $body');
+      }
+      return Success(PharmacyOrderModel.fromJson(record).order);
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
   Future<ApiResult<void>> decide({
     required String token,
     required int orderId,
@@ -42,7 +60,9 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
       await _remoteDataSource.updateStatus(
         token: token,
         orderId: orderId,
-        status: accept ? 'accepted' : 'rejected',
+        // "preparing" is the one value the API documents (Postman); the
+        // rejection value is still a guess until the backend lists its states.
+        status: accept ? 'preparing' : 'rejected',
       );
       return const Success(null);
     } catch (e) {

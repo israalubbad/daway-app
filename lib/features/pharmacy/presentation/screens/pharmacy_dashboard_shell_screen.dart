@@ -101,6 +101,7 @@ class _PharmacyDashboardShellScreenState
             },
             onDecide: (order, {required accept}) =>
                 _ordersCubit.decide(order, accept: accept),
+            onLoadDetails: _ordersCubit.loadDetails,
           ),
         ),
       ),
@@ -130,6 +131,7 @@ class _PharmacyDashboardShellScreenState
           onRetry: _ordersCubit.load,
           onDecide: (order, {required accept}) =>
               _ordersCubit.decide(order, accept: accept),
+          onLoadDetails: _ordersCubit.loadDetails,
         ),
       ),
       PharmacyDashboardTab.inventory: BlocProvider(

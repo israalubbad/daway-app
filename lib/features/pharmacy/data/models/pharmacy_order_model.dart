@@ -66,6 +66,7 @@ class PharmacyOrderModel {
         items: items,
         deliveryStreet: street,
         payment: _payment(json, parent),
+        patientName: _patientName(json, parent),
       ),
     );
   }
@@ -75,14 +76,35 @@ class PharmacyOrderModel {
     final quantity = jsonInt(raw['quantity']) ?? 1;
     final unit = jsonDouble(raw['unit_price']) ?? jsonDouble(raw['price']) ?? 0;
     return PharmacyOrderItem(
-      name: jsonString(raw['name']) ??
+      // `medicine_trade_name`, `quantity`, `unit_price` and `total_price` are
+      // the documented names (Postman collection); the rest are fallbacks.
+      name: jsonString(raw['medicine_trade_name']) ??
+          jsonString(raw['name']) ??
           jsonString(raw['medicine_name']) ??
           jsonString(medicine?['name']) ??
           jsonString(medicine?['trade_name']) ??
           '',
-      price: jsonDouble(raw['total']) ?? unit * quantity,
+      price: jsonDouble(raw['total_price']) ?? jsonDouble(raw['total']) ?? unit * quantity,
       imageUrl: jsonString(raw['image_url']) ?? jsonString(medicine?['image_url']),
+      quantity: quantity,
+      unitPrice: raw.containsKey('unit_price') || raw.containsKey('price') ? unit : null,
     );
+  }
+
+  /// The patient's name — on the record or the parent order, as a plain
+  /// string or inside a `patient` / `customer` / `user` object.
+  static String? _patientName(Map<String, dynamic> json, Map<String, dynamic>? parent) {
+    for (final source in [json, parent]) {
+      if (source == null) continue;
+      final direct = jsonString(source['patient_name']) ?? jsonString(source['customer_name']);
+      if (direct != null) return direct;
+      for (final key in ['patient', 'customer', 'user']) {
+        final nested = jsonMap(source[key]);
+        final name = jsonString(nested?['name']) ?? jsonString(nested?['full_name']);
+        if (name != null) return name;
+      }
+    }
+    return null;
   }
 
   static PharmacyOrderPayment? _payment(

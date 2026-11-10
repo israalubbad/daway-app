@@ -29,6 +29,28 @@ void main() {
     expect(order.payment!.isPaid, isTrue);
   });
 
+  test('reads the documented item fields and the patient', () {
+    final order = PharmacyOrderModel.fromJson({
+      'id': 9,
+      'patient': {'name': 'أحمد'},
+      'items': [
+        {
+          'medicine_trade_name': 'بنادول',
+          'quantity': 3,
+          'unit_price': 4,
+          'total_price': 12,
+        },
+      ],
+    }).order;
+
+    expect(order.patientName, 'أحمد');
+    final item = order.items.single;
+    expect(item.name, 'بنادول');
+    expect(item.quantity, 3);
+    expect(item.unitPrice, 4);
+    expect(item.price, 12);
+  });
+
   test('a bare record still parses, with the id as its number', () {
     final order = PharmacyOrderModel.fromJson({'id': 3}).order;
 

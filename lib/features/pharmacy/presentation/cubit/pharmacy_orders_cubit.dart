@@ -3,14 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/entities/pharmacy_order.dart';
 import '../../domain/usecases/decide_pharmacy_order_usecase.dart';
+import '../../domain/usecases/get_pharmacy_order_usecase.dart';
 import '../../domain/usecases/get_pharmacy_orders_usecase.dart';
 import 'pharmacy_orders_state.dart';
 
 class PharmacyOrdersCubit extends Cubit<PharmacyOrdersState> {
   final GetPharmacyOrdersUseCase _getOrdersUseCase;
   final DecidePharmacyOrderUseCase _decideOrderUseCase;
+  final GetPharmacyOrderUseCase _getOrderUseCase;
 
-  PharmacyOrdersCubit(this._getOrdersUseCase, this._decideOrderUseCase)
+  PharmacyOrdersCubit(this._getOrdersUseCase, this._decideOrderUseCase, this._getOrderUseCase)
       : super(const PharmacyOrdersLoading()) {
     load();
   }
@@ -37,6 +39,16 @@ class PharmacyOrdersCubit extends Cubit<PharmacyOrdersState> {
     final result = await _getOrdersUseCase();
     if (isClosed) return;
     if (result case Success(:final data)) emit(PharmacyOrdersLoaded(data));
+  }
+
+  /// The full record of [order] for the details screen; null when it cannot
+  /// be fetched (the screen then keeps showing what the list gave it).
+  Future<PharmacyOrder?> loadDetails(PharmacyOrder order) async {
+    final result = await _getOrderUseCase(orderId: order.id);
+    return switch (result) {
+      Success(:final data) => data,
+      ApiError() => null,
+    };
   }
 
   void _markDecided(PharmacyOrder order, {required bool accept}) {

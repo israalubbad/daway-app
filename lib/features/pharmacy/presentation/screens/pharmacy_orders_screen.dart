@@ -19,6 +19,7 @@ class PharmacyOrdersScreen extends StatelessWidget {
   final String? errorMessage;
   final VoidCallback? onRetry;
   final PharmacyOrderDecision? onDecide;
+  final PharmacyOrderLoader? onLoadDetails;
 
   const PharmacyOrdersScreen({
     super.key,
@@ -27,6 +28,7 @@ class PharmacyOrdersScreen extends StatelessWidget {
     this.errorMessage,
     this.onRetry,
     this.onDecide,
+    this.onLoadDetails,
   });
 
   @override
@@ -67,6 +69,7 @@ class PharmacyOrdersScreen extends StatelessWidget {
                     context,
                     orders[i],
                     onDecide: onDecide,
+                    onLoadDetails: onLoadDetails,
                   ),
                 ),
               ],

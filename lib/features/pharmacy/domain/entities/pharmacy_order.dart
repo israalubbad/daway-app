@@ -33,6 +33,9 @@ class PharmacyOrder {
   /// Null when the order carries no payment information.
   final PharmacyOrderPayment? payment;
 
+  /// Who placed the order; null when the API does not say.
+  final String? patientName;
+
   /// This order with another [status] — what a decision turns it into.
   PharmacyOrder withStatus(PharmacyOrderStatus status) => PharmacyOrder(
     id: id,
@@ -45,6 +48,7 @@ class PharmacyOrder {
     items: items,
     deliveryStreet: deliveryStreet,
     payment: payment,
+    patientName: patientName,
   );
 
   const PharmacyOrder({
@@ -58,6 +62,7 @@ class PharmacyOrder {
     this.items = const [],
     this.deliveryStreet,
     this.payment,
+    this.patientName,
   });
 }
 
@@ -65,9 +70,15 @@ class PharmacyOrder {
 class PharmacyOrderItem {
   final String name;
 
-  /// In shekels.
+  /// The line's total in shekels (unit price × [quantity]).
   final double price;
   final String? imageUrl;
+
+  /// How many of it were ordered.
+  final int quantity;
+
+  /// One unit's price in shekels, when the API gives it.
+  final double? unitPrice;
 
   /// Whether the pharmacy has it in stock right now.
   final bool isAvailable;
@@ -76,6 +87,8 @@ class PharmacyOrderItem {
     required this.name,
     required this.price,
     this.imageUrl,
+    this.quantity = 1,
+    this.unitPrice,
     this.isAvailable = true,
   });
 }

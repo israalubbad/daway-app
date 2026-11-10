@@ -33,8 +33,14 @@ class PharmacyHomeScreen extends StatelessWidget {
 
   /// Takes a decision made from an order's details screen.
   final PharmacyOrderDecision? onDecide;
+  final PharmacyOrderLoader? onLoadDetails;
 
-  const PharmacyHomeScreen({super.key, this.orders = const [], this.onDecide});
+  const PharmacyHomeScreen({
+    super.key,
+    this.orders = const [],
+    this.onDecide,
+    this.onLoadDetails,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +83,7 @@ class PharmacyHomeScreen extends StatelessWidget {
                         stats: stats,
                         orders: orders,
                         onDecide: onDecide,
+                        onLoadDetails: onLoadDetails,
                       ),
                     };
                   },
@@ -94,8 +101,14 @@ class _HomeContent extends StatelessWidget {
   final PharmacyDashboardStats stats;
   final List<PharmacyOrder> orders;
   final PharmacyOrderDecision? onDecide;
+  final PharmacyOrderLoader? onLoadDetails;
 
-  const _HomeContent({required this.stats, required this.orders, this.onDecide});
+  const _HomeContent({
+    required this.stats,
+    required this.orders,
+    this.onDecide,
+    this.onLoadDetails,
+  });
 
   Future<void> _openStockImport(BuildContext context) async {
     final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
@@ -141,7 +154,12 @@ class _HomeContent extends StatelessWidget {
             orders: orders,
             onViewAllTap: () => _goToTab(context, PharmacyDashboardTab.orders),
             onOrderTap: (order) =>
-                PharmacyOrderDetailsScreen.open(context, order, onDecide: onDecide),
+                PharmacyOrderDetailsScreen.open(
+                  context,
+                  order,
+                  onDecide: onDecide,
+                  onLoadDetails: onLoadDetails,
+                ),
           ),
         ],
       ],

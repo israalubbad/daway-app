@@ -6,6 +6,7 @@ import 'package:daway_app/features/auth/domain/repositories/session_repository.d
 import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_order.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/decide_pharmacy_order_usecase.dart';
+import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_order_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_orders_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_state.dart';
@@ -23,6 +24,7 @@ PharmacyOrder _order(int id) => PharmacyOrder(
 class _FakeOrdersRepository implements PharmacyOrdersRepository {
   ApiResult<List<PharmacyOrder>> orders = Success([_order(1)]);
   ApiResult<void> decision = const Success(null);
+  ApiResult<PharmacyOrder> detail = Success(_order(1));
   int? decidedId;
   bool? accepted;
   int fetches = 0;
@@ -32,6 +34,9 @@ class _FakeOrdersRepository implements PharmacyOrdersRepository {
     fetches++;
     return orders;
   }
+
+  @override
+  Future<ApiResult<PharmacyOrder>> getOrder({required String token, required int orderId}) async => detail;
 
   @override
   Future<ApiResult<void>> decide({
@@ -67,10 +72,19 @@ void main() {
     cubit = PharmacyOrdersCubit(
       GetPharmacyOrdersUseCase(repository, session),
       DecidePharmacyOrderUseCase(repository, session),
+      GetPharmacyOrderUseCase(repository, session),
     );
   });
 
   tearDown(() => cubit.close());
+
+  test('loadDetails returns the full record, or null on failure', () async {
+    repository.detail = Success(_order(1).withStatus(PharmacyOrderStatus.accepted));
+    expect((await cubit.loadDetails(_order(1)))!.status, PharmacyOrderStatus.accepted);
+
+    repository.detail = const ApiError(ApiFailure(message: 'x'));
+    expect(await cubit.loadDetails(_order(1)), isNull);
+  });
 
   test('loads the orders on creation', () async {
     await cubit.load();

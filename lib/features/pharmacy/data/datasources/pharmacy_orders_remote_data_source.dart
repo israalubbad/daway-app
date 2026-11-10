@@ -15,6 +15,13 @@ class PharmacyOrdersRemoteDataSource {
     );
   }
 
+  Future<Response<dynamic>> getOrder({required String token, required int orderId}) {
+    return _dio.get(
+      '${ApiConstants.pharmacySubOrders}/$orderId',
+      options: authOptions(token),
+    );
+  }
+
   Future<Response<dynamic>> updateStatus({
     required String token,
     required int orderId,
