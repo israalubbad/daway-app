@@ -9,9 +9,7 @@ import '../../../../core/theming/app_text_styles.dart';
 
 /// The dashed "أضف صورة" box for the medicine's (optional) photo, on the "add
 /// medicine" screen: a camera in a round chip over the label, replaced by the
-/// photo once one is picked. Distinct from [ProfileAvatarPicker] — that one is
-/// a circular avatar edited in place — but both share the same camera/gallery
-/// picking flow via [pickImageFromSourceSheet].
+/// photo once one is picked. Picking goes through [pickImageFromSourceSheet].
 class MedicineImagePicker extends StatelessWidget {
   final String? imageLocalPath;
   final String? imageUrl;

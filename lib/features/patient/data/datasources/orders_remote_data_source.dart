@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class OrdersRemoteDataSource {
@@ -11,14 +12,14 @@ class OrdersRemoteDataSource {
     return _dio.get(
       ApiConstants.patientOrders,
       queryParameters: {'page': page},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
   Future<Response<dynamic>> cancelOrder({required String token, required int orderId}) {
     return _dio.post(
       '${ApiConstants.patientOrders}/$orderId/cancel',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -35,7 +36,7 @@ class OrdersRemoteDataSource {
         'coupon_code': ?couponCode,
         'notes': ?notes,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

@@ -11,9 +11,7 @@ import '../../../../core/theming/app_text_styles.dart';
 
 /// Account-info screen's avatar: a 96x96 circle (falling back to the
 /// patient's first initial when no picture is set) with a small upload
-/// badge. Kept separate from [ProfileAvatarPicker] since that widget's
-/// look is shared with the pharmacy profile and medicine-image pickers —
-/// this one is specific to this screen's redesign.
+/// badge.
 class PatientProfileAvatar extends StatelessWidget {
   final String name;
   final String? avatarLocalPath;

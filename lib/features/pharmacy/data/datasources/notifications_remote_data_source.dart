@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class NotificationsRemoteDataSource {
@@ -16,14 +17,14 @@ class NotificationsRemoteDataSource {
     return _dio.get(
       ApiConstants.notifications,
       queryParameters: {'per_page': 100},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
   Future<Response<dynamic>> markAllAsRead({required String token}) {
     return _dio.post(
       ApiConstants.notificationsMarkAllAsRead,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -33,7 +34,7 @@ class NotificationsRemoteDataSource {
   }) {
     return _dio.post(
       '${ApiConstants.notifications}/$notificationId/read',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

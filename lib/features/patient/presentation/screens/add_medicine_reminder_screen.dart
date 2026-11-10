@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -150,7 +151,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          _selectedTime == null ? '' : _formatTime(_selectedTime!),
+                          _selectedTime == null ? '' : formatClockHourMinute(_selectedTime!.hour, _selectedTime!.minute),
                           textAlign: TextAlign.right,
                           style: AppTextStyles.profileFieldValue,
                         ),
@@ -190,13 +191,6 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
   }
 }
 
-/// Matches [MedicineReminder.formattedTime]'s format, for the time picker
-/// field's display before a reminder object even exists to ask.
-String _formatTime(TimeOfDay time) {
-  final period = time.hour < 12 ? 'ص' : 'م';
-  final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
-  return '$hour:${time.minute.toString().padLeft(2, '0')} $period';
-}
 
 class _FrequencyChip extends StatelessWidget {
   final String label;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../domain/entities/chat_message.dart';
@@ -120,12 +121,6 @@ class _DayChip extends StatelessWidget {
   }
 }
 
-String _formatTime(DateTime time) {
-  final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
-  final minute = time.minute.toString().padLeft(2, '0');
-  return '$hour:$minute ${time.hour < 12 ? 'ص' : 'م'}';
-}
-
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
 
@@ -135,7 +130,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final mine = message.isMine;
     final textColor = mine ? Colors.white : AppColors.textDark;
-    final time = _formatTime(message.createdAt);
+    final time = formatClockTime(message.createdAt);
     final imageOnly = message.imageUrl != null &&
         (message.text.isEmpty || message.text.trim() == message.imageUrl);
 

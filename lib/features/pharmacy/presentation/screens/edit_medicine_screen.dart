@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/helpers/digits_only_formatter.dart';
+import '../../../../core/helpers/text_controller_sync.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -53,12 +54,6 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
     super.dispose();
   }
 
-  void _syncController(TextEditingController controller, String value) {
-    if (controller.text == value) return;
-    controller.text = value;
-    controller.selection = TextSelection.collapsed(offset: value.length);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +83,11 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
           },
           builder: (context, state) {
             final formData = state.formData;
-            _syncController(_tradeNameController, formData.tradeName);
-            _syncController(_nameArController, formData.nameAr);
-            _syncController(_activeIngredientController, formData.activeIngredient);
-            _syncController(_priceController, formData.price);
-            _syncController(_quantityController, formData.quantity);
+            _tradeNameController.syncText(formData.tradeName);
+            _nameArController.syncText(formData.nameAr);
+            _activeIngredientController.syncText(formData.activeIngredient);
+            _priceController.syncText(formData.price);
+            _quantityController.syncText(formData.quantity);
 
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),

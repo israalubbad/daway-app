@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_parsing.dart';
 import '../../domain/entities/medicine.dart';
 
 /// Parses a `pharmacy_medicine` record. The descriptive fields (trade name,
@@ -40,18 +41,12 @@ class MedicineModel {
       nameAr: catalog['trade_name_ar'] as String?,
       activeIngredient: catalog['active_ingredient'] as String?,
       imageUrl: catalog['image_url'] as String?,
-      price: _parseDouble(json['price']),
+      price: jsonDouble(json['price']) ?? 0,
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
       isAvailable: json['is_available'] as bool? ?? true,
       isLowStock: json['is_low_stock'] as bool?,
       isOutOfStock: json['is_out_of_stock'] as bool?,
     );
-  }
-
-  static double _parseDouble(Object? value) {
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0;
-    return 0;
   }
 
   Medicine toEntity() => Medicine(

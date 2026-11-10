@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
+
 class ChatbotRemoteDataSource {
   final Dio _dio;
 
@@ -9,7 +11,7 @@ class ChatbotRemoteDataSource {
     return _dio.post(
       '/patient/assistant/chat',
       data: {'message': message},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

@@ -5,7 +5,7 @@ import '../entities/checkout_flow.dart';
 import '../repositories/checkout_flow_repository.dart';
 
 const _sessionExpired = ApiFailure(
-  message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى',
+  message: sessionExpiredMessage,
 );
 
 class ValidateCouponUseCase {

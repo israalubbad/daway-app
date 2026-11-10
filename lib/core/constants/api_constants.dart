@@ -29,7 +29,6 @@ abstract class ApiConstants {
   static const String deviceTokens = '/device-tokens';
   static const String deviceTokensCurrent = '/device-tokens/current';
   static const String notifications = '/notifications';
-  static const String notificationsCount = '/notifications/count';
   static const String notificationsMarkAllAsRead =
       '/notifications/mark-all-as-read';
   static const String categories = '/categories';

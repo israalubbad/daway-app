@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/helpers/digits_only_formatter.dart';
+import '../../../../core/helpers/text_controller_sync.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -54,12 +55,6 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     super.dispose();
   }
 
-  void _syncController(TextEditingController controller, String value) {
-    if (controller.text == value) return;
-    controller.text = value;
-    controller.selection = TextSelection.collapsed(offset: value.length);
-  }
-
   Future<void> _openSearch() async {
     final cubit = context.read<AddMedicineCubit>()..searchReset();
     await Navigator.of(context).push<void>(
@@ -89,10 +84,10 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           builder: (context, state) {
             final cubit = context.read<AddMedicineCubit>();
             final formData = state.formData;
-            _syncController(_nameController, formData.nameQuery);
-            _syncController(_activeIngredientController, formData.activeIngredient);
-            _syncController(_priceController, formData.price);
-            _syncController(_quantityController, formData.quantity);
+            _nameController.syncText(formData.nameQuery);
+            _activeIngredientController.syncText(formData.activeIngredient);
+            _priceController.syncText(formData.price);
+            _quantityController.syncText(formData.quantity);
 
             final isFromCatalog = !formData.isManualEntry;
 

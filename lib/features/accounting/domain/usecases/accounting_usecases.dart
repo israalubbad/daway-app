@@ -1,6 +1,7 @@
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 import '../entities/accounting_customer.dart';
 import '../entities/accounting_overview.dart';
 import '../entities/cash_ledger.dart';
@@ -8,21 +9,6 @@ import '../entities/refund_record.dart';
 import '../entities/sale_invoice.dart';
 import '../repositories/accounting_repository.dart';
 
-/// Runs [action] with the signed-in pharmacy's token, or answers the
-/// session-expired failure when there is none. Every accounting use case
-/// below is this plus one repository call.
-Future<ApiResult<T>> _withToken<T>(
-  SessionRepository sessions,
-  Future<ApiResult<T>> Function(String token) action,
-) async {
-  final session = await sessions.getSession();
-  if (session == null) {
-    return const ApiError(
-      ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
-    );
-  }
-  return action(session.token);
-}
 
 ApiResult<T> _refuse<T>(String message) => ApiError(ApiFailure(message: message));
 
@@ -33,7 +19,7 @@ class GetAccountingOverviewUseCase {
   const GetAccountingOverviewUseCase(this._repository, this._sessions);
 
   Future<ApiResult<AccountingOverview>> call(SalesPeriod period, {bool useCache = false}) =>
-      _withToken(
+      withSessionToken(
         _sessions,
         (token) => _repository.getOverview(token: token, period: period, useCache: useCache),
       );
@@ -46,7 +32,7 @@ class GetSalesUseCase {
   const GetSalesUseCase(this._repository, this._sessions);
 
   Future<ApiResult<List<SaleInvoice>>> call() =>
-      _withToken(_sessions, (token) => _repository.getSales(token: token));
+      withSessionToken(_sessions, (token) => _repository.getSales(token: token));
 }
 
 class GetInvoiceUseCase {
@@ -56,7 +42,7 @@ class GetInvoiceUseCase {
   const GetInvoiceUseCase(this._repository, this._sessions);
 
   Future<ApiResult<SaleInvoice>> call(String number) =>
-      _withToken(_sessions, (token) => _repository.getInvoice(token: token, number: number));
+      withSessionToken(_sessions, (token) => _repository.getInvoice(token: token, number: number));
 }
 
 class GetRefundableLinesUseCase {
@@ -71,7 +57,7 @@ class GetRefundableLinesUseCase {
     if (invoice.isClosed) {
       return Future.value(_refuse('الفاتورة ملغاة أو مرجوعة ولا يمكن إرجاع أصناف منها'));
     }
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.getRefundableLines(token: token, number: invoice.number),
     );
@@ -85,7 +71,7 @@ class GetRefundsUseCase {
   const GetRefundsUseCase(this._repository, this._sessions);
 
   Future<ApiResult<List<RefundRecord>>> call() =>
-      _withToken(_sessions, (token) => _repository.getRefunds(token: token));
+      withSessionToken(_sessions, (token) => _repository.getRefunds(token: token));
 }
 
 class GetCashLedgerUseCase {
@@ -95,7 +81,7 @@ class GetCashLedgerUseCase {
   const GetCashLedgerUseCase(this._repository, this._sessions);
 
   Future<ApiResult<CashLedger>> call() =>
-      _withToken(_sessions, (token) => _repository.getCashLedger(token: token));
+      withSessionToken(_sessions, (token) => _repository.getCashLedger(token: token));
 }
 
 /// Records a manual cash movement after checking what the user typed: the
@@ -117,7 +103,7 @@ class RecordCashMovementUseCase {
     if (!CashMovementRules.isValidReason(reason)) {
       return Future.value(_refuse('اذكر سبب الحركة (3 أحرف على الأقل)'));
     }
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.recordCashMovement(
         token: token,
@@ -140,7 +126,7 @@ class SearchSaleItemsUseCase {
   Future<ApiResult<List<SaleItemOption>>> call(String query) {
     final trimmed = query.trim();
     if (trimmed.length < 2) return Future.value(const Success(<SaleItemOption>[]));
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.searchSaleItems(token: token, query: trimmed),
     );
@@ -160,7 +146,7 @@ class FindSaleItemByBarcodeUseCase {
     if (!RegExp(r'^\d+$').hasMatch(digits) || ![8, 12, 13, 14].contains(digits.length)) {
       return Future.value(_refuse('صيغة الباركود غير مدعومة'));
     }
-    return _withToken(_sessions, (token) => _repository.findByBarcode(token: token, barcode: digits));
+    return withSessionToken(_sessions, (token) => _repository.findByBarcode(token: token, barcode: digits));
   }
 }
 
@@ -173,7 +159,7 @@ class SearchCustomersUseCase {
   Future<ApiResult<List<AccountingCustomer>>> call(String query) {
     final trimmed = query.trim();
     if (trimmed.length < 2) return Future.value(const Success(<AccountingCustomer>[]));
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.searchCustomers(token: token, query: trimmed),
     );
@@ -206,7 +192,7 @@ class RecordInvoicePaymentUseCase {
     if (!PaymentRules.isValidAmount(amount, remaining: invoice.remaining)) {
       return Future.value(_refuse('أدخل مبلغاً أكبر من صفر ولا يزيد عن المتبقي'));
     }
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.recordInvoicePayment(
         token: token,
@@ -229,7 +215,7 @@ class CreateRefundUseCase {
     if (!request.isValid) {
       return Future.value(_refuse('اختر وحدة واحدة على الأقل ولا تتجاوز الكمية المتاحة'));
     }
-    return _withToken(
+    return withSessionToken(
       _sessions,
       (token) => _repository.createRefund(
         token: token,
@@ -268,6 +254,6 @@ class CreateSaleUseCase {
       paid: paid?.clamp(0, total).toDouble(),
       method: sale.method,
     );
-    return _withToken(_sessions, (token) => _repository.createSale(token: token, sale: capped));
+    return withSessionToken(_sessions, (token) => _repository.createSale(token: token, sale: capped));
   }
 }

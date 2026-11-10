@@ -1,6 +1,7 @@
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../../core/helpers/json_list_extractor.dart';
+import '../../../../core/helpers/json_parsing.dart';
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/accounting_customer.dart';
 import '../../domain/entities/accounting_overview.dart';
@@ -14,33 +15,13 @@ import '../../domain/entities/sale_invoice.dart';
 
 // ---------------------------------------------------------------- helpers
 
-double? _double(Object? value) {
-  if (value is num) return value.toDouble();
-  if (value is String) return double.tryParse(value);
-  return null;
-}
-
-int? _int(Object? value) {
-  if (value is num) return value.toInt();
-  if (value is String) return int.tryParse(value);
-  return null;
-}
-
-String? _string(Object? value) {
-  if (value == null) return null;
-  final text = value.toString().trim();
-  return text.isEmpty ? null : text;
-}
-
-Map<String, dynamic>? _map(Object? value) => value is Map<String, dynamic> ? value : null;
-
-DateTime _date(Object? value) => tryParseServerTimestamp(_string(value)) ?? DateTime.now();
+DateTime _date(Object? value) => tryParseServerTimestamp(jsonString(value)) ?? DateTime.now();
 
 /// The `data` object of a response, or the body itself when it has none.
 Map<String, dynamic> dataOf(Object? body) {
-  final map = _map(body);
+  final map = jsonMap(body);
   if (map == null) throw FormatException('Unexpected response: $body');
-  return _map(map['data']) ?? map;
+  return jsonMap(map['data']) ?? map;
 }
 
 // ---------------------------------------------------------- enum mapping
@@ -59,14 +40,14 @@ String paymentMethodApiValue(PaymentMethod method) => switch (method) {
   PaymentMethod.credit => 'credit',
 };
 
-PaymentMethod paymentMethodFrom(Object? raw) => switch (_string(raw)) {
+PaymentMethod paymentMethodFrom(Object? raw) => switch (jsonString(raw)) {
   'card' => PaymentMethod.card,
   'bank_transfer' => PaymentMethod.bankTransfer,
   'credit' => PaymentMethod.credit,
   _ => PaymentMethod.cash,
 };
 
-PaymentStatus? paymentStatusFrom(Object? raw) => switch (_string(raw)) {
+PaymentStatus? paymentStatusFrom(Object? raw) => switch (jsonString(raw)) {
   'paid' => PaymentStatus.paid,
   'partially_paid' || 'partial' => PaymentStatus.partial,
   'unpaid' => PaymentStatus.unpaid,
@@ -75,7 +56,7 @@ PaymentStatus? paymentStatusFrom(Object? raw) => switch (_string(raw)) {
   _ => null,
 };
 
-CashMovementType cashTypeFrom(Object? sourceType) => switch (_string(sourceType)) {
+CashMovementType cashTypeFrom(Object? sourceType) => switch (jsonString(sourceType)) {
   'sale' => CashMovementType.sale,
   'expense' => CashMovementType.expense,
   'purchase' => CashMovementType.purchase,
@@ -93,29 +74,29 @@ AccountingOverview parseOverview(Map<String, dynamic> body, SalesPeriod period) 
 
   final kpis = <String, double>{};
   for (final kpi in data['kpis'] as List? ?? const []) {
-    final map = _map(kpi);
-    final key = _string(map?['key']);
-    final value = _double(map?['value']);
+    final map = jsonMap(kpi);
+    final key = jsonString(map?['key']);
+    final value = jsonDouble(map?['value']);
     if (key != null && value != null) kpis[key] = value;
   }
 
-  final series = _map(_map(data['series'])?[overviewRangeOf(period)]);
+  final series = jsonMap(jsonMap(data['series'])?[overviewRangeOf(period)]);
   final labels = series?['labels'] as List? ?? const [];
   final values = series?['data'] as List? ?? const [];
   final trend = [
     for (var i = 0; i < labels.length && i < values.length; i++)
-      SalesPoint(label: '${labels[i]}', amount: _double(values[i]) ?? 0),
+      SalesPoint(label: '${labels[i]}', amount: jsonDouble(values[i]) ?? 0),
   ];
 
   final expenses = <ExpenseSlice>[];
   for (final slice in data['expense_breakdown'] as List? ?? const []) {
-    final map = _map(slice);
+    final map = jsonMap(slice);
     if (map == null) continue;
-    final amount = _double(map['amount']);
+    final amount = jsonDouble(map['amount']);
     if (amount == null) continue;
     expenses.add(
       ExpenseSlice(
-        category: _string(map['label']) ?? _string(map['category']) ?? '',
+        category: jsonString(map['label']) ?? jsonString(map['category']) ?? '',
         amount: amount,
       ),
     );
@@ -123,9 +104,9 @@ AccountingOverview parseOverview(Map<String, dynamic> body, SalesPeriod period) 
 
   final alerts = <AccountingAlert>[];
   for (final alert in data['alerts'] as List? ?? const []) {
-    final map = _map(alert);
+    final map = jsonMap(alert);
     if (map == null) continue;
-    final href = _string(map['href']) ?? '';
+    final href = jsonString(map['href']) ?? '';
     alerts.add(
       AccountingAlert(
         kind: href.contains('cash')
@@ -133,22 +114,22 @@ AccountingOverview parseOverview(Map<String, dynamic> body, SalesPeriod period) 
             : (href.contains('debt') || href.contains('customer') || href.contains('sales'))
             ? AccountingAlertKind.overdueDebt
             : AccountingAlertKind.lowStock,
-        title: _string(map['title']) ?? '',
-        message: _string(map['description']) ?? '',
+        title: jsonString(map['title']) ?? '',
+        message: jsonString(map['description']) ?? '',
       ),
     );
   }
 
   final transactions = <AccountingTransaction>[];
   for (final transaction in data['recent_transactions'] as List? ?? const []) {
-    final map = _map(transaction);
+    final map = jsonMap(transaction);
     if (map == null) continue;
     transactions.add(
       AccountingTransaction(
-        reference: _string(map['reference']) ?? '',
-        description: _string(map['description']) ?? '',
+        reference: jsonString(map['reference']) ?? '',
+        description: jsonString(map['description']) ?? '',
         // Signed: a purchase or an expense comes as a negative amount.
-        amount: _double(map['amount']) ?? 0,
+        amount: jsonDouble(map['amount']) ?? 0,
         method: paymentMethodFrom(map['method']),
         status: paymentStatusFrom(map['status']) ?? PaymentStatus.paid,
         date: _date(map['date']),
@@ -177,28 +158,28 @@ SaleInvoice parseInvoice(Map<String, dynamic> json) {
   final customer = json['customer'];
   final lines = <InvoiceLine>[];
   for (final item in json['items'] as List? ?? const []) {
-    final map = _map(item);
+    final map = jsonMap(item);
     if (map == null) continue;
     lines.add(
       InvoiceLine(
-        itemId: _int(map['id']) ?? 0,
-        name: _string(map['medicine_name']) ?? '',
-        quantity: _int(map['quantity']) ?? 0,
-        unitPrice: _double(map['unit_price']) ?? 0,
+        itemId: jsonInt(map['id']) ?? 0,
+        name: jsonString(map['medicine_name']) ?? '',
+        quantity: jsonInt(map['quantity']) ?? 0,
+        unitPrice: jsonDouble(map['unit_price']) ?? 0,
       ),
     );
   }
   return SaleInvoice(
-    id: _int(json['id']) ?? 0,
-    number: _string(json['number']) ?? '',
+    id: jsonInt(json['id']) ?? 0,
+    number: jsonString(json['number']) ?? '',
     date: _date(json['date'] ?? json['sold_at']),
-    customerId: _int(json['customer_id']),
-    customerName: customer is Map ? _string(customer['name']) : _string(customer),
-    itemsCount: _int(json['items_count']) ?? lines.length,
-    subtotal: _double(json['subtotal']) ?? 0,
-    discount: _double(json['discount']) ?? 0,
-    total: _double(json['total']) ?? 0,
-    paid: _double(json['paid']) ?? 0,
+    customerId: jsonInt(json['customer_id']),
+    customerName: customer is Map ? jsonString(customer['name']) : jsonString(customer),
+    itemsCount: jsonInt(json['items_count']) ?? lines.length,
+    subtotal: jsonDouble(json['subtotal']) ?? 0,
+    discount: jsonDouble(json['discount']) ?? 0,
+    total: jsonDouble(json['total']) ?? 0,
+    paid: jsonDouble(json['paid']) ?? 0,
     method: paymentMethodFrom(json['method'] ?? json['payment_method']),
     statusOverride: paymentStatusFrom(json['status']),
     lines: lines,
@@ -209,17 +190,17 @@ SaleInvoice parseInvoice(Map<String, dynamic> json) {
 List<InvoiceLine> parseRefundableLines(Map<String, dynamic> data) {
   final lines = <InvoiceLine>[];
   for (final item in data['items'] as List? ?? const []) {
-    final map = _map(item);
+    final map = jsonMap(item);
     if (map == null) continue;
-    final left = _int(map['available_quantity']) ??
-        ((_int(map['original_quantity']) ?? 0) - (_int(map['refunded_quantity']) ?? 0));
+    final left = jsonInt(map['available_quantity']) ??
+        ((jsonInt(map['original_quantity']) ?? 0) - (jsonInt(map['refunded_quantity']) ?? 0));
     if (left <= 0) continue;
     lines.add(
       InvoiceLine(
-        itemId: _int(map['id']) ?? 0,
-        name: _string(map['medicine_name']) ?? '',
+        itemId: jsonInt(map['id']) ?? 0,
+        name: jsonString(map['medicine_name']) ?? '',
         quantity: left,
-        unitPrice: _double(map['unit_price']) ?? 0,
+        unitPrice: jsonDouble(map['unit_price']) ?? 0,
       ),
     );
   }
@@ -229,16 +210,16 @@ List<InvoiceLine> parseRefundableLines(Map<String, dynamic> data) {
 /// A record of `GET /refunds`, which is a raw model: the invoice sits under
 /// `sale`, the amount is a decimal string and there is no refund number.
 RefundRecord parseRefund(Map<String, dynamic> json) {
-  final sale = _map(json['sale']);
-  final id = _int(json['id']) ?? 0;
+  final sale = jsonMap(json['sale']);
+  final id = jsonInt(json['id']) ?? 0;
   return RefundRecord(
     id: id,
     number: '#$id',
-    invoiceNumber: _string(sale?['number']) ?? _string(json['sale_number']) ?? '',
+    invoiceNumber: jsonString(sale?['number']) ?? jsonString(json['sale_number']) ?? '',
     date: _date(json['refunded_at'] ?? json['created_at']),
-    customerName: _string(sale?['customer_name']),
-    amount: _double(json['amount']) ?? 0,
-    status: _string(json['status']) == 'pending' ? RefundStatus.pending : RefundStatus.completed,
+    customerName: jsonString(sale?['customer_name']),
+    amount: jsonDouble(json['amount']) ?? 0,
+    status: jsonString(json['status']) == 'pending' ? RefundStatus.pending : RefundStatus.completed,
   );
 }
 
@@ -263,32 +244,32 @@ Map<String, dynamic> saleRequestBody(NewSale sale) {
 // ------------------------------------------------------------------ cash
 
 CashLedger parseCashLedger(Object? body) {
-  final map = _map(body);
+  final map = jsonMap(body);
   if (map == null) throw FormatException('Unexpected cash response: $body');
   final list = extractJsonList(map, source: 'GET /pharmacy/accounting/cash');
-  final stats = _map(map['stats']);
+  final stats = jsonMap(map['stats']);
 
   final movements = <CashMovement>[];
   for (final record in list) {
-    final json = _map(record);
+    final json = jsonMap(record);
     if (json == null) continue;
-    final amount = _double(json['amount']) ?? 0;
-    final signed = _double(json['signed_amount']) ??
-        (_string(json['direction']) == 'out' ? -amount.abs() : amount.abs());
+    final amount = jsonDouble(json['amount']) ?? 0;
+    final signed = jsonDouble(json['signed_amount']) ??
+        (jsonString(json['direction']) == 'out' ? -amount.abs() : amount.abs());
     movements.add(
       CashMovement(
-        id: _int(json['id']) ?? 0,
+        id: jsonInt(json['id']) ?? 0,
         type: cashTypeFrom(json['source_type']),
-        description: _string(json['description']) ?? _string(json['reason']) ?? '',
+        description: jsonString(json['description']) ?? jsonString(json['reason']) ?? '',
         date: _date(json['date']),
         amount: signed,
       ),
     );
   }
   return CashLedger(
-    balance: _double(stats?['balance_now']) ?? 0,
+    balance: jsonDouble(stats?['balance_now']) ?? 0,
     // Read from the response, not fixed in the app.
-    safeLimit: _double(stats?['low_threshold']) ?? 0,
+    safeLimit: jsonDouble(stats?['low_threshold']) ?? 0,
     movements: movements,
   );
 }
@@ -304,24 +285,24 @@ List<SaleItemOption> parseStockSearch(Object? body) {
   final rows = data['medicines'] as List? ?? const [];
   final options = <SaleItemOption>[];
   for (final row in rows) {
-    final json = _map(row);
+    final json = jsonMap(row);
     if (json == null) continue;
-    final id = _int(json['pharmacy_medicine_id']) ?? _int(json['id']);
+    final id = jsonInt(json['pharmacy_medicine_id']) ?? jsonInt(json['id']);
     if (id == null) continue;
-    final catalog = _map(json['medicine']) ?? const <String, dynamic>{};
-    final name = _string(json['trade_name_ar']) ??
-        _string(catalog['trade_name_ar']) ??
-        _string(json['trade_name']) ??
-        _string(catalog['trade_name']) ??
-        _string(json['name']) ??
+    final catalog = jsonMap(json['medicine']) ?? const <String, dynamic>{};
+    final name = jsonString(json['trade_name_ar']) ??
+        jsonString(catalog['trade_name_ar']) ??
+        jsonString(json['trade_name']) ??
+        jsonString(catalog['trade_name']) ??
+        jsonString(json['name']) ??
         '';
     if (name.isEmpty) continue;
     options.add(
       SaleItemOption(
         id: id,
         name: name,
-        price: _double(json['price']) ?? 0,
-        stock: _int(json['quantity']) ?? 9999,
+        price: jsonDouble(json['price']) ?? 0,
+        stock: jsonInt(json['quantity']) ?? 9999,
       ),
     );
   }
@@ -332,18 +313,18 @@ List<SaleItemOption> parseStockSearch(Object? body) {
 /// known medicine that cannot be sold comes back as a failure saying why; an
 /// unknown barcode is null.
 ApiResult<SaleItemOption?> barcodeLookupResult(Map<String, dynamic> data, String barcode) {
-  switch (_string(data['status'])) {
+  switch (jsonString(data['status'])) {
     case 'found':
-      final medicine = _map(data['medicine']) ?? const <String, dynamic>{};
-      final id = _int(data['pharmacy_medicine_id']);
+      final medicine = jsonMap(data['medicine']) ?? const <String, dynamic>{};
+      final id = jsonInt(data['pharmacy_medicine_id']);
       if (id == null) return const Success(null);
       return Success(
         SaleItemOption(
           id: id,
-          name: _string(medicine['trade_name_ar']) ?? _string(medicine['trade_name']) ?? '',
+          name: jsonString(medicine['trade_name_ar']) ?? jsonString(medicine['trade_name']) ?? '',
           barcode: barcode,
-          price: _double(data['price']) ?? 0,
-          stock: _int(data['quantity']) ?? 0,
+          price: jsonDouble(data['price']) ?? 0,
+          stock: jsonInt(data['quantity']) ?? 0,
         ),
       );
     case 'out_of_stock':
@@ -361,9 +342,9 @@ ApiResult<SaleItemOption?> barcodeLookupResult(Map<String, dynamic> data, String
 
 AccountingCustomer parseCustomer(Map<String, dynamic> json) {
   return AccountingCustomer(
-    id: _int(json['id']) ?? 0,
-    name: _string(json['name']) ?? '',
-    phone: _string(json['phone']),
-    balance: _double(json['current_balance']) ?? 0,
+    id: jsonInt(json['id']) ?? 0,
+    name: jsonString(json['name']) ?? '',
+    phone: jsonString(json['phone']),
+    balance: jsonDouble(json['current_balance']) ?? 0,
   );
 }

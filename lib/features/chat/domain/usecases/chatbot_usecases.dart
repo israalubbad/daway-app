@@ -14,7 +14,7 @@ class SendChatbotMessageUseCase {
     final session = await _sessionRepository.getSession();
     if (session == null) {
       return const ApiError(
-        ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
+        ApiFailure(message: sessionExpiredMessage),
       );
     }
     return _repository.send(token: session.token, message: message);

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PatientInquiriesRemoteDataSource {
@@ -11,7 +12,7 @@ class PatientInquiriesRemoteDataSource {
     return _dio.get(
       ApiConstants.patientInquiries,
       queryParameters: {'page': page},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -24,7 +25,7 @@ class PatientInquiriesRemoteDataSource {
     return _dio.post(
       ApiConstants.patientInquiries,
       data: {'pharmacy_id': pharmacyId, 'medicine_id': ?medicineId, 'message': message},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

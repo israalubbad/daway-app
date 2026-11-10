@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PharmacyOrdersRemoteDataSource {
@@ -10,7 +11,7 @@ class PharmacyOrdersRemoteDataSource {
   Future<Response<dynamic>> getOrders({required String token}) {
     return _dio.get(
       ApiConstants.pharmacySubOrders,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -22,7 +23,7 @@ class PharmacyOrdersRemoteDataSource {
     return _dio.post(
       '${ApiConstants.pharmacySubOrders}/$orderId/status',
       data: {'status': status},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

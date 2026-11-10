@@ -26,7 +26,7 @@ const _arabicMonths = [
 /// exists so a test can pin it.
 String smartDate(DateTime dateTime, {DateTime? now}) {
   now ??= DateTime.now();
-  final time = _formatTime(dateTime);
+  final time = formatClockTime(dateTime);
 
   if (_isSameDate(dateTime, now)) return 'اليوم، $time';
   final yesterday = DateTime(now.year, now.month, now.day - 1);
@@ -84,10 +84,14 @@ String _relativeTime(
   return smartDate(dateTime, now: now);
 }
 
-String _formatTime(DateTime dateTime) {
-  final isAm = dateTime.hour < 12;
-  var hour12 = dateTime.hour % 12;
+/// The time of day on a 12-hour clock, in Arabic: "9:05 ص", "12:30 م".
+String formatClockTime(DateTime dateTime) => formatClockHourMinute(dateTime.hour, dateTime.minute);
+
+/// [formatClockTime] for an hour (0-23) and a minute, where there is no
+/// [DateTime] (a reminder's time of day).
+String formatClockHourMinute(int hour, int minute) {
+  final isAm = hour < 12;
+  var hour12 = hour % 12;
   if (hour12 == 0) hour12 = 12;
-  final minute = dateTime.minute.toString().padLeft(2, '0');
-  return '$hour12:$minute ${isAm ? 'ص' : 'م'}';
+  return '$hour12:${minute.toString().padLeft(2, '0')} ${isAm ? 'ص' : 'م'}';
 }

@@ -7,7 +7,7 @@ import '../entities/chat_message.dart';
 import '../repositories/chat_image_uploader.dart';
 import '../repositories/chat_repository.dart';
 
-const _sessionExpired = ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى');
+const _sessionExpired = ApiFailure(message: sessionExpiredMessage);
 
 class GetChatMessagesUseCase {
   final ChatRepository _repository;

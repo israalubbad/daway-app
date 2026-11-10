@@ -1,3 +1,5 @@
+import '../../../../core/helpers/smart_date_formatter.dart';
+
 /// How often a reminder repeats — replaces the old weekday-multi-select
 /// model (redesigned 2026-09-28: one reminder now fires at fixed times
 /// through every day instead of on chosen days of the week).
@@ -38,11 +40,7 @@ class MedicineReminder {
     required this.minute,
   });
 
-  String get formattedTime {
-    final period = hour < 12 ? 'ص' : 'م';
-    final h = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-    return '$h:${minute.toString().padLeft(2, '0')} $period';
-  }
+  String get formattedTime => formatClockHourMinute(hour, minute);
 
   String get scheduleLabel => frequency.chipLabel;
 

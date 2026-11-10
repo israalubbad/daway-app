@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/text_controller_sync.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_filter_chip.dart';
@@ -38,12 +39,6 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
     super.dispose();
   }
 
-  void _syncController(TextEditingController controller, String value) {
-    if (controller.text == value) return;
-    controller.text = value;
-    controller.selection = TextSelection.collapsed(offset: value.length);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +72,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
           },
           builder: (context, state) {
             if (state is PharmacyInventoryLoaded) {
-              _syncController(_searchController, state.query);
+              _searchController.syncText(state.query);
             }
             return switch (state) {
               PharmacyInventoryLoading() => const Center(child: CircularProgressIndicator()),

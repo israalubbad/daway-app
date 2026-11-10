@@ -5,7 +5,7 @@ import '../entities/patient_health_profile.dart';
 import '../repositories/health_profile_repository.dart';
 
 const _sessionExpired = ApiError<PatientHealthProfile>(
-  ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
+  ApiFailure(message: sessionExpiredMessage),
 );
 
 class GetHealthProfileUseCase {

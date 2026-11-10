@@ -43,3 +43,7 @@ class PermissionFailure extends Failure {
 class ComingSoonFailure extends Failure {
   const ComingSoonFailure() : super('قريباً');
 }
+
+/// What is shown when a request needs the signed-in account and there is no
+/// stored session any more.
+const String sessionExpiredMessage = 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى';
