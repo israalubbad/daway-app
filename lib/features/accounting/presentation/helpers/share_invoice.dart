@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../domain/entities/sale_invoice.dart';
 import 'accounting_format.dart';
+import 'invoice_pdf.dart';
 
 /// The invoice as plain text, the way it is sent in a message.
 String invoiceShareText(SaleInvoice invoice) {
@@ -22,11 +24,24 @@ String invoiceShareText(SaleInvoice invoice) {
   return lines.toString();
 }
 
-/// Opens WhatsApp with the invoice written out, to pick who gets it. There is
-/// no PDF yet: building one with Arabic text needs a PDF package and an
-/// embedded font, which is not in the app.
+/// Shares the invoice as a PDF through the system share sheet (WhatsApp, mail,
+/// ...). If the PDF cannot be made or shared, falls back to WhatsApp with the
+/// invoice written out.
 Future<void> shareInvoice(BuildContext context, SaleInvoice invoice) async {
   final messenger = ScaffoldMessenger.of(context);
+  try {
+    final bytes = await buildInvoicePdfFromAssets(invoice);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes, mimeType: 'application/pdf', name: '${invoice.number}.pdf')],
+        fileNameOverrides: ['${invoice.number}.pdf'],
+        subject: 'فاتورة ${invoice.number}',
+      ),
+    );
+    return;
+  } catch (_) {
+    // Fall back to the text message below.
+  }
   final uri = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(invoiceShareText(invoice))}');
   try {
     if (await launchUrl(uri, mode: LaunchMode.externalApplication)) return;
