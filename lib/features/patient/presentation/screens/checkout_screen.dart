@@ -205,7 +205,10 @@ class _CheckoutViewState extends State<_CheckoutView> {
                 SizedBox(height: 16.h),
                 _SummaryCard(items: widget.items),
                 SizedBox(height: 16.h),
-                _TotalsCard(state: state),
+                _TotalsCard(
+                  state: state,
+                  onRetryQuote: () => context.read<CheckoutCubit>().refreshQuote(),
+                ),
                 SizedBox(height: 16.h),
               ],
             ),
@@ -215,7 +218,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
           padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
           child: AppCustomButton(
             text: 'التالي',
-            isLoading: state.isSubmitting,
+            // Also held while the price is read: an order is only confirmed
+            // against the total the patient can see.
+            isLoading: state.isSubmitting || state.isQuoting,
             onPressed: () {
               if (state.selectedAddressId == null) {
                 AppSnackbar.show(context, 'اختر عنوان التوصيل أولاً');
@@ -438,11 +443,50 @@ class _SummaryCard extends StatelessWidget {
 
 class _TotalsCard extends StatelessWidget {
   final CheckoutReady state;
+  final VoidCallback onRetryQuote;
 
-  const _TotalsCard({required this.state});
+  const _TotalsCard({required this.state, required this.onRetryQuote});
+
+  /// The delivery line: the server's fee once it is quoted, and otherwise why
+  /// there is none — still being read, could not be read (tap to retry), or
+  /// not priced up front (no address yet, or the server prices it later).
+  Widget _deliveryLine() {
+    final quote = state.quote;
+    if (quote != null) {
+      return Text(
+        'دليفري : ${formatPrice(quote.deliveryFee.toDouble())} \$',
+        textAlign: TextAlign.right,
+        style: AppTextStyles.cartItemPrice,
+      );
+    }
+    if (state.isQuoting) {
+      return Text(
+        'دليفري : جارٍ الحساب...',
+        textAlign: TextAlign.right,
+        style: AppTextStyles.cartItemPrice,
+      );
+    }
+    if (state.quoteError != null) {
+      return GestureDetector(
+        onTap: onRetryQuote,
+        behavior: HitTestBehavior.opaque,
+        child: Text(
+          'دليفري : تعذر حساب الرسوم، اضغط لإعادة المحاولة',
+          textAlign: TextAlign.right,
+          style: AppTextStyles.cartItemPrice.copyWith(color: AppColors.logoutRed),
+        ),
+      );
+    }
+    return Text(
+      'دليفري : يحدده الأدمن بعد إرسال الطلب',
+      textAlign: TextAlign.right,
+      style: AppTextStyles.cartItemPrice,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final shownDiscount = state.shownDiscount;
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -453,29 +497,23 @@ class _TotalsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'سعر الطلبات : ${formatPrice(state.subtotal)} \$',
+            'سعر الطلبات : ${formatPrice(state.quote?.subtotal ?? state.subtotal)} \$',
             textAlign: TextAlign.right,
             style: AppTextStyles.cartItemPrice,
           ),
           SizedBox(height: 8.h),
-          // Only the server knows the delivery fee (it prices the distance
-          // once the order exists), so it is shown on the payment step.
-          Text(
-            'دليفري : يحدده الأدمن بعد إرسال الطلب',
-            textAlign: TextAlign.right,
-            style: AppTextStyles.cartItemPrice,
-          ),
-          if (state.discount > 0) ...[
+          _deliveryLine(),
+          if (shownDiscount > 0) ...[
             SizedBox(height: 8.h),
             Text(
-              'الخصم : ${formatPrice(state.discount)} \$',
+              'الخصم : ${formatPrice(shownDiscount)} \$',
               textAlign: TextAlign.right,
               style: AppTextStyles.cartItemPrice,
             ),
           ],
           SizedBox(height: 12.h),
           Text(
-            'الاجمالي : ${formatPrice(state.productsTotal)} \$',
+            'الاجمالي : ${formatPrice(state.grandTotal)} \$',
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel.copyWith(
               fontWeight: FontWeight.w700,

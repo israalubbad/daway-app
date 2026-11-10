@@ -3,7 +3,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../features/auth/data/datasources/account_closure_remote_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/repositories/account_closure_repository_impl.dart';
+import '../../features/auth/domain/repositories/account_closure_repository.dart';
+import '../../features/auth/domain/usecases/close_patient_account_usecase.dart';
+import '../../features/auth/domain/usecases/get_pharmacy_closure_request_usecase.dart';
+import '../../features/auth/domain/usecases/request_pharmacy_closure_usecase.dart';
+import '../../features/auth/presentation/cubit/account_closure_cubit.dart';
+import '../../features/auth/presentation/cubit/pharmacy_closure_cubit.dart';
 import '../../features/auth/data/datasources/device_tokens_remote_data_source.dart';
 import '../../features/auth/data/repositories/device_token_syncing_session_repository.dart';
 import '../../features/auth/data/repositories/device_tokens_repository_impl.dart';
@@ -145,6 +153,7 @@ import '../../features/patient/domain/usecases/get_medicine_detail_usecase.dart'
 import '../../features/patient/domain/usecases/get_medicine_pharmacies_usecase.dart';
 import '../../features/patient/domain/usecases/get_nearby_pharmacies_usecase.dart';
 import '../../features/patient/domain/usecases/get_orders_usecase.dart';
+import '../../features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_addresses_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_inquiries_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_profile_usecase.dart';
@@ -328,6 +337,15 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => GetSessionUseCase(getIt()));
   getIt.registerLazySingleton(() => LogoutUseCase(getIt(), getIt()));
 
+  // Closing the account: a patient deletes it, a pharmacy asks the admin to.
+  getIt.registerLazySingleton(() => AccountClosureRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<AccountClosureRepository>(
+    () => AccountClosureRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => ClosePatientAccountUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetPharmacyClosureRequestUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RequestPharmacyClosureUseCase(getIt(), getIt()));
+
   // Resetting a forgotten pharmacy password: the backend has no endpoints for
   // it yet, so the repository answers "قريباً" until one is written.
   getIt.registerLazySingleton<PasswordResetRepository>(
@@ -349,6 +367,8 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => PharmacySignUpCubit(getIt(), getIt()));
   getIt.registerFactory(() => PasswordResetCubit(getIt(), getIt(), getIt()));
   getIt.registerFactory(() => LogoutCubit(getIt()));
+  getIt.registerFactory(() => AccountClosureCubit(getIt()));
+  getIt.registerFactory(() => PharmacyClosureCubit(getIt(), getIt()));
 
   // ---------------- Patient Profile ----------------
   getIt.registerLazySingleton(() => PatientProfileRemoteDataSource(getIt()));
@@ -469,6 +489,7 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<CheckoutFlowRepository>(
     () => CheckoutFlowRepositoryImpl(getIt()),
   );
+  getIt.registerLazySingleton(() => GetCheckoutQuoteUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => ValidateCouponUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetOrderPaymentUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => SubmitPaymentReceiptUseCase(getIt(), getIt()));
@@ -476,7 +497,8 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => GetOrderTrackingUseCase(getIt(), getIt()));
   // The subtotal of the cart being ordered (the coupon is checked against it).
   getIt.registerFactoryParam<CheckoutCubit, double, void>(
-    (subtotal, _) => CheckoutCubit(subtotal, getIt(), getIt(), getIt(), getIt(), getIt()),
+    (subtotal, _) =>
+        CheckoutCubit(subtotal, getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerFactoryParam<PaymentCubit, int, void>(
     (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt(), getIt()),

@@ -9,6 +9,7 @@ import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_flow.dart';
 import 'package:daway_app/features/patient/domain/repositories/checkout_flow_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_flow_usecases.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
@@ -17,6 +18,7 @@ import 'package:daway_app/features/patient/domain/repositories/orders_repository
 import 'package:daway_app/features/patient/domain/repositories/patient_addresses_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_profile_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/clear_cart_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/delete_cart_item_usecase.dart';
@@ -189,6 +191,16 @@ class _FakeProfileRepository implements PatientProfileRepository {
 }
 
 class _FakeOrdersRepository implements OrdersRepository {
+  /// What the quote call answers. By default delivery pricing is off (the
+  /// server answers 422), so a flow that does not care about the quote runs
+  /// without one.
+  ApiResult<CheckoutQuote> quoteResult =
+      const ApiError(ApiFailure(message: 'pricing off', statusCode: 422));
+  int quoteCallCount = 0;
+  String? lastQuoteCouponCode;
+  CheckoutQuote? lastQuote;
+  String? lastIdempotencyKey;
+
   @override
   Future<ApiResult<void>> cancelOrder({
     required String token,
@@ -202,12 +214,27 @@ class _FakeOrdersRepository implements OrdersRepository {
       const Success([]);
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    quoteCallCount++;
+    lastQuoteCouponCode = couponCode;
+    return quoteResult;
+  }
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
+    lastQuote = quote;
+    lastIdempotencyKey = idempotencyKey;
     lastAddressId = addressId;
     return checkoutResult;
   }
@@ -302,6 +329,7 @@ void main() {
         GetPatientProfileUseCase(_FakeProfileRepository(), sessionRepository),
         ValidateCouponUseCase(_FakeCheckoutFlowRepository(), sessionRepository),
         CheckoutUseCase(ordersRepository, sessionRepository),
+        GetCheckoutQuoteUseCase(ordersRepository, sessionRepository),
       ),
     );
   });

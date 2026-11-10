@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/widgets/app_toggle_switch.dart';
+import 'package:daway_app/core/routing/routes.dart';
+import 'package:daway_app/features/auth/domain/usecases/close_patient_account_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:daway_app/features/auth/presentation/cubit/account_closure_cubit.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:daway_app/features/auth/presentation/screens/privacy_policy_screen.dart';
 import 'package:daway_app/features/auth/presentation/screens/terms_screen.dart';
@@ -21,6 +24,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../auth/account_closure_test_fakes.dart';
 
 class _FakePermissions implements DevicePermissionsRepository {
   ApiResult<bool> notifications = const Success(true);
@@ -70,11 +75,15 @@ void main() {
   late _FakePermissions permissions;
   late _FakeAppInfo appInfo;
   late _FakeLogoutUseCase logoutUseCase;
+  late FakeAccountClosureRepository closureRepository;
+  late FakeClosureSessionRepository closureSession;
 
   setUp(() {
     permissions = _FakePermissions();
     appInfo = _FakeAppInfo();
     logoutUseCase = _FakeLogoutUseCase();
+    closureRepository = FakeAccountClosureRepository();
+    closureSession = FakeClosureSessionRepository();
   });
 
   Future<void> setViewport(WidgetTester tester, {Size size = const Size(440, 956)}) async {
@@ -94,11 +103,20 @@ void main() {
     addTearDown(cubit.close);
     final logoutCubit = LogoutCubit(logoutUseCase);
     addTearDown(logoutCubit.close);
+    final closureCubit = AccountClosureCubit(
+      ClosePatientAccountUseCase(closureRepository, closureSession),
+    );
+    addTearDown(closureCubit.close);
 
     return ScreenUtilInit(
       designSize: const Size(440, 956),
       builder: (context, child) => MaterialApp(
         locale: const Locale('ar'),
+        // Where a deleted account lands: the route is only a marker here.
+        onGenerateRoute: (settings) => MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => Scaffold(body: Text('route:${settings.name}')),
+        ),
         supportedLocales: const [Locale('ar')],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
@@ -109,6 +127,7 @@ void main() {
           providers: [
             BlocProvider.value(value: cubit),
             BlocProvider.value(value: logoutCubit),
+            BlocProvider.value(value: closureCubit),
           ],
           child: const PatientSettingsScreen(),
         ),
@@ -401,6 +420,11 @@ void main() {
                             ),
                           ),
                           BlocProvider(create: (_) => LogoutCubit(logoutUseCase)),
+                          BlocProvider(
+                            create: (_) => AccountClosureCubit(
+                              ClosePatientAccountUseCase(closureRepository, closureSession),
+                            ),
+                          ),
                         ],
                         child: const PatientSettingsScreen(),
                       ),
@@ -485,11 +509,15 @@ void main() {
       tester,
     ) async {
       await openScreen(tester);
-      final card = tester.getRect(find.byType(AccountRowCard).last);
+      final logoutRow = find.ancestor(
+        of: find.text('تسجيل الخروج'),
+        matching: find.byType(AccountRowCard),
+      );
+      final card = tester.getRect(logoutRow);
 
       final label = tester.getRect(find.text('تسجيل الخروج'));
       final icon = tester.getRect(
-        find.descendant(of: find.byType(AccountRowCard).last, matching: find.byType(SvgPicture)),
+        find.descendant(of: logoutRow, matching: find.byType(SvgPicture)),
       );
 
       expect(card.right - label.right, closeTo(17, 0.5));
@@ -526,6 +554,86 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.scrollUntilVisible(find.text('الإصدار 1.0.0'), 200);
       expect(find.text('الإصدار 1.0.0'), findsOneWidget);
+    });
+  });
+
+  group('deleting the account', () {
+    testWidgets('has a red row under logout', (tester) async {
+      await openScreen(tester);
+
+      expect(find.text('حذف الحساب'), findsOneWidget);
+    });
+
+    testWidgets('asks first, and nothing is sent until it is confirmed', (tester) async {
+      await openScreen(tester);
+
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('حذف الحساب نهائياً؟'), findsOneWidget);
+      expect(find.text('السبب (اختياري)'), findsOneWidget);
+      expect(closureRepository.closeCount, 0);
+    });
+
+    testWidgets('cancelling keeps the account', (tester) async {
+      await openScreen(tester);
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('إلغاء'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('حذف الحساب نهائياً؟'), findsNothing);
+      expect(closureRepository.closeCount, 0);
+      expect(closureSession.savedSession, isNotNull);
+    });
+
+    testWidgets('confirming deletes the account and replaces every route', (tester) async {
+      await openScreen(tester);
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'لا أحتاجه');
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'حذف حسابي'));
+      await tester.pumpAndSettle();
+
+      expect(closureRepository.closeCount, 1);
+      expect(closureRepository.lastReason, 'لا أحتاجه');
+      expect(closureSession.savedSession, isNull);
+      expect(find.text('route:${Routes.accountTypeScreen}'), findsOneWidget);
+      expect(find.text('حذف الحساب نهائياً؟'), findsNothing);
+      expect(find.byType(PatientSettingsScreen), findsNothing);
+    });
+
+    testWidgets('a refusal is shown in the sheet and the account stays', (tester) async {
+      closureRepository.closePatientResult = refusedClosure;
+      await openScreen(tester);
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'حذف حسابي'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('لديك طلبات جارية'), findsOneWidget);
+      expect(find.text('حذف الحساب نهائياً؟'), findsOneWidget);
+      expect(find.byType(PatientSettingsScreen), findsOneWidget);
+      expect(closureSession.savedSession, isNotNull);
+    });
+
+    testWidgets('an old refusal is not shown when the sheet is opened again', (tester) async {
+      closureRepository.closePatientResult = refusedClosure;
+      await openScreen(tester);
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'حذف حسابي'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('إلغاء'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('حذف الحساب'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('لديك طلبات جارية'), findsNothing);
     });
   });
 }

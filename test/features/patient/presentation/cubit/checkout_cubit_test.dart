@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
@@ -5,6 +7,7 @@ import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_flow.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
@@ -14,6 +17,7 @@ import 'package:daway_app/features/patient/domain/repositories/patient_addresses
 import 'package:daway_app/features/patient/domain/repositories/patient_profile_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_flow_usecases.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_addresses_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_profile_usecase.dart';
@@ -117,6 +121,20 @@ class _FakeOrdersRepository implements OrdersRepository {
   String? lastCouponCode;
   int checkoutCallCount = 0;
 
+  /// What the quote call answers. By default delivery pricing is off (the
+  /// server answers 422), so a flow that does not care about the quote runs
+  /// without one.
+  ApiResult<CheckoutQuote> quoteResult =
+      const ApiError(ApiFailure(message: 'pricing off', statusCode: 422));
+  int quoteCallCount = 0;
+  String? lastQuoteCouponCode;
+  CheckoutQuote? lastQuote;
+  String? lastIdempotencyKey;
+
+  /// Quote answers held back until the test completes them, oldest first;
+  /// once empty, [quoteResult] answers at once.
+  final List<Completer<ApiResult<CheckoutQuote>>> quoteGates = [];
+
   @override
   Future<ApiResult<void>> cancelOrder({
     required String token,
@@ -128,13 +146,29 @@ class _FakeOrdersRepository implements OrdersRepository {
       const Success([]);
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    quoteCallCount++;
+    lastQuoteCouponCode = couponCode;
+    if (quoteGates.isNotEmpty) return quoteGates.removeAt(0).future;
+    return quoteResult;
+  }
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
     checkoutCallCount++;
+    lastQuote = quote;
+    lastIdempotencyKey = idempotencyKey;
     lastAddressId = addressId;
     lastCouponCode = couponCode;
     return checkoutResult;
@@ -208,6 +242,7 @@ void main() {
   late _FakeOrdersRepository ordersRepository;
   late _FakeCheckoutFlowRepository flowRepository;
   late _FakeSessionRepository sessionRepository;
+  var keyCounter = 0;
 
   CheckoutCubit buildCubit() {
     return CheckoutCubit(
@@ -217,6 +252,8 @@ void main() {
       GetPatientProfileUseCase(profileRepository, sessionRepository),
       ValidateCouponUseCase(flowRepository, sessionRepository),
       CheckoutUseCase(ordersRepository, sessionRepository),
+      GetCheckoutQuoteUseCase(ordersRepository, sessionRepository),
+      idempotencyKeyFactory: () => 'key-${++keyCounter}',
     );
   }
 
@@ -228,6 +265,7 @@ void main() {
   }
 
   setUp(() {
+    keyCounter = 0;
     addressesRepository = _FakeAddressesRepository();
     profileRepository = _FakeProfileRepository();
     ordersRepository = _FakeOrdersRepository();
@@ -394,6 +432,8 @@ void main() {
         final cubit = await readyCubit();
         cubit.selectAddress(_nonDefaultAddress.id);
         await cubit.applyCoupon('SAVE4');
+        // The order waits for the price the coupon just changed.
+        await Future<void>.delayed(Duration.zero);
 
         final result = await cubit.submit();
 
@@ -424,6 +464,236 @@ void main() {
       final result = await cubit.submit();
 
       expect((result! as ApiError<int>).failure.message, 'السلة فارغة');
+    });
+  });
+
+  group('delivery quote', () {
+    const quote = CheckoutQuote(
+      subtotal: 139,
+      discount: 0,
+      total: 139,
+      deliveryFee: 9,
+      grandTotal: 148,
+    );
+    const otherQuote = CheckoutQuote(
+      subtotal: 139,
+      discount: 0,
+      total: 139,
+      deliveryFee: 15,
+      grandTotal: 154,
+    );
+
+    setUp(() {
+      addressesRepository.addressesResult = const Success([
+        _defaultAddress,
+        _nonDefaultAddress,
+      ]);
+    });
+
+    test('is read for the default address once the addresses load', () async {
+      ordersRepository.quoteResult = const Success(quote);
+
+      final cubit = await readyCubit();
+
+      final state = cubit.state as CheckoutReady;
+      expect(state.quote, quote);
+      expect(state.isQuoting, isFalse);
+      expect(state.grandTotal, 148);
+      expect(ordersRepository.quoteCallCount, 1);
+    });
+
+    test('the server pricing of the coupon replaces the coupon check', () async {
+      ordersRepository.quoteResult = const Success(
+        CheckoutQuote(subtotal: 139, discount: 10, total: 129, deliveryFee: 9, grandTotal: 138),
+      );
+
+      final cubit = await readyCubit();
+
+      final state = cubit.state as CheckoutReady;
+      expect(state.shownDiscount, 10);
+      expect(state.grandTotal, 138);
+    });
+
+    test('a 422 (delivery pricing off) leaves no quote and no error', () async {
+      final cubit = await readyCubit();
+
+      final state = cubit.state as CheckoutReady;
+      expect(state.quote, isNull);
+      expect(state.quoteError, isNull);
+      expect(state.grandTotal, 139);
+    });
+
+    test('any other failure is kept as the reason there is no quote', () async {
+      ordersRepository.quoteResult = const ApiError(
+        ApiFailure(message: 'تعذر الاتصال', statusCode: 500),
+      );
+
+      final cubit = await readyCubit();
+
+      final state = cubit.state as CheckoutReady;
+      expect(state.quote, isNull);
+      expect(state.quoteError, 'تعذر الاتصال');
+    });
+
+    test('refreshQuote tries again after a failure', () async {
+      ordersRepository.quoteResult = const ApiError(
+        ApiFailure(message: 'تعذر الاتصال', statusCode: 500),
+      );
+      final cubit = await readyCubit();
+      ordersRepository.quoteResult = const Success(quote);
+
+      await cubit.refreshQuote();
+
+      final state = cubit.state as CheckoutReady;
+      expect(state.quote, quote);
+      expect(state.quoteError, isNull);
+    });
+
+    test('is not asked for without an address', () async {
+      addressesRepository.addressesResult = const Success([]);
+
+      final cubit = await readyCubit();
+
+      expect((cubit.state as CheckoutReady).quote, isNull);
+      expect(ordersRepository.quoteCallCount, 0);
+    });
+
+    test('is read again when another address is chosen', () async {
+      ordersRepository.quoteResult = const Success(quote);
+      final cubit = await readyCubit();
+      ordersRepository.quoteResult = const Success(otherQuote);
+
+      cubit.selectAddress(_nonDefaultAddress.id);
+      await Future<void>.delayed(Duration.zero);
+
+      expect((cubit.state as CheckoutReady).quote, otherQuote);
+      expect(ordersRepository.quoteCallCount, 2);
+    });
+
+    test('choosing the address that is already chosen does not ask again', () async {
+      final cubit = await readyCubit();
+
+      cubit.selectAddress(_defaultAddress.id);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(ordersRepository.quoteCallCount, 1);
+    });
+
+    test('is read again with the coupon when one is accepted, and without it when removed',
+        () async {
+      final cubit = await readyCubit();
+
+      await cubit.applyCoupon('SAVE4');
+      await Future<void>.delayed(Duration.zero);
+      expect(ordersRepository.lastQuoteCouponCode, 'SAVE4');
+
+      cubit.removeCoupon();
+      await Future<void>.delayed(Duration.zero);
+      expect(ordersRepository.lastQuoteCouponCode, isNull);
+      expect(ordersRepository.quoteCallCount, 3);
+    });
+
+    test('a slow, older answer does not overwrite a newer one', () async {
+      final first = Completer<ApiResult<CheckoutQuote>>();
+      final second = Completer<ApiResult<CheckoutQuote>>();
+      ordersRepository.quoteGates.addAll([first, second]);
+      final cubit = await readyCubit();
+
+      cubit.selectAddress(_nonDefaultAddress.id);
+      await Future<void>.delayed(Duration.zero);
+      second.complete(const Success(otherQuote));
+      await Future<void>.delayed(Duration.zero);
+      first.complete(const Success(quote));
+      await Future<void>.delayed(Duration.zero);
+
+      expect((cubit.state as CheckoutReady).quote, otherQuote);
+    });
+
+    test('the order waits while the price is being read', () async {
+      final gate = Completer<ApiResult<CheckoutQuote>>();
+      ordersRepository.quoteGates.add(gate);
+      final cubit = await readyCubit();
+
+      expect((cubit.state as CheckoutReady).isQuoting, isTrue);
+      final result = await cubit.submit();
+
+      expect(result, isNull);
+      expect(ordersRepository.checkoutCallCount, 0);
+    });
+
+    test('the order is guarded by the quote and a key', () async {
+      ordersRepository.quoteResult = const Success(quote);
+      final cubit = await readyCubit();
+
+      await cubit.submit();
+
+      expect(ordersRepository.lastQuote, quote);
+      expect(ordersRepository.lastIdempotencyKey, isNotNull);
+    });
+
+    test('retrying the same order keeps the same key', () async {
+      ordersRepository.quoteResult = const Success(quote);
+      ordersRepository.checkoutResult = const ApiError(
+        ApiFailure(message: 'تعذر الاتصال', statusCode: 500),
+      );
+      final cubit = await readyCubit();
+
+      await cubit.submit();
+      final firstKey = ordersRepository.lastIdempotencyKey;
+      await cubit.submit();
+
+      expect(ordersRepository.lastIdempotencyKey, firstKey);
+      expect(ordersRepository.checkoutCallCount, 2);
+    });
+
+    test('a new quote is a new order, with a new key', () async {
+      ordersRepository.quoteResult = const Success(quote);
+      final cubit = await readyCubit();
+      await cubit.submit();
+      final firstKey = ordersRepository.lastIdempotencyKey;
+
+      cubit.selectAddress(_nonDefaultAddress.id);
+      await Future<void>.delayed(Duration.zero);
+      await cubit.submit();
+
+      expect(ordersRepository.lastIdempotencyKey, isNot(firstKey));
+    });
+
+    test('without a quote the order carries neither a quote nor a key', () async {
+      final cubit = await readyCubit();
+
+      await cubit.submit();
+
+      expect(ordersRepository.checkoutCallCount, 1);
+      expect(ordersRepository.lastQuote, isNull);
+      expect(ordersRepository.lastIdempotencyKey, isNull);
+    });
+
+    test('a 409 says the price moved and reads the new price', () async {
+      ordersRepository.quoteResult = const Success(quote);
+      ordersRepository.checkoutResult = const ApiError(
+        ApiFailure(message: 'quote_changed', code: 'quote_changed', statusCode: 409),
+      );
+      final cubit = await readyCubit();
+      ordersRepository.quoteResult = const Success(otherQuote);
+
+      final result = await cubit.submit();
+      await Future<void>.delayed(Duration.zero);
+
+      expect((result! as ApiError<int>).failure.message, quoteChangedMessage);
+      expect((cubit.state as CheckoutReady).quote, otherQuote);
+      expect(ordersRepository.quoteCallCount, 2);
+    });
+
+    test('a 409 on an order sent without a quote is passed on as it came', () async {
+      ordersRepository.checkoutResult = const ApiError(
+        ApiFailure(message: 'تعارض', statusCode: 409),
+      );
+      final cubit = await readyCubit();
+
+      final result = await cubit.submit();
+
+      expect((result! as ApiError<int>).failure.message, 'تعارض');
     });
   });
 }

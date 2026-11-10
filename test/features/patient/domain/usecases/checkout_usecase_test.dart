@@ -3,6 +3,7 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
@@ -17,9 +18,18 @@ class _FakeOrdersRepository implements OrdersRepository {
   String? lastToken;
   int? lastAddressId;
   String? lastCouponCode;
+  CheckoutQuote? lastQuote;
+  String? lastIdempotencyKey;
 
   @override
   Future<ApiResult<List<Order>>> getOrders({required String token}) async => const Success([]);
+
+  @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) => throw UnimplementedError();
 
   @override
   Future<ApiResult<int>> checkout({
@@ -27,7 +37,11 @@ class _FakeOrdersRepository implements OrdersRepository {
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
+    lastQuote = quote;
+    lastIdempotencyKey = idempotencyKey;
     lastToken = token;
     lastAddressId = addressId;
     lastCouponCode = couponCode;
@@ -83,5 +97,36 @@ void main() {
     final result = await useCase(addressId: 1);
 
     expect(result, isA<ApiError<int>>());
+  });
+
+  test('hands the quote and the idempotency key to the repository', () async {
+    const quote = CheckoutQuote(
+      subtotal: 80,
+      discount: 0,
+      total: 80,
+      deliveryFee: 9,
+      grandTotal: 89,
+    );
+    final repository = _FakeOrdersRepository();
+    final sessionRepository = _FakeSessionRepository()
+      ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
+    final useCase = CheckoutUseCase(repository, sessionRepository);
+
+    await useCase(addressId: 1, quote: quote, idempotencyKey: 'key-1');
+
+    expect(repository.lastQuote, same(quote));
+    expect(repository.lastIdempotencyKey, 'key-1');
+  });
+
+  test('sends no quote and no key when none is given', () async {
+    final repository = _FakeOrdersRepository();
+    final sessionRepository = _FakeSessionRepository()
+      ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
+    final useCase = CheckoutUseCase(repository, sessionRepository);
+
+    await useCase(addressId: 1);
+
+    expect(repository.lastQuote, isNull);
+    expect(repository.lastIdempotencyKey, isNull);
   });
 }

@@ -3,12 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_toggle_switch.dart';
 import '../../../../core/widgets/logout_confirmation_sheet.dart';
+import '../../../auth/presentation/cubit/account_closure_cubit.dart';
+import '../../../auth/presentation/cubit/account_closure_state.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
+import '../../../auth/presentation/widgets/delete_account_sheet.dart';
 import '../../../auth/presentation/screens/privacy_policy_screen.dart';
 import '../../../auth/presentation/screens/terms_screen.dart';
 import '../../domain/entities/account_settings.dart';
@@ -44,6 +48,7 @@ class PatientSettingsScreen extends StatefulWidget {
       builder: (_) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => getIt<AccountSettingsCubit>()),
+          BlocProvider(create: (_) => getIt<AccountClosureCubit>()),
           BlocProvider.value(value: logoutCubit),
         ],
         child: const PatientSettingsScreen(),
@@ -103,8 +108,23 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
     );
   }
 
+  void _confirmDeleteAccount() {
+    DeleteAccountSheet.show(context, context.read<AccountClosureCubit>());
+  }
+
   @override
   Widget build(BuildContext context) {
+    // The account is gone and its session ended: nothing signed-in is left to
+    // show, so every route is replaced with the account-type screen.
+    return BlocListener<AccountClosureCubit, AccountClosureState>(
+      listenWhen: (previous, current) => current is AccountClosureDone,
+      listener: (context, state) => Navigator.of(context)
+          .pushNamedAndRemoveUntil(Routes.accountTypeScreen, (route) => false),
+      child: _buildScaffold(),
+    );
+  }
+
+  Widget _buildScaffold() {
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -217,6 +237,15 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
             height: 58,
             radius: 12,
             onTap: _confirmLogout,
+          ),
+          SizedBox(height: 16.h),
+          AccountRowCard(
+            label: 'حذف الحساب',
+            labelColor: AppColors.logoutRed,
+            trailing: Icon(Icons.delete_outline_rounded, size: 22.r, color: AppColors.logoutRed),
+            height: 58,
+            radius: 12,
+            onTap: _confirmDeleteAccount,
           ),
           SizedBox(height: 40.h),
           const Spacer(),

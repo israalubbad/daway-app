@@ -1,9 +1,11 @@
 import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../../core/helpers/paginated_fetch.dart';
+import '../../domain/entities/checkout_quote.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/repositories/orders_repository.dart';
 import '../datasources/orders_remote_data_source.dart';
+import '../models/checkout_quote_model.dart';
 import '../models/order_model.dart';
 
 class OrdersRepositoryImpl implements OrdersRepository {
@@ -39,11 +41,32 @@ class OrdersRepositoryImpl implements OrdersRepository {
   }
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getCheckoutQuote(
+        token: token,
+        addressId: addressId,
+        couponCode: couponCode,
+      );
+      final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      return Success(CheckoutQuoteModel.fromJson(data));
+    } catch (e) {
+      return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
     try {
       final response = await _remoteDataSource.checkout(
@@ -51,6 +74,10 @@ class OrdersRepositoryImpl implements OrdersRepository {
         addressId: addressId,
         couponCode: couponCode,
         notes: notes,
+        quotedDeliveryFee: quote?.deliveryFee,
+        quotedDiscount: quote?.discount,
+        quotedGrandTotal: quote?.grandTotal,
+        idempotencyKey: idempotencyKey,
       );
       final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
       final orderId = (data['order_id'] as num?)?.toInt();

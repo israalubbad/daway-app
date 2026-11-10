@@ -31,6 +31,8 @@ import 'package:daway_app/features/pharmacy/presentation/widgets/pharmacy_dashbo
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../auth/account_closure_test_fakes.dart';
+
 import '../../../../helpers/arabic_test_app.dart';
 
 // The tabs' own cubits are stood in for by cubits that just sit in their
@@ -182,6 +184,7 @@ void main() {
       )
       ..registerFactory<PharmacyProfileCubit>(_FakeProfileCubit.new)
       ..registerFactory<AccountSettingsCubit>(_FakeAccountSettingsCubit.new);
+    registerClosureCubits(getIt);
   });
 
   tearDown(() async {

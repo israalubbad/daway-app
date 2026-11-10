@@ -9,6 +9,8 @@ abstract class ApiConstants {
   static const String pharmacyLogin = '/login/pharmacy';
   static const String registerPharmacy = '/register/pharmacy';
   static const String logout = '/logout';
+  static const String accountClosure = '/account/closure';
+  static const String pharmacyClosureRequest = '/pharmacy/account/closure-request';
   static const String patientProfile = '/profile/patient';
   static const String pharmacyProfile = '/profile/pharmacy';
   static const String pharmacyChangePassword = '/pharmacy/change-password';
@@ -43,6 +45,7 @@ abstract class ApiConstants {
   static const String patientAddresses = '/patient/addresses';
   static const String patientOrders = '/patient/orders';
   static const String patientCheckout = '/patient/checkout';
+  static const String patientCheckoutQuote = '/patient/checkout/quote';
   static const String patientCouponsValidate = '/patient/coupons/validate';
   static const String patientPaymentBanks = '/patient/payment-banks';
   static const String patientInquiries = '/patient/inquiries';

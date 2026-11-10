@@ -2,6 +2,7 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_orders_usecase.dart';
@@ -22,11 +23,20 @@ class _FakeOrdersRepository implements OrdersRepository {
   }
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) => throw UnimplementedError();
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async =>
       const Success(1);
 }

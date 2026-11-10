@@ -15,6 +15,8 @@ import '../../../../core/widgets/logout_confirmation_sheet.dart';
 import '../../../../core/widgets/settings_brand_footer.dart';
 import '../../../../core/widgets/settings_section_label.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
+import '../../../auth/presentation/cubit/pharmacy_closure_cubit.dart';
+import '../../../auth/presentation/widgets/pharmacy_closure_row.dart';
 import '../../../auth/presentation/screens/privacy_policy_screen.dart';
 import '../../../auth/presentation/screens/terms_screen.dart';
 import '../../../patient/domain/entities/device_setting.dart';
@@ -41,8 +43,11 @@ class PharmacySettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<AccountSettingsCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<AccountSettingsCubit>()),
+        BlocProvider(create: (_) => getIt<PharmacyClosureCubit>()..load()),
+      ],
       child: const _SettingsBody(),
     );
   }
@@ -288,6 +293,8 @@ class _SettingsBodyState extends State<_SettingsBody>
             radius: 12,
             onTap: _confirmLogout,
           ),
+          SizedBox(height: 16.h),
+          const PharmacyClosureRow(),
           SizedBox(height: 40.h),
           const Spacer(),
           SettingsBrandFooter(version: version),

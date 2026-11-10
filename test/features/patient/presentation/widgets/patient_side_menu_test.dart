@@ -13,6 +13,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../auth/account_closure_test_fakes.dart';
 import 'package:get_it/get_it.dart';
 
 class _FakePermissions implements DevicePermissionsRepository {
@@ -48,6 +50,7 @@ void main() {
   setUp(() {
     logoutUseCase = _FakeLogoutUseCase();
     final permissions = _FakePermissions();
+    registerClosureCubits(getIt);
     getIt.registerFactory<AccountSettingsCubit>(
       () => AccountSettingsCubit(
         GetAccountSettingsUseCase(permissions, _FakeAppInfo()),
