@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../../../core/widgets/profile_load_error.dart';
@@ -72,6 +73,29 @@ class AccountingOverviewScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  SizedBox(height: 12.h),
+                  AccountingCard(
+                    onTap: () => Navigator.of(context).pushNamed(Routes.phoneScannerScreen),
+                    child: Row(
+                      children: [
+                        Icon(Icons.qr_code_scanner_rounded, size: 24.r, color: AppColors.mainTeal),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('المسح بالهاتف', style: AccountingStyles.cardTitle),
+                              Text(
+                                'استخدم هاتفك كماسح باركود لشاشة البيع في الموقع',
+                                style: AccountingStyles.muted,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.chevron_left_rounded, size: 22.r, color: AppColors.mainTeal),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 16.h),
                   ..._content(context, state),

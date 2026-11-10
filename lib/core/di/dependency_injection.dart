@@ -234,6 +234,11 @@ import '../../features/pharmacy/domain/usecases/update_pharmacy_inventory_usecas
 import '../../features/pharmacy/domain/usecases/get_notifications_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
 import '../../features/accounting/data/datasources/accounting_remote_data_source.dart';
+import '../../features/scanner/data/datasources/scan_session_remote_data_source.dart';
+import '../../features/scanner/data/repositories/scan_session_repository_impl.dart';
+import '../../features/scanner/domain/repositories/scan_session_repository.dart';
+import '../../features/scanner/domain/usecases/scan_session_usecases.dart';
+import '../../features/scanner/presentation/cubit/phone_scanner_cubit.dart';
 import '../../features/accounting/data/repositories/accounting_repository_impl.dart';
 import '../../features/accounting/data/repositories/sample_accounting_repository.dart';
 import '../../features/accounting/domain/repositories/accounting_repository.dart';
@@ -725,6 +730,13 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => RefundsCubit(getIt()));
   getIt.registerFactory(() => CashCubit(getIt(), getIt()));
   getIt.registerFactory(() => NewSaleCubit(getIt(), getIt(), getIt(), getIt()));
+
+  // ---------------- Phone scanner (web sales screen pairing) ----------------
+  getIt.registerLazySingleton(() => ScanSessionRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<ScanSessionRepository>(() => ScanSessionRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => PairScannerUseCase(getIt()));
+  getIt.registerLazySingleton(() => SendScannedBarcodeUseCase(getIt()));
+  getIt.registerFactory(() => PhoneScannerCubit(getIt(), getIt()));
 
   // ---------------- Pharmacy Orders ----------------
   getIt.registerLazySingleton(() => PharmacyOrdersRemoteDataSource(getIt()));
