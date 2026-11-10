@@ -1,6 +1,6 @@
 /// What a cash movement is for. Deposits and withdrawals are the two a pharmacy
 /// records by hand; the others come from invoices and expenses.
-enum CashMovementType { sale, expense, payment, refund, deposit, withdrawal }
+enum CashMovementType { sale, expense, purchase, payment, refund, deposit, withdrawal, adjustment }
 
 /// One entry of the cash book.
 class CashMovement {
@@ -45,7 +45,12 @@ class CashLedger {
 abstract class CashMovementRules {
   static bool isValidAmount(double amount) => amount > 0;
 
-  static bool isValidReason(String reason) => reason.trim().isNotEmpty;
+  /// The backend asks for 3 to 500 characters: a movement with no reason is
+  /// not accepted.
+  static bool isValidReason(String reason) {
+    final length = reason.trim().length;
+    return length >= 3 && length <= 500;
+  }
 
   static bool isValid({required double amount, required String reason}) =>
       isValidAmount(amount) && isValidReason(reason);

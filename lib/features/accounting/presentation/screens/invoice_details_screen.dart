@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../../pharmacy/presentation/widgets/pharmacy_products_header.dart';
-import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/sale_invoice.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
@@ -128,7 +127,7 @@ class InvoiceDetailsScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-            if (invoice.status != PaymentStatus.paid) ...[
+            if (!invoice.isClosed && invoice.remaining > 0) ...[
               AppCustomButton(
                 text: 'تسجيل دفعة',
                 height: 48.h,
@@ -138,17 +137,19 @@ class InvoiceDetailsScreen extends StatelessWidget {
             ],
             Row(
               children: [
-                Expanded(
-                  child: AppCustomButton(
-                    text: 'إرجاع',
-                    height: 48.h,
-                    backgroundColor: Colors.white,
-                    textColor: AppColors.mainTeal,
-                    borderColor: AppColors.cardBorder,
-                    onPressed: () => _run(context, InvoiceAction.refund),
+                if (!invoice.isClosed) ...[
+                  Expanded(
+                    child: AppCustomButton(
+                      text: 'إرجاع',
+                      height: 48.h,
+                      backgroundColor: Colors.white,
+                      textColor: AppColors.mainTeal,
+                      borderColor: AppColors.cardBorder,
+                      onPressed: () => _run(context, InvoiceAction.refund),
+                    ),
                   ),
-                ),
-                SizedBox(width: 8.w),
+                  SizedBox(width: 8.w),
+                ],
                 Expanded(
                   child: AppCustomButton(
                     text: 'مشاركة',

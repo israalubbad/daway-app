@@ -300,16 +300,23 @@ void main() {
       return (result as Success).data.monthlySales;
     }
 
-    test('reads a figure named for the month', () async {
-      expect(await monthlySales({'data': {'monthly_sales': 1250.5}}), 1250.5);
+    test('reads the total of the summary the sales-summary endpoint documents', () async {
+      expect(
+        await monthlySales({
+          'data': {
+            'summary': {'total': 1250.5, 'count': 9, 'paid': 1000, 'remaining': 250.5, 'discount': 0},
+          },
+        }),
+        1250.5,
+      );
     });
 
-    test('reads the amount inside a this_month object', () async {
-      expect(await monthlySales({'data': {'this_month': {'total': '300'}}}), 300);
+    test('a total sent as a decimal string is read too', () async {
+      expect(await monthlySales({'data': {'summary': {'total': '300.00'}}}), 300);
     });
 
-    test('a bare total is not taken for the month: it may be any period', () async {
-      expect(await monthlySales({'data': {'total': 99999, 'total_sales': 5}}), isNull);
+    test('a response without the summary leaves the card on its dash', () async {
+      expect(await monthlySales({'data': {'total': 99999}}), isNull);
     });
 
     test('a failed call leaves the card on its dash without failing the stats', () async {

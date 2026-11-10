@@ -17,6 +17,7 @@ class PharmacyDashboardRemoteDataSource {
   Future<Response<dynamic>> getSalesSummary({required String token}) {
     return _dio.get(
       ApiConstants.pharmacySalesSummary,
+      queryParameters: {'range': 'month'},
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
   }

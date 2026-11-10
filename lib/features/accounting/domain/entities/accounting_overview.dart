@@ -1,8 +1,8 @@
 /// How an invoice has been paid so far.
-enum PaymentStatus { paid, partial, unpaid }
+enum PaymentStatus { paid, partial, unpaid, refunded, cancelled }
 
 /// How money was handed over.
-enum PaymentMethod { cash, bankTransfer, card }
+enum PaymentMethod { cash, bankTransfer, card, credit }
 
 /// The range the overview's sales chart covers.
 enum SalesPeriod { today, last7Days, last30Days, thisMonth }

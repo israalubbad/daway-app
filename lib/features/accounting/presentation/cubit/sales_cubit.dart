@@ -8,11 +8,18 @@ import 'sales_state.dart';
 
 class SalesCubit extends Cubit<SalesState> {
   final GetSalesUseCase _getSales;
+  final GetInvoiceUseCase _getInvoice;
+  final GetRefundableLinesUseCase _getRefundableLines;
   final RecordInvoicePaymentUseCase _recordPayment;
   final CreateRefundUseCase _createRefund;
 
-  SalesCubit(this._getSales, this._recordPayment, this._createRefund)
-    : super(const SalesLoading()) {
+  SalesCubit(
+    this._getSales,
+    this._getInvoice,
+    this._getRefundableLines,
+    this._recordPayment,
+    this._createRefund,
+  ) : super(const SalesLoading()) {
     load();
   }
 
@@ -57,6 +64,32 @@ class SalesCubit extends Cubit<SalesState> {
         clearStatus: status == null,
       ),
     );
+  }
+
+  /// [invoice] with its lines, which the list does not carry; or the message to
+  /// show when they cannot be fetched.
+  Future<({SaleInvoice? invoice, String? error})> loadDetails(SaleInvoice invoice) async {
+    final result = await _getInvoice(invoice.number);
+    return switch (result) {
+      Success(:final data) => (invoice: data, error: null),
+      ApiError(:final failure) => (invoice: null, error: failure.message),
+    };
+  }
+
+  /// The lines of [invoice] that can still be returned, or the message to show
+  /// (a cancelled invoice, nothing left to return).
+  Future<({List<InvoiceLine>? lines, String? error})> loadRefundableLines(
+    SaleInvoice invoice,
+  ) async {
+    final result = await _getRefundableLines(invoice);
+    return switch (result) {
+      Success(:final data) when data.isEmpty => (
+        lines: null,
+        error: 'لا توجد أصناف متاحة للإرجاع',
+      ),
+      Success(:final data) => (lines: data, error: null),
+      ApiError(:final failure) => (lines: null, error: failure.message),
+    };
   }
 
   /// Records a payment against [invoice]; returns the message to show when it

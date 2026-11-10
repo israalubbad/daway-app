@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
-import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/sale_invoice.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
@@ -115,11 +114,16 @@ class _Menu extends StatelessWidget {
       onSelected: onAction,
       itemBuilder: (_) => [
         const PopupMenuItem(value: InvoiceAction.view, child: Text('عرض')),
-        const PopupMenuItem(value: InvoiceAction.refund, child: Text('إرجاع')),
+        // A cancelled or refunded invoice takes no returns or payments.
+        PopupMenuItem(
+          value: InvoiceAction.refund,
+          enabled: !invoice.isClosed,
+          child: const Text('إرجاع'),
+        ),
         // A fully paid invoice has nothing left to pay.
         PopupMenuItem(
           value: InvoiceAction.recordPayment,
-          enabled: invoice.status != PaymentStatus.paid,
+          enabled: !invoice.isClosed && invoice.remaining > 0,
           child: const Text('تسجيل دفعة'),
         ),
         const PopupMenuItem(value: InvoiceAction.share, child: Text('مشاركة PDF')),

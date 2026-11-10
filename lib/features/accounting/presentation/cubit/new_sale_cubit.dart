@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/api_result.dart';
+import '../../domain/entities/accounting_customer.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/sale_invoice.dart';
 import '../../domain/usecases/accounting_usecases.dart';
@@ -9,10 +10,15 @@ import 'new_sale_state.dart';
 class NewSaleCubit extends Cubit<NewSaleState> {
   final SearchSaleItemsUseCase _searchItems;
   final FindSaleItemByBarcodeUseCase _findByBarcode;
+  final SearchCustomersUseCase _searchCustomers;
   final CreateSaleUseCase _createSale;
 
-  NewSaleCubit(this._searchItems, this._findByBarcode, this._createSale)
-    : super(const NewSaleState());
+  NewSaleCubit(
+    this._searchItems,
+    this._findByBarcode,
+    this._searchCustomers,
+    this._createSale,
+  ) : super(const NewSaleState());
 
   Future<void> queryChanged(String query) async {
     emit(state.copyWith(query: query, isSearching: query.trim().length >= 2));
@@ -89,13 +95,24 @@ class NewSaleCubit extends Cubit<NewSaleState> {
     emit(state.copyWith(lines: [for (final l in state.lines) if (l.item.id != itemId) l]));
   }
 
-  void customerChanged(String name) {
-    final trimmed = name.trim();
-    emit(state.copyWith(customerName: trimmed, clearCustomer: trimmed.isEmpty));
+  /// Looks for a customer to put on the invoice, as the name is typed.
+  Future<void> customerQueryChanged(String query) async {
+    final result = await _searchCustomers(query);
+    if (isClosed) return;
+    if (result case Success(:final data)) emit(state.copyWith(customerResults: data));
   }
 
+  void customerSelected(AccountingCustomer customer) =>
+      emit(state.copyWith(customer: customer, customerResults: const []));
+
+  /// Back to the walk-in customer.
+  void customerCleared() =>
+      emit(state.copyWith(clearCustomer: true, customerResults: const []));
+
+  /// What was paid, typed; empty leaves the backend's default.
   void paidChanged(String text) {
-    emit(state.copyWith(paid: double.tryParse(text.trim()) ?? 0));
+    final value = double.tryParse(text.trim());
+    emit(state.copyWith(paid: value, clearPaid: value == null));
   }
 
   void methodChanged(PaymentMethod method) => emit(state.copyWith(method: method));
@@ -105,7 +122,8 @@ class NewSaleCubit extends Cubit<NewSaleState> {
     emit(state.copyWith(isSaving: true, clearError: true));
     final result = await _createSale(
       NewSale(
-        customerName: state.customerName,
+        customerId: state.customer?.id,
+        customerName: state.customer?.name,
         lines: state.lines,
         paid: state.paid,
         method: state.method,

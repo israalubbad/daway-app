@@ -2,6 +2,7 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/accounting/data/repositories/sample_accounting_repository.dart';
 import 'package:daway_app/features/accounting/domain/entities/cash_ledger.dart';
+import 'package:daway_app/features/accounting/domain/repositories/accounting_repository.dart';
 import 'package:daway_app/features/accounting/domain/entities/accounting_overview.dart';
 import 'package:daway_app/features/accounting/domain/entities/sale_invoice.dart';
 import 'package:daway_app/features/accounting/domain/usecases/accounting_usecases.dart';
@@ -31,6 +32,22 @@ class _Session implements SessionRepository {
 
 Future<void> _settle() => Future<void>.delayed(Duration.zero);
 
+SalesCubit _salesCubit(AccountingRepository repository, SessionRepository session) => SalesCubit(
+  GetSalesUseCase(repository, session),
+  GetInvoiceUseCase(repository, session),
+  GetRefundableLinesUseCase(repository, session),
+  RecordInvoicePaymentUseCase(repository, session),
+  CreateRefundUseCase(repository, session),
+);
+
+NewSaleCubit _newSaleCubit(AccountingRepository repository, SessionRepository session) =>
+    NewSaleCubit(
+      SearchSaleItemsUseCase(repository, session),
+      FindSaleItemByBarcodeUseCase(repository, session),
+      SearchCustomersUseCase(repository, session),
+      CreateSaleUseCase(repository, session),
+    );
+
 /// The sample repository, which can be told to fail every read.
 class _FlakyRepository extends SampleAccountingRepository {
   bool failing = false;
@@ -47,9 +64,10 @@ class _FlakyRepository extends SampleAccountingRepository {
   Future<ApiResult<AccountingOverview>> getOverview({
     required String token,
     required SalesPeriod period,
+    bool useCache = false,
   }) async => failing
       ? const ApiError(ApiFailure(message: 'offline'))
-      : super.getOverview(token: token, period: period);
+      : super.getOverview(token: token, period: period, useCache: useCache);
 }
 
 void main() {
@@ -89,11 +107,7 @@ void main() {
     late SalesCubit cubit;
 
     setUp(() async {
-      cubit = SalesCubit(
-        GetSalesUseCase(repository, session),
-        RecordInvoicePaymentUseCase(repository, session),
-        CreateRefundUseCase(repository, session),
-      );
+      cubit = _salesCubit(repository, session);
       await _settle();
     });
 
@@ -167,7 +181,7 @@ void main() {
     });
 
     test('a rejected movement returns its message and changes nothing', () async {
-      final error = await cubit.record(isDeposit: true, amount: 0, reason: 'x');
+      final error = await cubit.record(isDeposit: true, amount: 0, reason: 'xyz');
 
       expect(error, isNotNull);
       expect((cubit.state as CashLoaded).ledger.balance, 250);
@@ -184,11 +198,7 @@ void main() {
     late NewSaleCubit cubit;
 
     setUp(() {
-      cubit = NewSaleCubit(
-        SearchSaleItemsUseCase(repository, session),
-        FindSaleItemByBarcodeUseCase(repository, session),
-        CreateSaleUseCase(repository, session),
-      );
+      cubit = _newSaleCubit(repository, session);
     });
 
     tearDown(() => cubit.close());
@@ -221,7 +231,12 @@ void main() {
 
       expect(cubit.state.remaining, 8);
 
+      // Not a number: back to the backend's default, everything paid for cash.
       cubit.paidChanged('abc');
+      expect(cubit.state.remaining, 0);
+
+      // And nothing paid for a sale on credit.
+      cubit.methodChanged(PaymentMethod.credit);
       expect(cubit.state.remaining, 18);
     });
 
@@ -271,11 +286,7 @@ void main() {
     setUp(() => flaky = _FlakyRepository());
 
     test('sales', () async {
-      final cubit = SalesCubit(
-        GetSalesUseCase(flaky, session),
-        RecordInvoicePaymentUseCase(flaky, session),
-        CreateRefundUseCase(flaky, session),
-      );
+      final cubit = _salesCubit(flaky, session);
       addTearDown(cubit.close);
       await _settle();
 
@@ -287,11 +298,7 @@ void main() {
 
     test('sales still fail when there was nothing to keep', () async {
       flaky.failing = true;
-      final cubit = SalesCubit(
-        GetSalesUseCase(flaky, session),
-        RecordInvoicePaymentUseCase(flaky, session),
-        CreateRefundUseCase(flaky, session),
-      );
+      final cubit = _salesCubit(flaky, session);
       addTearDown(cubit.close);
       await _settle();
 
@@ -307,7 +314,7 @@ void main() {
       await _settle();
 
       flaky.failing = true;
-      final error = await cubit.record(isDeposit: true, amount: 10, reason: 'x');
+      final error = await cubit.record(isDeposit: true, amount: 10, reason: 'xyz');
 
       expect(error, isNull);
       expect(cubit.state, isA<CashLoaded>());
@@ -332,11 +339,7 @@ void main() {
     late NewSaleCubit cubit;
 
     setUp(() {
-      cubit = NewSaleCubit(
-        SearchSaleItemsUseCase(repository, session),
-        FindSaleItemByBarcodeUseCase(repository, session),
-        CreateSaleUseCase(repository, session),
-      );
+      cubit = _newSaleCubit(repository, session);
     });
 
     tearDown(() => cubit.close());
@@ -352,9 +355,9 @@ void main() {
     });
 
     test('the cash rules refuse a zero amount and a blank reason', () {
-      expect(CashMovementRules.isValid(amount: 0, reason: 'x'), isFalse);
+      expect(CashMovementRules.isValid(amount: 0, reason: 'xyz'), isFalse);
       expect(CashMovementRules.isValid(amount: 5, reason: '  '), isFalse);
-      expect(CashMovementRules.isValid(amount: 5, reason: 'x'), isTrue);
+      expect(CashMovementRules.isValid(amount: 5, reason: 'xyz'), isTrue);
       expect(CashMovementRules.exceedsBalance(isDeposit: false, amount: 10, balance: 5), isTrue);
       expect(CashMovementRules.exceedsBalance(isDeposit: true, amount: 10, balance: 5), isFalse);
     });
@@ -364,11 +367,7 @@ void main() {
     late SalesCubit cubit;
 
     setUp(() async {
-      cubit = SalesCubit(
-        GetSalesUseCase(repository, session),
-        RecordInvoicePaymentUseCase(repository, session),
-        CreateRefundUseCase(repository, session),
-      );
+      cubit = _salesCubit(repository, session);
       await _settle();
     });
 
@@ -412,11 +411,11 @@ void main() {
     test('a return is priced at the sold price and is refused when empty or too large', () async {
       final sold = invoice('INV-1002');
 
-      expect(await cubit.refund(RefundRequest(invoice: sold, quantities: const {})), isNotNull);
-      expect(await cubit.refund(RefundRequest(invoice: sold, quantities: const {2: 3})), isNotNull);
-      expect(RefundRequest(invoice: sold, quantities: const {2: 1}).amount, 50);
+      expect(await cubit.refund(RefundRequest(invoiceNumber: sold.number, lines: sold.lines, quantities: const {})), isNotNull);
+      expect(await cubit.refund(RefundRequest(invoiceNumber: sold.number, lines: sold.lines, quantities: const {2: 3})), isNotNull);
+      expect(RefundRequest(invoiceNumber: sold.number, lines: sold.lines, quantities: const {2: 1}).amount, 50);
 
-      final error = await cubit.refund(RefundRequest(invoice: sold, quantities: const {2: 1}));
+      final error = await cubit.refund(RefundRequest(invoiceNumber: sold.number, lines: sold.lines, quantities: const {2: 1}));
 
       expect(error, isNull);
       final refunds = (await GetRefundsUseCase(repository, session)() as dynamic).data as List;

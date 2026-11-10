@@ -38,8 +38,9 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
   void initState() {
     super.initState();
     final state = widget.cubit.state;
-    _customerController = TextEditingController(text: state.customerName ?? '');
-    _paidController = TextEditingController(text: state.paid > 0 ? state.paid.toString() : '');
+    _customerController = TextEditingController();
+    final paid = state.paid;
+    _paidController = TextEditingController(text: paid == null ? '' : paid.toString());
   }
 
   @override
@@ -92,12 +93,38 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                   ),
                   _Field(
                     label: 'العميل',
-                    child: TextField(
-                      controller: _customerController,
-                      onChanged: widget.cubit.customerChanged,
-                      decoration: _decoration('زائر نقدي'),
-                    ),
+                    child: state.customer == null
+                        ? TextField(
+                            controller: _customerController,
+                            onChanged: widget.cubit.customerQueryChanged,
+                            decoration: _decoration('زائر نقدي · اكتب اسماً لاختيار عميل'),
+                          )
+                        : _SelectedCustomer(
+                            name: state.customer!.name,
+                            onClear: () {
+                              widget.cubit.customerCleared();
+                              _customerController.clear();
+                            },
+                          ),
                   ),
+                  for (final customer in state.customerResults)
+                    InkWell(
+                      onTap: () => widget.cubit.customerSelected(customer),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        child: Row(
+                          children: [
+                            Expanded(child: Text(customer.name, style: AccountingStyles.body)),
+                            if (customer.balance > 0)
+                              Text(
+                                'عليه ${formatMoney(customer.balance)}',
+                                textDirection: TextDirection.rtl,
+                                style: AccountingStyles.muted,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
                   SizedBox(height: 12.h),
                   _Row('المجموع الفرعي', formatMoney(state.subtotal)),
                   _Row('الخصم', '−${formatMoney(0)}'),
@@ -114,7 +141,11 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                       textDirection: TextDirection.ltr,
                       textAlign: TextAlign.right,
                       onChanged: widget.cubit.paidChanged,
-                      decoration: _decoration('0.00'),
+                      // Left empty, the backend decides: everything for a cash
+                      // sale, nothing for a sale on credit.
+                      decoration: _decoration(
+                        state.method == PaymentMethod.credit ? '0.00' : state.total.toStringAsFixed(2),
+                      ),
                     ),
                   ),
                   SizedBox(height: 8.h),
@@ -168,6 +199,35 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
       contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       enabledBorder: border(AppColors.cardBorder),
       focusedBorder: border(AppColors.mainTeal),
+    );
+  }
+}
+
+/// The customer already chosen for the invoice, with a button to drop it.
+class _SelectedCustomer extends StatelessWidget {
+  final String name;
+  final VoidCallback onClear;
+
+  const _SelectedCustomer({required this.name, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.permissionIconBg,
+        border: Border.all(color: AppColors.iconBlueBorder),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: Text(name, style: AccountingStyles.cardTitle)),
+          GestureDetector(
+            onTap: onClear,
+            child: Icon(Icons.close_rounded, size: 18.r, color: AppColors.mainTeal),
+          ),
+        ],
+      ),
     );
   }
 }

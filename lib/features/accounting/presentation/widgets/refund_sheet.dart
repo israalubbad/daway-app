@@ -14,14 +14,22 @@ import 'accounting_card.dart';
 /// the return is saved.
 class RefundSheet extends StatefulWidget {
   final SaleInvoice invoice;
+
+  /// The lines that can still be returned, each with the units left.
+  final List<InvoiceLine> lines;
   final SalesCubit cubit;
 
-  const RefundSheet({super.key, required this.invoice, required this.cubit});
+  const RefundSheet({super.key, required this.invoice, required this.lines, required this.cubit});
 
-  static Future<bool?> show(BuildContext context, SaleInvoice invoice, SalesCubit cubit) {
+  static Future<bool?> show(
+    BuildContext context,
+    SaleInvoice invoice,
+    List<InvoiceLine> lines,
+    SalesCubit cubit,
+  ) {
     return AppBottomSheet.show<bool>(
       context,
-      builder: (_) => RefundSheet(invoice: invoice, cubit: cubit),
+      builder: (_) => RefundSheet(invoice: invoice, lines: lines, cubit: cubit),
     );
   }
 
@@ -35,7 +43,11 @@ class _RefundSheetState extends State<RefundSheet> {
   bool _isSaving = false;
   String? _error;
 
-  RefundRequest get _request => RefundRequest(invoice: widget.invoice, quantities: _quantities);
+  RefundRequest get _request => RefundRequest(
+    invoiceNumber: widget.invoice.number,
+    lines: widget.lines,
+    quantities: _quantities,
+  );
 
   void _change(InvoiceLine line, int delta) {
     final next = ((_quantities[line.itemId] ?? 0) + delta).clamp(0, line.quantity);
@@ -98,7 +110,7 @@ class _RefundSheetState extends State<RefundSheet> {
             ),
             Text('الفاتورة ${widget.invoice.number} · اختر الكمية المرجعة من كل صنف', style: AccountingStyles.muted),
             SizedBox(height: 12.h),
-            for (final line in widget.invoice.lines)
+            for (final line in widget.lines)
               Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
                 child: _RefundLineTile(

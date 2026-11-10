@@ -7,7 +7,8 @@ import '../cubit/sales_state.dart';
 /// An amount in shekels, always with two decimals: "₪100.00". Set it
 /// left-to-right when it is drawn, so the sign and the "₪" keep their places
 /// in a right-to-left line.
-String formatMoney(double amount) => '₪${amount.toStringAsFixed(2)}';
+String formatMoney(double amount) =>
+    amount < 0 ? '−₪${(-amount).toStringAsFixed(2)}' : '₪${amount.toStringAsFixed(2)}';
 
 /// "2026-10-22 12:57".
 String formatDateTime(DateTime date) {
@@ -19,12 +20,15 @@ String paymentMethodLabel(PaymentMethod method) => switch (method) {
   PaymentMethod.cash => 'نقداً',
   PaymentMethod.bankTransfer => 'حوالة بنكية',
   PaymentMethod.card => 'بطاقة',
+  PaymentMethod.credit => 'دين',
 };
 
 String paymentStatusLabel(PaymentStatus status) => switch (status) {
   PaymentStatus.paid => 'مدفوع',
   PaymentStatus.partial => 'مدفوع جزئياً',
   PaymentStatus.unpaid => 'غير مدفوع',
+  PaymentStatus.refunded => 'مرجوعة',
+  PaymentStatus.cancelled => 'ملغاة',
 };
 
 String salesPeriodLabel(SalesPeriod period) => switch (period) {
@@ -57,6 +61,8 @@ String cashTypeFilterLabel(CashTypeFilter type) => switch (type) {
 String cashMovementLabel(CashMovementType type) => switch (type) {
   CashMovementType.sale => 'مبيعات',
   CashMovementType.expense => 'مصروف',
+  CashMovementType.purchase => 'مشتريات',
+  CashMovementType.adjustment => 'تسوية',
   CashMovementType.payment => 'دفعة',
   CashMovementType.refund => 'إرجاع',
   CashMovementType.deposit => 'إيداع',

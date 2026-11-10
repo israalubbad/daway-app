@@ -67,55 +67,24 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
     }
   }
 
-  /// Best-effort like the other enrichments: a failure leaves the card on its
-  /// dash. The response has not been seen, so the figure is looked for under
-  /// the names a sales summary most likely uses, on `data` or one level in.
+  /// This month's sales: `GET /pharmacy/accounting/sales-summary?range=month`
+  /// answers `data.summary.total` (cancelled invoices already left out).
+  /// Best-effort like the other enrichments: a failure, or a response without
+  /// the figure, leaves the card on its dash.
   Future<double?> _monthlySales({required String token}) async {
     try {
       final response = await _remoteDataSource.getSalesSummary(token: token);
       final body = response.data;
       if (body is! Map<String, dynamic>) return null;
       final data = body['data'];
-      return _salesFigure(data is Map<String, dynamic> ? data : body);
+      final summary = data is Map<String, dynamic> ? data['summary'] : null;
+      final total = summary is Map<String, dynamic> ? summary['total'] : null;
+      if (total is num) return total.toDouble();
+      if (total is String) return double.tryParse(total);
+      return null;
     } catch (_) {
       return null;
     }
-  }
-
-  /// Only keys that say "this month" are read: a bare `total` or `total_sales`
-  /// may be an all-time or per-period figure, and showing it as the month's
-  /// sales would state a wrong financial number as fact.
-  static const _monthlyKeys = [
-    'monthly_sales',
-    'month_sales',
-    'sales_this_month',
-    'this_month',
-    'month_total',
-  ];
-
-  /// Inside a `this_month`-style object, the names its amount may carry.
-  static const _amountKeys = ['total', 'sales', 'amount', 'revenue'];
-
-  double? _salesFigure(Map<String, dynamic> map) {
-    for (final key in _monthlyKeys) {
-      final value = map[key];
-      if (value is Map<String, dynamic>) {
-        for (final amountKey in _amountKeys) {
-          final nested = _asDouble(value[amountKey]);
-          if (nested != null) return nested;
-        }
-      } else {
-        final figure = _asDouble(value);
-        if (figure != null) return figure;
-      }
-    }
-    return null;
-  }
-
-  double? _asDouble(Object? value) {
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
   }
 
   /// Same fault-isolation reasoning as [_averageRating]: the home screen's

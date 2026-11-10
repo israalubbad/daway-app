@@ -1,5 +1,6 @@
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
+import '../../domain/entities/accounting_customer.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/cash_ledger.dart';
 import '../../domain/entities/refund_record.dart';
@@ -19,6 +20,7 @@ class SampleAccountingRepository implements AccountingRepository {
         id: 2,
         number: 'INV-1002',
         date: now.subtract(const Duration(days: 6, hours: 2)),
+        customerId: 7,
         customerName: 'محمد قالع',
         itemsCount: 1,
         subtotal: 100,
@@ -74,6 +76,9 @@ class SampleAccountingRepository implements AccountingRepository {
   late List<CashMovement> _movements;
   final List<RefundRecord> _refunds = [];
 
+  /// Units already returned, by invoice line id.
+  final Map<int, int> _returned = {};
+
   static const _catalog = [
     SaleItemOption(id: 1, name: 'Panadol Extra 500mg', barcode: '6221031234567', price: 18, stock: 40),
     SaleItemOption(id: 2, name: 'Baby Diaper Cream', barcode: '6221039876543', price: 50, stock: 12),
@@ -85,6 +90,7 @@ class SampleAccountingRepository implements AccountingRepository {
   Future<ApiResult<AccountingOverview>> getOverview({
     required String token,
     required SalesPeriod period,
+    bool useCache = false,
   }) async {
     final days = switch (period) {
       SalesPeriod.today => 1,
@@ -216,17 +222,19 @@ class SampleAccountingRepository implements AccountingRepository {
   Future<ApiResult<void>> createSale({required String token, required NewSale sale}) async {
     final total = sale.lines.fold<double>(0, (sum, line) => sum + line.total);
     final number = 1000 + _sales.length + 1;
+    final paid = sale.paid ?? (sale.method == PaymentMethod.credit ? 0.0 : total);
     _sales.insert(
       0,
       SaleInvoice(
         id: number,
         number: 'INV-$number',
         date: DateTime.now(),
-        customerName: sale.customerName,
         itemsCount: sale.lines.length,
         subtotal: total,
         total: total,
-        paid: sale.paid,
+        customerId: sale.customerId,
+        customerName: sale.customerName,
+        paid: paid,
         method: sale.method,
         lines: [
           for (final line in sale.lines)
@@ -239,7 +247,7 @@ class SampleAccountingRepository implements AccountingRepository {
         ],
       ),
     );
-    if (sale.paid > 0) {
+    if (paid > 0 && sale.method == PaymentMethod.cash) {
       _movements.insert(
         0,
         CashMovement(
@@ -247,30 +255,31 @@ class SampleAccountingRepository implements AccountingRepository {
           type: CashMovementType.sale,
           description: 'فاتورة بيع INV-$number',
           date: DateTime.now(),
-          amount: sale.paid,
+          amount: paid,
         ),
       );
     }
     return const Success(null);
   }
 
+
   @override
   Future<ApiResult<void>> recordInvoicePayment({
     required String token,
-    required int invoiceId,
+    required SaleInvoice invoice,
     required double amount,
     required PaymentMethod method,
   }) async {
-    final index = _sales.indexWhere((s) => s.id == invoiceId);
+    final index = _sales.indexWhere((s) => s.id == invoice.id);
     if (index == -1) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
-    final invoice = _sales[index];
-    _sales[index] = invoice.withPayment(amount, method);
+    final current = _sales[index];
+    _sales[index] = current.withPayment(amount, method);
     _movements.insert(
       0,
       CashMovement(
         id: DateTime.now().millisecondsSinceEpoch,
         type: CashMovementType.payment,
-        description: 'دفعة على الفاتورة ${invoice.number}',
+        description: 'دفعة على الفاتورة ${current.number}',
         date: DateTime.now(),
         amount: amount,
       ),
@@ -279,20 +288,65 @@ class SampleAccountingRepository implements AccountingRepository {
   }
 
   @override
+  Future<ApiResult<SaleInvoice>> getInvoice({required String token, required String number}) async {
+    final invoice = _sales.where((s) => s.number == number).firstOrNull;
+    if (invoice == null) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
+    return Success(invoice);
+  }
+
+  @override
+  Future<ApiResult<List<InvoiceLine>>> getRefundableLines({
+    required String token,
+    required String number,
+  }) async {
+    final invoice = _sales.where((s) => s.number == number).firstOrNull;
+    if (invoice == null) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
+    return Success([
+      for (final line in invoice.lines)
+        if (line.quantity - (_returned[line.itemId] ?? 0) > 0)
+          InvoiceLine(
+            itemId: line.itemId,
+            name: line.name,
+            quantity: line.quantity - (_returned[line.itemId] ?? 0),
+            unitPrice: line.unitPrice,
+          ),
+    ]);
+  }
+
+  static const _customers = [
+    AccountingCustomer(id: 7, name: 'محمد قالع', phone: '0599123456', balance: 10),
+    AccountingCustomer(id: 8, name: 'سارة أحمد', phone: '0598765432'),
+  ];
+
+  @override
+  Future<ApiResult<List<AccountingCustomer>>> searchCustomers({
+    required String token,
+    required String query,
+  }) async => Success([
+    for (final customer in _customers)
+      if (customer.name.contains(query)) customer,
+  ]);
+
+  @override
   Future<ApiResult<void>> createRefund({
     required String token,
-    required int invoiceId,
+    required String invoiceNumber,
     required Map<int, int> quantities,
   }) async {
-    final invoice = _sales.where((s) => s.id == invoiceId).firstOrNull;
+    final invoice = _sales.where((s) => s.number == invoiceNumber).firstOrNull;
     if (invoice == null) return const ApiError(ApiFailure(message: 'الفاتورة غير موجودة'));
-    final amount = RefundRequest(invoice: invoice, quantities: quantities).amount;
+    final amount = RefundRequest(
+      invoiceNumber: invoiceNumber,
+      lines: invoice.lines,
+      quantities: quantities,
+    ).amount;
+    quantities.forEach((id, units) => _returned[id] = (_returned[id] ?? 0) + units);
     final number = 3000 + _refunds.length + 1;
     _refunds.insert(
       0,
       RefundRecord(
         id: number,
-        number: 'RET-$number',
+        number: '#$number',
         invoiceNumber: invoice.number,
         date: DateTime.now(),
         customerName: invoice.customerName,
@@ -305,7 +359,7 @@ class SampleAccountingRepository implements AccountingRepository {
       CashMovement(
         id: DateTime.now().millisecondsSinceEpoch,
         type: CashMovementType.refund,
-        description: 'إرجاع RET-$number',
+        description: 'إرجاع #$number',
         date: DateTime.now(),
         amount: -amount,
       ),

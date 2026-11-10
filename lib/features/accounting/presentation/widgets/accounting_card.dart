@@ -61,6 +61,10 @@ class PaymentStatusBadge extends StatelessWidget {
       PaymentStatus.paid => (AppColors.productAvailableText, AppColors.productAvailableTint),
       PaymentStatus.partial => (const Color(0xFFB7791F), AppColors.productLowStockTint),
       PaymentStatus.unpaid => (AppColors.logoutRed, AppColors.logoutRedTint),
+      PaymentStatus.refunded || PaymentStatus.cancelled => (
+        AppColors.authTextMuted,
+        AppColors.lightGrey,
+      ),
     };
     return _Pill(label: paymentStatusLabel(status), color: text, background: tint);
   }

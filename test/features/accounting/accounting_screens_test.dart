@@ -39,6 +39,8 @@ void main() {
       ..registerFactory(
         () => SalesCubit(
           GetSalesUseCase(repository, session),
+          GetInvoiceUseCase(repository, session),
+          GetRefundableLinesUseCase(repository, session),
           RecordInvoicePaymentUseCase(repository, session),
           CreateRefundUseCase(repository, session),
         ),
@@ -54,6 +56,7 @@ void main() {
         () => NewSaleCubit(
           SearchSaleItemsUseCase(repository, session),
           FindSaleItemByBarcodeUseCase(repository, session),
+          SearchCustomersUseCase(repository, session),
           CreateSaleUseCase(repository, session),
         ),
       );
@@ -334,7 +337,7 @@ void main() {
 
       expect(find.text('تم تسجيل الإرجاع'), findsOneWidget);
       await openTab(tester, 'الإرجاعات');
-      expect(find.text('RET-3001'), findsOneWidget);
+      expect(find.text('#3001'), findsOneWidget);
       expect(find.text('₪50.00'), findsWidgets);
     });
 

@@ -4,11 +4,12 @@ import 'accounting_overview.dart';
 class SaleInvoice {
   final int id;
 
-  /// "INV-1002".
+  /// "INV-1002". What the sale endpoints address an invoice by.
   final String number;
   final DateTime date;
 
   /// Null for a walk-in cash customer.
+  final int? customerId;
   final String? customerName;
   final int itemsCount;
   final double subtotal;
@@ -17,13 +18,20 @@ class SaleInvoice {
   final double paid;
   final PaymentMethod method;
 
-  /// What was sold, line by line. A list response may leave it out.
+  /// The status the backend reported, when it is not just paid / partly paid /
+  /// unpaid (a cancelled or refunded invoice); otherwise it is worked out from
+  /// the amounts.
+  final PaymentStatus? statusOverride;
+
+  /// What was sold, line by line. A list response leaves it out; the details
+  /// fetch fills it.
   final List<InvoiceLine> lines;
 
   const SaleInvoice({
     required this.id,
     required this.number,
     required this.date,
+    this.customerId,
     this.customerName,
     required this.itemsCount,
     required this.subtotal,
@@ -31,6 +39,7 @@ class SaleInvoice {
     required this.total,
     required this.paid,
     required this.method,
+    this.statusOverride,
     this.lines = const [],
   });
 
@@ -39,6 +48,7 @@ class SaleInvoice {
     id: id,
     number: number,
     date: date,
+    customerId: customerId,
     customerName: customerName,
     itemsCount: itemsCount,
     subtotal: subtotal,
@@ -46,34 +56,64 @@ class SaleInvoice {
     total: total,
     paid: paid + amount,
     method: method,
+    statusOverride: statusOverride,
+    lines: lines,
+  );
+
+  /// This invoice with [lines] filled in.
+  SaleInvoice withLines(List<InvoiceLine> lines) => SaleInvoice(
+    id: id,
+    number: number,
+    date: date,
+    customerId: customerId,
+    customerName: customerName,
+    itemsCount: itemsCount,
+    subtotal: subtotal,
+    discount: discount,
+    total: total,
+    paid: paid,
+    method: method,
+    statusOverride: statusOverride,
     lines: lines,
   );
 
   double get remaining => (total - paid).clamp(0, double.infinity).toDouble();
 
   PaymentStatus get status {
+    final reported = statusOverride;
+    if (reported != null) return reported;
     if (paid <= 0) return PaymentStatus.unpaid;
     return paid >= total ? PaymentStatus.paid : PaymentStatus.partial;
   }
+
+  /// A cancelled or refunded invoice takes no more payments or returns.
+  bool get isClosed => status == PaymentStatus.cancelled || status == PaymentStatus.refunded;
 }
 
 /// A sale being made: what the cart holds and how it is paid.
 class NewSale {
+  final int? customerId;
   final String? customerName;
   final List<SaleLine> lines;
-  final double paid;
+
+  /// Null leaves it to the backend: everything for a cash sale, nothing for a
+  /// credit sale.
+  final double? paid;
   final PaymentMethod method;
 
   const NewSale({
+    this.customerId,
     this.customerName,
     required this.lines,
-    required this.paid,
+    this.paid,
     required this.method,
   });
 }
 
 /// A medicine that can be put in the cart (a hit of the search or the barcode).
 class SaleItemOption {
+  /// The pharmacy's own stock row (`pharmacy_medicine_id`), what a sale line
+  /// refers to.
   final int id;
   final String name;
   final String? barcode;
@@ -105,7 +145,7 @@ class SaleLine {
 
 /// One line of an invoice: what was sold, how many and at what price.
 class InvoiceLine {
-  /// The medicine's id, what a return refers to.
+  /// The invoice line's own id (`sale_item_id`), what a return refers to.
   final int itemId;
   final String name;
   final int quantity;
@@ -121,17 +161,23 @@ class InvoiceLine {
   double get total => unitPrice * quantity;
 }
 
-/// A return of some units of an invoice's lines: item id to units given back.
+/// A return of some units of an invoice's lines: line id to units given back.
+/// [lines] are the lines that can still be returned, each with the units left.
 class RefundRequest {
-  final SaleInvoice invoice;
+  final String invoiceNumber;
+  final List<InvoiceLine> lines;
   final Map<int, int> quantities;
 
-  const RefundRequest({required this.invoice, required this.quantities});
+  const RefundRequest({
+    required this.invoiceNumber,
+    required this.lines,
+    required this.quantities,
+  });
 
   /// What is paid back: each returned unit at the price it was sold for.
   double get amount {
     var sum = 0.0;
-    for (final line in invoice.lines) {
+    for (final line in lines) {
       sum += line.unitPrice * (quantities[line.itemId] ?? 0);
     }
     return sum;
@@ -139,11 +185,11 @@ class RefundRequest {
 
   int get unitsCount => quantities.values.fold(0, (a, b) => a + b);
 
-  /// At least one unit, and no line returned beyond what was sold.
+  /// At least one unit, and no line returned beyond what is left of it.
   bool get isValid =>
       unitsCount > 0 &&
       quantities.entries.every((e) {
-        final line = invoice.lines.where((l) => l.itemId == e.key);
+        final line = lines.where((l) => l.itemId == e.key);
         return e.value >= 0 && line.isNotEmpty && e.value <= line.first.quantity;
       });
 }

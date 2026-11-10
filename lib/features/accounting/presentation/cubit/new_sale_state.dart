@@ -1,3 +1,4 @@
+import '../../domain/entities/accounting_customer.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../../domain/entities/sale_invoice.dart';
 
@@ -14,9 +15,13 @@ class NewSaleState {
   final SaleItemOption? recognized;
   final String? barcodeMessage;
 
-  /// Null means the walk-in "زائر نقدي".
-  final String? customerName;
-  final double paid;
+  /// The customer chosen for the invoice; null is the walk-in "زائر نقدي".
+  final AccountingCustomer? customer;
+  final List<AccountingCustomer> customerResults;
+
+  /// What was paid. Null leaves it to the backend's default: everything for a
+  /// cash, card or transfer sale, nothing for a sale on credit.
+  final double? paid;
   final PaymentMethod method;
   final bool isSaving;
   final String? errorMessage;
@@ -29,8 +34,9 @@ class NewSaleState {
     this.isSearching = false,
     this.recognized,
     this.barcodeMessage,
-    this.customerName,
-    this.paid = 0,
+    this.customer,
+    this.customerResults = const [],
+    this.paid,
     this.method = PaymentMethod.cash,
     this.isSaving = false,
     this.errorMessage,
@@ -43,7 +49,14 @@ class NewSaleState {
   /// subtotal.
   double get total => subtotal;
 
-  double get remaining => (total - paid).clamp(0, double.infinity).toDouble();
+  /// What will be recorded as paid.
+  double get effectivePaid {
+    final typed = paid;
+    if (typed != null) return typed.clamp(0, total).toDouble();
+    return method == PaymentMethod.credit ? 0 : total;
+  }
+
+  double get remaining => (total - effectivePaid).clamp(0, double.infinity).toDouble();
 
   int get itemsCount => lines.length;
 
@@ -58,9 +71,11 @@ class NewSaleState {
     bool clearRecognized = false,
     String? barcodeMessage,
     bool clearBarcodeMessage = false,
-    String? customerName,
+    AccountingCustomer? customer,
     bool clearCustomer = false,
+    List<AccountingCustomer>? customerResults,
     double? paid,
+    bool clearPaid = false,
     PaymentMethod? method,
     bool? isSaving,
     String? errorMessage,
@@ -74,8 +89,9 @@ class NewSaleState {
       isSearching: isSearching ?? this.isSearching,
       recognized: clearRecognized ? null : (recognized ?? this.recognized),
       barcodeMessage: clearBarcodeMessage ? null : (barcodeMessage ?? this.barcodeMessage),
-      customerName: clearCustomer ? null : (customerName ?? this.customerName),
-      paid: paid ?? this.paid,
+      customer: clearCustomer ? null : (customer ?? this.customer),
+      customerResults: customerResults ?? this.customerResults,
+      paid: clearPaid ? null : (paid ?? this.paid),
       method: method ?? this.method,
       isSaving: isSaving ?? this.isSaving,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
