@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -19,7 +20,7 @@ class CategoryIcon extends StatelessWidget {
     if (image == null || image.isEmpty) {
       return Icon(iconForCategorySlug(category.slug), size: 56.sp, color: AppColors.mainTeal);
     }
-    return Image.network(
+    return networkImage(
       image,
       width: 62.w,
       height: 62.w,

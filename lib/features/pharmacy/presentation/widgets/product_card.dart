@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -175,7 +176,7 @@ class _ProductImage extends StatelessWidget {
       ),
       child: (url == null || url.isEmpty)
           ? null
-          : Image.network(
+          : networkImage(
               url,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),

@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -54,7 +55,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                 child: (imageUrl != null && imageUrl.isNotEmpty)
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(7.r),
-                        child: Image.network(
+                        child: networkImage(
                           imageUrl,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) => Icon(

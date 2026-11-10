@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -112,7 +113,7 @@ class _PharmacyThumbnail extends StatelessWidget {
       child: (url != null && url.isNotEmpty)
           ? ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
+              child: networkImage(
                 url,
                 fit: BoxFit.cover,
                 width: 45.w,

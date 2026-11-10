@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theming/app_colors.dart';
@@ -26,7 +27,7 @@ class SearchedMedicineCard extends StatelessWidget {
 
     return MedicineGridCard(
       media: (imageUrl != null && imageUrl.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               imageUrl,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const MedicinePlaceholderIcon(),

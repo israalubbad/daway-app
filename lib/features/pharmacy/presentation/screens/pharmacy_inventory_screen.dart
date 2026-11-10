@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -327,7 +328,7 @@ class _InventoryItemTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: (medicine.imageUrl != null && medicine.imageUrl!.isNotEmpty)
-                ? Image.network(
+                ? networkImage(
                     medicine.imageUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>

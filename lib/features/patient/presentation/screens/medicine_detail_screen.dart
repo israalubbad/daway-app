@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -357,7 +358,7 @@ class _MedicineImageHeader extends StatelessWidget {
           color: AppColors.background,
           alignment: Alignment.center,
           child: (imageUrl != null && imageUrl.isNotEmpty)
-              ? Image.network(
+              ? networkImage(
                   imageUrl,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => Icon(

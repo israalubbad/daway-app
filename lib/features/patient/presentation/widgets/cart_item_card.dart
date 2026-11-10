@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -109,7 +110,7 @@ class _Thumbnail extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: (url != null && url.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               url,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(

@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -134,7 +135,7 @@ class _Thumbnail extends StatelessWidget {
         color: AppColors.permissionIconBg,
         child: url == null
             ? Icon(Icons.medication_outlined, color: AppColors.mainTeal, size: 28.sp)
-            : Image.network(
+            : networkImage(
                 url!,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>

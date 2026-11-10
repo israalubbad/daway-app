@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -178,7 +179,7 @@ class _CandidateImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: (imageUrl != null && imageUrl!.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               imageUrl!,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Icon(

@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class MedicineImagePicker extends StatelessWidget {
       return Image.file(File(imageLocalPath!), fit: BoxFit.cover);
     }
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return Image.network(imageUrl!, fit: BoxFit.cover);
+      return networkImage(imageUrl!, fit: BoxFit.cover);
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

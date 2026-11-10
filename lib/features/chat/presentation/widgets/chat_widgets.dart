@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -168,7 +169,7 @@ class ChatBubble extends StatelessWidget {
                         onTap: () => _openImage(context, message.imageUrl!),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(6.r),
-                          child: Image.network(
+                          child: networkImage(
                             message.imageUrl!,
                             fit: BoxFit.cover,
                             width: imageOnly ? 240.w : null,
@@ -227,7 +228,7 @@ void _openImage(BuildContext context, String url) {
           child: InteractiveViewer(
             minScale: 1,
             maxScale: 5,
-            child: Image.network(
+            child: networkImage(
               url,
               fit: BoxFit.contain,
               loadingBuilder: (context, child, progress) => progress == null

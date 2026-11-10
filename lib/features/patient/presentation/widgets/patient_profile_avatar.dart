@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class PatientProfileAvatar extends StatelessWidget {
     final url = avatarUrl;
     if (url != null && url.isNotEmpty) {
       return ClipOval(
-        child: Image.network(
+        child: networkImage(
           cacheBustedUrl(url, version: avatarVersion),
           width: 96.w,
           height: 96.w,

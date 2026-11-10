@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -307,7 +308,7 @@ class _ItemCard extends StatelessWidget {
             ),
             child: imageUrl == null || imageUrl.isEmpty
                 ? null
-                : Image.network(
+                : networkImage(
                     imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
