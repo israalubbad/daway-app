@@ -49,24 +49,4 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
       return ApiError(mapExceptionToFailure(e));
     }
   }
-
-  @override
-  Future<ApiResult<void>> decide({
-    required String token,
-    required int orderId,
-    required bool accept,
-  }) async {
-    try {
-      await _remoteDataSource.updateStatus(
-        token: token,
-        orderId: orderId,
-        // "preparing" is the one value the API documents (Postman); the
-        // rejection value is still a guess until the backend lists its states.
-        status: accept ? 'preparing' : 'rejected',
-      );
-      return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
-  }
 }

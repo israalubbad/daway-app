@@ -26,7 +26,7 @@ void main() {
   Future<void> pumpScreen(
     WidgetTester tester, {
     PharmacyOrder? order,
-    PharmacyOrderDecision? onDecide,
+    PharmacyOrderLoader? onLoadDetails,
   }) async {
     await setDesignViewport(tester);
     await tester.pumpWidget(
@@ -38,7 +38,7 @@ void main() {
                 MaterialPageRoute<void>(
                   builder: (_) => PharmacyOrderDetailsScreen(
                     order: order ?? _order,
-                    onDecide: onDecide,
+                    onLoadDetails: onLoadDetails,
                   ),
                 ),
               ),
@@ -135,78 +135,38 @@ void main() {
     expect(find.text('طريقة الدفع'), findsNothing);
   });
 
-  testWidgets('قبول الطلب sends the decision and closes the screen', (tester) async {
-    final decisions = <bool>[];
-    await pumpScreen(
-      tester,
-      onDecide: (order, {required accept}) async {
-        decisions.add(accept);
-        return null;
-      },
-    );
-
-    await tester.ensureVisible(find.text('قبول الطلب'));
-    await tester.tap(find.text('قبول الطلب'));
-    await tester.pumpAndSettle();
-
-    expect(decisions, [true]);
-    expect(find.text('تفاصيل الطلب'), findsNothing);
-  });
-
-  testWidgets('رفض الطلب sends a rejection', (tester) async {
-    final decisions = <bool>[];
-    await pumpScreen(
-      tester,
-      onDecide: (order, {required accept}) async {
-        decisions.add(accept);
-        return null;
-      },
-    );
-
-    await tester.ensureVisible(find.text('رفض الطلب'));
-    await tester.tap(find.text('رفض الطلب'));
-    await tester.pumpAndSettle();
-
-    expect(decisions, [false]);
-  });
-
-  testWidgets('a failed decision shows the error and stays on the screen', (tester) async {
-    await pumpScreen(tester, onDecide: (order, {required accept}) async => 'تعذر الاتصال');
-
-    await tester.ensureVisible(find.text('قبول الطلب'));
-    await tester.tap(find.text('قبول الطلب'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('تعذر الاتصال'), findsOneWidget);
-    expect(find.text('تفاصيل الطلب'), findsOneWidget);
-  });
-
-  testWidgets('an order already decided has no decision buttons', (tester) async {
-    await pumpScreen(
-      tester,
-      order: PharmacyOrder(
-        orderNumber: 'DW-9',
-        status: PharmacyOrderStatus.accepted,
-        createdAt: DateTime.now(),
-        itemsCount: 1,
-        total: 5,
-        area: 'غزة',
-      ),
-    );
+  testWidgets('a pending order has no accept or reject buttons', (tester) async {
+    await pumpScreen(tester);
 
     expect(find.text('قبول الطلب'), findsNothing);
     expect(find.text('رفض الطلب'), findsNothing);
+    expect(find.byType(AppCustomButton), findsNothing);
   });
 
-  testWidgets('without handlers both buttons say قريباً', (tester) async {
-    await pumpScreen(tester);
+  testWidgets('shows the full record fetched on open', (tester) async {
+    await pumpScreen(
+      tester,
+      onLoadDetails: (order) async => PharmacyOrder(
+        id: order.id,
+        orderNumber: order.orderNumber,
+        createdAt: order.createdAt,
+        itemsCount: 1,
+        total: 12,
+        area: order.area,
+        patientName: 'أحمد',
+        items: const [PharmacyOrderItem(name: 'بنادول', price: 12, quantity: 3, unitPrice: 4)],
+      ),
+    );
 
-    await tester.ensureVisible(find.text('قبول الطلب'));
-    await tester.tap(find.text('قبول الطلب'));
-    await tester.pump();
+    expect(find.text('العميل: أحمد'), findsOneWidget);
+    expect(find.text('بنادول'), findsOneWidget);
+    expect(find.textContaining('الكمية: 3'), findsOneWidget);
+  });
 
-    expect(find.text('قريباً'), findsOneWidget);
-    expect(find.byType(AppCustomButton), findsNWidgets(2));
+  testWidgets('keeps the list data when the full record cannot be fetched', (tester) async {
+    await pumpScreen(tester, onLoadDetails: (order) async => null);
+
+    expect(find.text('أموكسيسيلين 500 مج'), findsOneWidget);
   });
 
   testWidgets('the back chip returns to the previous screen', (tester) async {

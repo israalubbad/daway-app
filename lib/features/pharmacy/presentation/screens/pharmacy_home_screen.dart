@@ -32,13 +32,11 @@ class PharmacyHomeScreen extends StatelessWidget {
   final List<PharmacyOrder> orders;
 
   /// Takes a decision made from an order's details screen.
-  final PharmacyOrderDecision? onDecide;
   final PharmacyOrderLoader? onLoadDetails;
 
   const PharmacyHomeScreen({
     super.key,
     this.orders = const [],
-    this.onDecide,
     this.onLoadDetails,
   });
 
@@ -82,7 +80,6 @@ class PharmacyHomeScreen extends StatelessWidget {
                       PharmacyDashboardLoaded(:final stats) => _HomeContent(
                         stats: stats,
                         orders: orders,
-                        onDecide: onDecide,
                         onLoadDetails: onLoadDetails,
                       ),
                     };
@@ -100,13 +97,11 @@ class PharmacyHomeScreen extends StatelessWidget {
 class _HomeContent extends StatelessWidget {
   final PharmacyDashboardStats stats;
   final List<PharmacyOrder> orders;
-  final PharmacyOrderDecision? onDecide;
   final PharmacyOrderLoader? onLoadDetails;
 
   const _HomeContent({
     required this.stats,
     required this.orders,
-    this.onDecide,
     this.onLoadDetails,
   });
 
@@ -157,7 +152,6 @@ class _HomeContent extends StatelessWidget {
                 PharmacyOrderDetailsScreen.open(
                   context,
                   order,
-                  onDecide: onDecide,
                   onLoadDetails: onLoadDetails,
                 ),
           ),

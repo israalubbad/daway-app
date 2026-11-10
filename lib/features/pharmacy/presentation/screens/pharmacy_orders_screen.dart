@@ -18,7 +18,6 @@ class PharmacyOrdersScreen extends StatelessWidget {
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback? onRetry;
-  final PharmacyOrderDecision? onDecide;
   final PharmacyOrderLoader? onLoadDetails;
 
   const PharmacyOrdersScreen({
@@ -27,7 +26,6 @@ class PharmacyOrdersScreen extends StatelessWidget {
     this.isLoading = false,
     this.errorMessage,
     this.onRetry,
-    this.onDecide,
     this.onLoadDetails,
   });
 
@@ -68,7 +66,6 @@ class PharmacyOrdersScreen extends StatelessWidget {
                   onViewTap: () => PharmacyOrderDetailsScreen.open(
                     context,
                     orders[i],
-                    onDecide: onDecide,
                     onLoadDetails: onLoadDetails,
                   ),
                 ),

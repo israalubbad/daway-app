@@ -99,8 +99,6 @@ class _PharmacyDashboardShellScreenState
               PharmacyOrdersLoaded(:final orders) => orders.take(3).toList(),
               _ => const [],
             },
-            onDecide: (order, {required accept}) =>
-                _ordersCubit.decide(order, accept: accept),
             onLoadDetails: _ordersCubit.loadDetails,
           ),
         ),
@@ -129,8 +127,6 @@ class _PharmacyDashboardShellScreenState
           isLoading: state is PharmacyOrdersLoading,
           errorMessage: state is PharmacyOrdersLoadFailure ? state.message : null,
           onRetry: _ordersCubit.load,
-          onDecide: (order, {required accept}) =>
-              _ordersCubit.decide(order, accept: accept),
           onLoadDetails: _ordersCubit.loadDetails,
         ),
       ),

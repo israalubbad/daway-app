@@ -21,16 +21,4 @@ class PharmacyOrdersRemoteDataSource {
       options: authOptions(token),
     );
   }
-
-  Future<Response<dynamic>> updateStatus({
-    required String token,
-    required int orderId,
-    required String status,
-  }) {
-    return _dio.post(
-      '${ApiConstants.pharmacySubOrders}/$orderId/status',
-      data: {'status': status},
-      options: authOptions(token),
-    );
-  }
 }

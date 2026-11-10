@@ -260,7 +260,6 @@ import '../../features/accounting/presentation/cubit/sales_cubit.dart';
 import '../../features/pharmacy/data/datasources/pharmacy_orders_remote_data_source.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_orders_repository_impl.dart';
 import '../../features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
-import '../../features/pharmacy/domain/usecases/decide_pharmacy_order_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_order_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_orders_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_ratings_usecase.dart';
@@ -768,8 +767,7 @@ Future<void> setupGetIt() async {
   );
   getIt.registerLazySingleton(() => GetPharmacyOrdersUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetPharmacyOrderUseCase(getIt(), getIt()));
-  getIt.registerLazySingleton(() => DecidePharmacyOrderUseCase(getIt(), getIt()));
-  getIt.registerFactory(() => PharmacyOrdersCubit(getIt(), getIt(), getIt()));
+  getIt.registerFactory(() => PharmacyOrdersCubit(getIt(), getIt()));
 
   // ---------------- Pharmacy Inquiries ----------------
   getIt.registerLazySingleton(() => PharmacyInquiriesRemoteDataSource(getIt()));

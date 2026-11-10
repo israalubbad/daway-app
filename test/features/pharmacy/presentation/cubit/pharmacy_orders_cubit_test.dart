@@ -5,7 +5,6 @@ import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_order.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
-import 'package:daway_app/features/pharmacy/domain/usecases/decide_pharmacy_order_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_order_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_orders_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
@@ -23,10 +22,7 @@ PharmacyOrder _order(int id) => PharmacyOrder(
 
 class _FakeOrdersRepository implements PharmacyOrdersRepository {
   ApiResult<List<PharmacyOrder>> orders = Success([_order(1)]);
-  ApiResult<void> decision = const Success(null);
   ApiResult<PharmacyOrder> detail = Success(_order(1));
-  int? decidedId;
-  bool? accepted;
   int fetches = 0;
 
   @override
@@ -38,16 +34,6 @@ class _FakeOrdersRepository implements PharmacyOrdersRepository {
   @override
   Future<ApiResult<PharmacyOrder>> getOrder({required String token, required int orderId}) async => detail;
 
-  @override
-  Future<ApiResult<void>> decide({
-    required String token,
-    required int orderId,
-    required bool accept,
-  }) async {
-    decidedId = orderId;
-    accepted = accept;
-    return decision;
-  }
 }
 
 class _FakeSessionRepository implements SessionRepository {
@@ -71,7 +57,6 @@ void main() {
     final session = _FakeSessionRepository();
     cubit = PharmacyOrdersCubit(
       GetPharmacyOrdersUseCase(repository, session),
-      DecidePharmacyOrderUseCase(repository, session),
       GetPharmacyOrderUseCase(repository, session),
     );
   });
@@ -97,47 +82,5 @@ void main() {
     await cubit.load();
 
     expect((cubit.state as PharmacyOrdersLoadFailure).message, 'تعذر التحميل');
-  });
-
-  test('accepting sends the id and refreshes the list', () async {
-    await cubit.load();
-    final fetchesBefore = repository.fetches;
-
-    final error = await cubit.decide(_order(1), accept: true);
-
-    expect(error, isNull);
-    expect(repository.decidedId, 1);
-    expect(repository.accepted, isTrue);
-    expect(repository.fetches, greaterThan(fetchesBefore));
-  });
-
-  test('a rejected decision returns the backend message and keeps the list', () async {
-    await cubit.load();
-    repository.decision = const ApiError(ApiFailure(message: 'الطلب تم البت فيه'));
-
-    final error = await cubit.decide(_order(1), accept: false);
-
-    expect(error, 'الطلب تم البت فيه');
-    expect(cubit.state, isA<PharmacyOrdersLoaded>());
-  });
-
-  test('a decided order shows as decided even when the refetch fails', () async {
-    await cubit.load();
-    repository.orders = const ApiError(ApiFailure(message: 'offline'));
-
-    final error = await cubit.decide(_order(1), accept: true);
-
-    expect(error, isNull);
-    final orders = (cubit.state as PharmacyOrdersLoaded).orders;
-    expect(orders.single.status, PharmacyOrderStatus.accepted);
-  });
-
-  test('a rejection is shown as rejected', () async {
-    await cubit.load();
-    repository.orders = const ApiError(ApiFailure(message: 'offline'));
-
-    await cubit.decide(_order(1), accept: false);
-
-    expect((cubit.state as PharmacyOrdersLoaded).orders.single.status, PharmacyOrderStatus.rejected);
   });
 }
