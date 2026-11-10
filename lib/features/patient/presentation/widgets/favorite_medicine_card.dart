@@ -14,12 +14,12 @@ import '../helpers/pharmacy_availability_label.dart';
 /// that chip isn't modeled here — add it back once the backend returns one.
 class FavoriteMedicineCard extends StatelessWidget {
   final FavoriteMedicine medicine;
-  final VoidCallback onCompareTap;
+  final VoidCallback onDetailsTap;
 
   const FavoriteMedicineCard({
     super.key,
     required this.medicine,
-    required this.onCompareTap,
+    required this.onDetailsTap,
   });
 
   @override
@@ -133,7 +133,7 @@ class FavoriteMedicineCard extends StatelessWidget {
           SizedBox(
             height: 56.h,
             child: ElevatedButton(
-              onPressed: onCompareTap,
+              onPressed: onDetailsTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainTeal,
                 foregroundColor: Colors.white,
@@ -143,10 +143,8 @@ class FavoriteMedicineCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset('assets/icons/price_comparison.svg', width: 14.w, height: 14.w),
-                  SizedBox(width: 6.w),
                   Text(
-                    'مقارنة الأسعار',
+                    'تفاصيل الدواء',
                     style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700),
                   ),
                 ],

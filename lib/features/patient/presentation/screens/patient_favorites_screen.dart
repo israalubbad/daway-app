@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/empty_state_view.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../cubit/favorite_medicines_cubit.dart';
@@ -17,7 +16,8 @@ import '../widgets/patient_sub_screen_header.dart';
 class PatientFavoritesScreen extends StatelessWidget {
   const PatientFavoritesScreen({super.key});
 
-  void _compareTap(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  void _openDetails(BuildContext context, int medicineId) =>
+      Navigator.of(context).pushNamed(Routes.medicineDetailScreen, arguments: medicineId);
 
   void _browseProducts(BuildContext context) {
     Navigator.of(context).pushNamed(Routes.allCategoriesScreen);
@@ -62,7 +62,7 @@ class PatientFavoritesScreen extends StatelessWidget {
                           for (final medicine in medicines) ...[
                             FavoriteMedicineCard(
                               medicine: medicine,
-                              onCompareTap: () => _compareTap(context),
+                              onDetailsTap: () => _openDetails(context, medicine.medicineId),
                             ),
                             SizedBox(height: 24.h),
                           ],
