@@ -33,6 +33,7 @@ class PharmacyOrderModel {
         jsonString(address?['city']) ??
         jsonString(address?['label']) ??
         jsonString(json['area']) ??
+        _fulfillmentLabel(jsonString(json['fulfillment_method'])) ??
         '';
     final street = jsonString(address?['street']) ??
         jsonString(address?['address']) ??
@@ -57,6 +58,7 @@ class PharmacyOrderModel {
         orderNumber: jsonString(json['order_number']) ??
             jsonString(parent?['order_number']) ??
             jsonString(json['number']) ??
+            jsonString(json['order_id']) ??
             '$id',
         createdAt: createdAt,
         // A list response often carries only the count, not the lines.
@@ -107,6 +109,13 @@ class PharmacyOrderModel {
     return null;
   }
 
+  /// Where an order without an address is going, from `fulfillment_method`.
+  static String? _fulfillmentLabel(String? method) => switch (method?.toLowerCase()) {
+    'delivery' => 'توصيل',
+    'pickup' => 'استلام من الصيدلية',
+    _ => null,
+  };
+
   static PharmacyOrderPayment? _payment(
     Map<String, dynamic> json,
     Map<String, dynamic>? parent,
@@ -116,7 +125,8 @@ class PharmacyOrderModel {
         jsonString(raw?['payment_method']) ??
         jsonString(json['payment_method']) ??
         jsonString(parent?['payment_method']);
-    if (method == null) return null;
+    final hasStatus = json['payment_status'] != null || raw?['status'] != null;
+    if (method == null && !hasStatus) return null;
     final paid = raw?['status'] == 'paid' ||
         raw?['is_paid'] == true ||
         json['payment_status'] == 'paid' ||

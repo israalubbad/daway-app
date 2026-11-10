@@ -51,6 +51,32 @@ void main() {
     expect(item.price, 12);
   });
 
+  test('parses a real /pharmacy/sub-orders record', () {
+    final order = PharmacyOrderModel.fromJson({
+      'id': 14,
+      'order_id': 16,
+      'pharmacy_name': 'صيدلية الأمل',
+      'total': 80,
+      'status': 'confirmed',
+      'payment_status': 'pending',
+      'created_at': '2026-11-09 13:44:27',
+      'patient': {'name': 'Postman Test Patient'},
+      'fulfillment_method': 'delivery',
+      'items': [
+        {'id': 17, 'medicine_trade_name': 'Brufen', 'quantity': 2, 'unit_price': 40, 'total_price': 80},
+      ],
+    }).order;
+
+    expect(order.id, 14);
+    expect(order.orderNumber, '16');
+    expect(order.patientName, 'Postman Test Patient');
+    expect(order.total, 80);
+    expect(order.area, 'توصيل');
+    expect(order.payment!.isPaid, isFalse);
+    expect(order.payment!.method, isNull);
+    expect(order.items.single.name, 'Brufen');
+  });
+
   test('a bare record still parses, with the id as its number', () {
     final order = PharmacyOrderModel.fromJson({'id': 3}).order;
 

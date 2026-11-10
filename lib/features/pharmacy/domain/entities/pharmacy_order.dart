@@ -95,12 +95,12 @@ class PharmacyOrderItem {
 
 /// How an order is paid, and whether it already has been.
 class PharmacyOrderPayment {
-  /// "محفظة إلكترونية".
-  final String method;
+  /// "محفظة إلكترونية"; null when the API gives only the payment status.
+  final String? method;
 
   /// Extra line under the method ("فوري باي · ****4827"), when there is one.
   final String? detail;
   final bool isPaid;
 
-  const PharmacyOrderPayment({required this.method, this.detail, required this.isPaid});
+  const PharmacyOrderPayment({this.method, this.detail, required this.isPaid});
 }

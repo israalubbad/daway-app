@@ -384,8 +384,10 @@ class _PaymentCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 16.h),
-          Text(payment.method, style: AppTextStyles.pharmacyOrderNumber),
+          if (payment.method case final method?) ...[
+            SizedBox(height: 16.h),
+            Text(method, style: AppTextStyles.pharmacyOrderNumber),
+          ],
           if (payment.detail case final detail?) ...[
             SizedBox(height: 8.h),
             Text(detail, style: AppTextStyles.settingsMutedText),
