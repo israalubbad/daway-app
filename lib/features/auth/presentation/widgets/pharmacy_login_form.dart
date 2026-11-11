@@ -8,7 +8,7 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../cubit/pharmacy_auth_cubit.dart';
 import '../cubit/pharmacy_auth_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Pharmacy ID + password fields shown on [PharmacyAuthScreen].
 

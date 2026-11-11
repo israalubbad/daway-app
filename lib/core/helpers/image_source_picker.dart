@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../theming/app_colors.dart';
-
+
 import '../../core/localization/translations.dart';
 /// Shows a camera/gallery bottom sheet and returns the picked file, or null
 

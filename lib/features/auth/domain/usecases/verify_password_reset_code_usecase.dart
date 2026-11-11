@@ -1,7 +1,7 @@
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../repositories/password_reset_repository.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The length of the verification code the backend sends.
 

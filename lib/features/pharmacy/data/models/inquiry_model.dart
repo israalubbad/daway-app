@@ -1,5 +1,5 @@
 import '../../domain/entities/inquiry.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/inquiries` (confirmed against a live
 

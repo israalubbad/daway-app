@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_colors.dart';
-
+
 import '../../core/localization/translations.dart';
 /// Tap-to-open field backed by [showDatePicker]. Stores/returns the date as
 

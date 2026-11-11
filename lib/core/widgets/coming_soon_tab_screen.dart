@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
-
+
 import '../../core/localization/translations.dart';
 /// Placeholder for a bottom-nav tab that doesn't have a real screen yet —
 

@@ -8,7 +8,7 @@ import '../cubit/patient_auth_cubit.dart';
 import '../cubit/patient_auth_state.dart';
 import '../widgets/patient_phone_form.dart';
 import 'otp_verification_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class PatientAuthScreen extends StatelessWidget {
 

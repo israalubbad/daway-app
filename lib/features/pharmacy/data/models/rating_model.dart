@@ -1,5 +1,5 @@
 import '../../domain/entities/rating.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/ratings`. Only `stars` is confirmed
 

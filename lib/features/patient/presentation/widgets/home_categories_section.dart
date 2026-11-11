@@ -9,7 +9,7 @@ import '../../domain/entities/category.dart';
 import '../cubit/categories_cubit.dart';
 import '../cubit/categories_state.dart';
 import 'category_icon.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// How many categories the home grid shows — matches the design's 3x2 grid;
 

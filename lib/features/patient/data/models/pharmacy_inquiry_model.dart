@@ -1,6 +1,6 @@
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_inquiry.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class PharmacyInquiryModel {
 

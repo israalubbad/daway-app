@@ -5,7 +5,7 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/patient_address.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The names an address can be given. "آخر" is the catch-all, stored as-is.
 

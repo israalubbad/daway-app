@@ -18,7 +18,7 @@ import '../../domain/entities/nearby_pharmacy.dart';
 import '../cubit/nearby_pharmacies_cubit.dart';
 import '../cubit/nearby_pharmacies_state.dart';
 import '../helpers/pharmacy_marker.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "اكتشف الصيدليات القريبة منك" from the home screen — a live map (see
 

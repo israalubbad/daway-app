@@ -12,7 +12,7 @@ import '../cubit/patient_notifications_state.dart';
 import '../helpers/patient_notification_display.dart';
 import '../widgets/notification_item.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "الإشعارات" — backed by the real `GET /notifications` endpoint. Expects a
 

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../core/widgets/app_snackbar.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The shell's tabs, in the order [PharmacyDashboardShellScreen] builds
 

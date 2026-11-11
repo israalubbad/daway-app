@@ -11,7 +11,7 @@ import '../../../../core/models/picked_location.dart';
 import '../cubit/location_picker_cubit.dart';
 import '../cubit/location_picker_state.dart';
 import '../widgets/location_search_bar.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Interactive map with a pin fixed at the screen center — the user drags
 

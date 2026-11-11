@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The quantity on a product card with its two buttons: "−" first, then the
 

@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import 'patient_dashboard_tab_scope.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Custom 5-item bottom navigation bar for [PatientDashboardShellScreen] —
 

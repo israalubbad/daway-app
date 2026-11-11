@@ -11,7 +11,7 @@ import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
 import '../widgets/patient_profile_avatar.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "معلومات الحساب": the name and birth date are inputs you simply tap and
 

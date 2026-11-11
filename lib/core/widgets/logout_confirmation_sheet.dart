@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 import 'app_bottom_sheet.dart';
-
+
 import '../../core/localization/translations.dart';
 /// Bottom-sheet confirmation shown before ending the user's session. Purely
 

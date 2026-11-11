@@ -8,7 +8,7 @@ import '../cubit/home_location_cubit.dart';
 import '../../../../core/widgets/header_icon_button.dart';
 import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Greeting + cart/notification actions + the patient's saved location —
 

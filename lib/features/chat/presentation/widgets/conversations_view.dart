@@ -10,7 +10,7 @@ import '../../../../core/widgets/profile_load_error.dart';
 import '../../domain/entities/chat_conversation.dart';
 import '../cubit/conversations_cubit.dart';
 import '../cubit/conversations_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The "الاستشارات / الاستفسارات" list, identical for patient and pharmacy:
 

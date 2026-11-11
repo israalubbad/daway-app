@@ -10,7 +10,7 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import '../screens/patient_settings_screen.dart';
 import 'patient_dashboard_tab_scope.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Drawer shown from every tab inside [PatientDashboardShellScreen] — each
 

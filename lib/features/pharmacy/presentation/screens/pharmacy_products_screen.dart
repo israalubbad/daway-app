@@ -15,7 +15,7 @@ import '../widgets/product_action_card.dart';
 import '../widgets/product_card.dart';
 import '../widgets/product_filter_chips.dart';
 import '../widgets/product_search_field.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "اجمالي المنتجات": the pharmacy's medicines, opened from the الرئيسية card
 

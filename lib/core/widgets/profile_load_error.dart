@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_text_styles.dart';
 import 'app_custom_button.dart';
-
+
 import '../../core/localization/translations.dart';
 /// Centered error message + retry button, shown when a profile screen
 

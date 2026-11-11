@@ -4,7 +4,7 @@ import '../../../../core/helpers/api_result.dart';
 import '../../domain/entities/device_setting.dart';
 import '../../domain/repositories/device_permissions_repository.dart';
 import '../datasources/device_settings_data_source.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class DevicePermissionsRepositoryImpl implements DevicePermissionsRepository {
 

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/header_icon_button.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The top of a password-reset screen: the back chip, the title, and the line
 

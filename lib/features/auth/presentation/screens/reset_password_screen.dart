@@ -12,7 +12,7 @@ import '../cubit/password_reset_state.dart';
 import '../widgets/auth_flow_header.dart';
 import '../widgets/password_reset_notice_listener.dart';
 import 'password_updated_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The third screen of resetting a password: choosing the new one.
 

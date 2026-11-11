@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/medicine.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Shared by every widget that colors itself off a [MedicineStatus] — keeps
 

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/medicine.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The small tinted tag on a product card that says how the stock stands:
 

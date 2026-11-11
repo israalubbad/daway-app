@@ -13,7 +13,7 @@ import '../../domain/entities/patient_health_profile.dart';
 import '../cubit/health_profile_cubit.dart';
 import '../cubit/health_profile_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "الملف الصحي" — blood type, allergies, chronic diseases and notes, backed
 

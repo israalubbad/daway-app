@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The last screen of resetting a password: a card in the middle of the screen
 

@@ -2,7 +2,7 @@ import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../entities/pharmacy_auth_result.dart';
 import '../repositories/auth_repository.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class PharmacyLoginUseCase {
 

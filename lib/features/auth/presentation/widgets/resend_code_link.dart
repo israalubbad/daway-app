@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Helper link under a verification-code field to ask for the code again, gated
 

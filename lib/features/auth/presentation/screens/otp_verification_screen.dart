@@ -10,7 +10,7 @@ import '../cubit/patient_auth_state.dart';
 import '../widgets/otp_verification_form.dart';
 import 'location_permission_screen.dart';
 import 'notifications_permission_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class OtpVerificationScreen extends StatelessWidget {
 

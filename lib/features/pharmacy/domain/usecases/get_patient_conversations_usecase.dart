@@ -3,7 +3,7 @@ import '../../../chat/domain/entities/chat_conversation.dart';
 import '../../../chat/domain/entities/chat_message.dart';
 import '../entities/inquiry.dart';
 import 'get_pharmacy_inquiries_usecase.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The pharmacy's conversations: one per patient, however many inquiries they
 

@@ -25,7 +25,7 @@ import '../widgets/language_bottom_sheet.dart';
 import '../widgets/patient_sub_screen_header.dart';
 import '../../../../core/widgets/settings_brand_footer.dart';
 import '../../../../core/widgets/settings_section_label.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The account-settings screen (opened from the account hub's "الإعدادات"
 

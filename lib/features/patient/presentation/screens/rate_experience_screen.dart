@@ -12,7 +12,7 @@ import '../../../../core/widgets/star_rating.dart';
 import '../cubit/rate_experience_cubit.dart';
 import '../cubit/rate_experience_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "قيم تجربتك معنا" — rates the pharmacy only (stars + notes) and sends it to
 

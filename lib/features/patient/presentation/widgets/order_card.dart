@@ -8,7 +8,7 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/order.dart';
 import 'order_status_badge.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// One order in "طلباتي" — pharmacy name/status, an item/price/location
 

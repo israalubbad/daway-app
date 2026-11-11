@@ -7,7 +7,7 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/header_icon_button.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../cubit/pharmacy_profile_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Greeting, the pharmacy's address and the notifications button — the top
 

@@ -1,5 +1,5 @@
 import '../../domain/entities/patient_notification.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The filter tabs on the notifications screen.
 

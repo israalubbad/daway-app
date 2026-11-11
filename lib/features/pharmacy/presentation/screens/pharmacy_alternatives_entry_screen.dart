@@ -14,7 +14,7 @@ import '../cubit/pharmacy_alternatives_medicines_cubit.dart';
 import '../cubit/pharmacy_alternatives_medicines_state.dart';
 import '../helpers/medicine_text_display.dart';
 import '../widgets/medicine_status_badge.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Entry point for "البدائل" from the side menu: every medicine in stock,
 

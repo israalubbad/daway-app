@@ -14,7 +14,7 @@ import '../widgets/auth_flow_header.dart';
 import '../widgets/password_reset_notice_listener.dart';
 import '../widgets/resend_code_link.dart';
 import 'reset_password_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The second screen of resetting a password: the code sent to the phone.
 

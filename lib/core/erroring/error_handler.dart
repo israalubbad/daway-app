@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import 'api_error_model.dart';
 import 'failure.dart';
-
+
 import '../../core/localization/translations.dart';
 String get _genericErrorMessage => 'حدث خطأ ما، يرجى المحاولة لاحقاً'.tr;
 

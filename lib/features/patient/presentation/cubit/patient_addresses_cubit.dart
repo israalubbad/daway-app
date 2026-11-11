@@ -9,7 +9,7 @@ import '../../domain/usecases/get_patient_addresses_usecase.dart';
 import '../../domain/usecases/get_patient_profile_usecase.dart';
 import '../../domain/usecases/update_patient_address_usecase.dart';
 import 'patient_addresses_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Drives "عناويني". The screen has no name/phone fields of its own (see
 

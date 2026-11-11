@@ -5,7 +5,7 @@ import '../../domain/entities/order.dart';
 import '../../domain/usecases/cancel_order_usecase.dart';
 import '../../domain/usecases/get_orders_usecase.dart';
 import 'orders_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class OrdersCubit extends Cubit<OrdersState> {
 

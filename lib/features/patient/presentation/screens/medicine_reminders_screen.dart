@@ -11,7 +11,7 @@ import '../../domain/entities/medicine_reminder.dart';
 import '../cubit/reminders_cubit.dart';
 import '../cubit/reminders_state.dart';
 import 'add_medicine_reminder_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 import '../../../../core/widgets/mirror_when_ltr.dart';
 class MedicineRemindersScreen extends StatelessWidget {

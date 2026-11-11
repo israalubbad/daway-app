@@ -11,7 +11,7 @@ import '../../../../core/widgets/profile_load_error.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 import '../widgets/chat_widgets.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Arguments to open a chat: the [inquiryIds] of a conversation (newest
 

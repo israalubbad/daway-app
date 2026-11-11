@@ -6,7 +6,7 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../cubit/location_picker_cubit.dart';
 import '../cubit/location_picker_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Free-text address search bar floated over the top of the map. Reuses
 

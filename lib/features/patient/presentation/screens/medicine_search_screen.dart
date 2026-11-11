@@ -13,7 +13,7 @@ import '../../domain/entities/searched_medicine.dart';
 import '../cubit/medicine_search_cubit.dart';
 import '../cubit/medicine_search_state.dart';
 import '../widgets/searched_medicine_card.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Static fallback for "الأكثر بحثاً" — there's no trending/popular-search
 

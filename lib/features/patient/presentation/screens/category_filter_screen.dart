@@ -8,7 +8,7 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/category_subcategory.dart';
 import '../cubit/category_medicines_cubit.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Arabic section titles for the subcategory `group_key`s the backend sends
 

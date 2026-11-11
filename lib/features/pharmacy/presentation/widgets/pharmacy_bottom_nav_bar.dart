@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import 'pharmacy_dashboard_tab_scope.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// The 5-item bottom navigation bar of [PharmacyDashboardShellScreen]: an icon
 

@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
-
+
 import '../../core/localization/translations.dart';
 import '../../core/widgets/mirror_when_ltr.dart';
 /// Section title + "عرض الكل" chip, shared by the patient home's sections and

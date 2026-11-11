@@ -8,7 +8,7 @@ import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/pharmacy_order.dart';
-
+
 import '../../../../core/localization/translations.dart';
 import '../../../../core/widgets/mirror_when_ltr.dart';
 /// One order on the pharmacy home: its number and how long ago it came in, a

@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// "ابحث بالصورة" promo card — hands off to the scan tab. Laid out as a Row
 

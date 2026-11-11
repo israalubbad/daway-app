@@ -8,7 +8,7 @@ import '../../domain/entities/chat_message.dart';
 import '../../domain/repositories/inquiry_thread_resolver.dart';
 import '../../domain/usecases/chat_usecases.dart';
 import 'chat_state.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// One conversation, for patient and pharmacy alike. A conversation can span
 

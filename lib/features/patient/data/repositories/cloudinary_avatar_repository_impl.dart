@@ -6,7 +6,7 @@ import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/repositories/avatar_repository.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Uploads directly to Cloudinary using an unsigned upload preset — there is
 

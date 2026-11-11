@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
-
+
 import '../../core/localization/translations.dart';
 /// A labelled outlined field of the auth flows: the label above (right-aligned
 

@@ -11,7 +11,7 @@ import '../cubit/pharmacy_sign_up_cubit.dart';
 import '../cubit/pharmacy_sign_up_state.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/terms_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Pharmacy name / phone / address / password fields shown on
 

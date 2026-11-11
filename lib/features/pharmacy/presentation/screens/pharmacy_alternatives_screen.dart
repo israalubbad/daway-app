@@ -13,7 +13,7 @@ import '../cubit/pharmacy_alternatives_state.dart';
 import '../helpers/medicine_text_display.dart';
 import '../widgets/alternative_candidate_card.dart';
 import '../widgets/medicine_status_badge.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class PharmacyAlternativesScreen extends StatelessWidget {
 

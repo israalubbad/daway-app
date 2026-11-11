@@ -9,7 +9,7 @@ import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../../core/models/picked_location.dart';
 import '../../domain/repositories/location_repository.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class LocationRepositoryImpl implements LocationRepository {
 

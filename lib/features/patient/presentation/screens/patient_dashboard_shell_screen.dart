@@ -12,7 +12,7 @@ import 'medicine_search_screen.dart';
 import 'patient_account_screen.dart';
 import 'patient_conversations_screen.dart';
 import 'patient_home_screen.dart';
-
+
 import '../../../../core/localization/translations.dart';
 /// Bottom-nav shell for the logged-in patient area. Each tab keeps its own
 
