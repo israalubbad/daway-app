@@ -1,11 +1,8 @@
 import 'package:daway_app/core/di/dependency_injection.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:daway_app/features/chat/presentation/cubit/conversations_cubit.dart';
@@ -34,6 +31,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../auth/account_closure_test_fakes.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 // The tabs' own cubits are stood in for by cubits that just sit in their
 // loading state: what these tests are about is the shell — which screen a nav
@@ -143,18 +141,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 /// The settings tab's header line — the tab has no AppBar to find by title.
 const _settingsDescription = 'إدارة معلوماتك الشخصية وتفاصيل حسابك';
 
@@ -168,7 +154,7 @@ void main() {
   setUp(() {
     dashboardCubit = _FakeDashboardCubit();
     medicinesCubits = [];
-    logoutCubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    logoutCubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository.pharmacy()));
     getIt
       ..registerFactory<PharmacyDashboardCubit>(() => dashboardCubit)
       ..registerFactory<PharmacyMedicinesCubit>(() {

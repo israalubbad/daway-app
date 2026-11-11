@@ -1,8 +1,5 @@
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/widgets/star_rating.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_ratings_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/submit_pharmacy_rating_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/rate_experience_cubit.dart';
@@ -11,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakePatientRatingsRepository implements PatientRatingsRepository {
   ApiResult<void> result = const Success(null);
@@ -25,24 +23,6 @@ class _FakePatientRatingsRepository implements PatientRatingsRepository {
   }) async {
     lastStars = stars;
     return result;
-  }
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
   }
 }
 
@@ -61,7 +41,7 @@ void main() {
 
   setUp(() {
     repository = _FakePatientRatingsRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.patient();
     getIt.registerFactoryParam<RateExperienceCubit, int, void>(
       (pharmacyId, _) => RateExperienceCubit(
         pharmacyId,

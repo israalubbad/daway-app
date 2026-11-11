@@ -1,8 +1,5 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_notification.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_notifications_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_notifications_usecase.dart';
@@ -13,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeRepository implements PatientNotificationsRepository {
   ApiResult<List<PatientNotification>> result = const Success([]);
@@ -28,24 +26,6 @@ class _FakeRepository implements PatientNotificationsRepository {
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async =>
       result;
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
 }
 
 PatientNotification _notification(
@@ -73,8 +53,8 @@ void main() {
   // RTL like the real app — the tabs row and items are laid out right-to-left.
   Widget buildTestableScreen(_FakeRepository repository) {
     final cubit = PatientNotificationsCubit(
-      GetPatientNotificationsUseCase(repository, _FakeSessionRepository()),
-      MarkPatientNotificationReadUseCase(repository, _FakeSessionRepository()),
+      GetPatientNotificationsUseCase(repository, InMemorySessionRepository.patient()),
+      MarkPatientNotificationReadUseCase(repository, InMemorySessionRepository.patient()),
     );
     addTearDown(cubit.close);
 

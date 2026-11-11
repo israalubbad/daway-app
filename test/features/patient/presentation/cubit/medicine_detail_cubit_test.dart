@@ -1,9 +1,6 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
 import 'package:daway_app/features/patient/domain/entities/favorite_medicine.dart';
 import 'package:daway_app/features/patient/domain/entities/medicine_detail.dart';
@@ -24,6 +21,7 @@ import 'package:daway_app/features/patient/domain/usecases/remove_favorite_medic
 import 'package:daway_app/features/patient/presentation/cubit/medicine_detail_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/medicine_detail_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _medicine = MedicineDetail(id: 1, tradeName: 'Panadol');
 const _offers = [
@@ -162,31 +160,11 @@ class _FakeFavoritesRepository implements FavoritesRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.patient,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakeMedicineDetailRepository medicineDetailRepository;
   late _FakeLocationRepository locationRepository;
   late _FakeFavoritesRepository favoritesRepository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late _FakeCartRepository cartRepository;
 
   MedicineDetailCubit buildCubit() {
@@ -208,7 +186,7 @@ void main() {
     medicineDetailRepository = _FakeMedicineDetailRepository();
     locationRepository = _FakeLocationRepository();
     favoritesRepository = _FakeFavoritesRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.patient();
     cartRepository = _FakeCartRepository();
   });
 

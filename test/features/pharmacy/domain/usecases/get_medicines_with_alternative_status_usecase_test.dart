@@ -1,8 +1,5 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/alternatives_overview.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -12,6 +9,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/get_medicine_ids_wit
 import 'package:daway_app/features/pharmacy/domain/usecases/get_medicines_with_alternative_status_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _available = Medicine(
   id: 1,
@@ -132,26 +130,6 @@ class _FakeAlternativesRepository implements PharmacyAlternativesRepository {
   }) async => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakeMedicineRepository medicineRepository;
   late _FakeAlternativesRepository alternativesRepository;
@@ -160,7 +138,7 @@ void main() {
   setUp(() {
     medicineRepository = _FakeMedicineRepository();
     alternativesRepository = _FakeAlternativesRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     useCase = GetMedicinesWithAlternativeStatusUseCase(
       GetPharmacyMedicinesUseCase(medicineRepository, sessionRepository),
       GetMedicineIdsWithAlternativeUseCase(

@@ -5,9 +5,7 @@ import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/core/widgets/otp_input_field.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/save_session_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/verify_otp_usecase.dart';
@@ -19,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   ApiResult<String?> sendOtpResult = const Success(null);
@@ -61,23 +60,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 class _FakeLocationRepository implements LocationRepository {
   @override
   Future<ApiResult<PickedLocation>> getCurrentLocation() async =>
@@ -106,7 +88,7 @@ void main() {
     return PatientAuthCubit(
       SendOtpUseCase(repository),
       VerifyOtpUseCase(repository),
-      SaveSessionUseCase(_FakeSessionRepository()),
+      SaveSessionUseCase(InMemorySessionRepository()),
       GetCurrentLocationUseCase(_FakeLocationRepository()),
     );
   }

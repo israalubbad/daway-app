@@ -1,14 +1,12 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_medicine_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/export_current_inventory_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeMedicineRepository implements PharmacyMedicineRepository {
   ApiResult<List<Medicine>> result = const Success([
@@ -32,18 +30,6 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 void main() {
   late _FakeMedicineRepository repository;
   late ExportCurrentInventoryUseCase useCase;
@@ -51,7 +37,7 @@ void main() {
   setUp(() {
     repository = _FakeMedicineRepository();
     useCase = ExportCurrentInventoryUseCase(
-      GetPharmacyMedicinesUseCase(repository, _FakeSessionRepository()),
+      GetPharmacyMedicinesUseCase(repository, InMemorySessionRepository.pharmacy()),
     );
   });
 

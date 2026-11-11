@@ -1,12 +1,11 @@
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   @override
@@ -45,28 +44,11 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late LogoutCubit cubit;
 
   setUp(() {
-    cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository()));
   });
 
   tearDown(() => cubit.close());

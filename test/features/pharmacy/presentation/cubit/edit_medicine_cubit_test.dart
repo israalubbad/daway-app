@@ -1,8 +1,5 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_medicine_repository.dart';
@@ -10,6 +7,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/update_pharmacy_medi
 import 'package:daway_app/features/pharmacy/presentation/cubit/edit_medicine_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/edit_medicine_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _medicine = Medicine(
   id: 7,
@@ -106,31 +104,13 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePharmacyMedicineRepository repository;
   late EditMedicineCubit cubit;
 
   setUp(() {
     repository = _FakePharmacyMedicineRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     cubit = EditMedicineCubit(
       UpdatePharmacyMedicineUseCase(repository, sessionRepository),
       _medicine,

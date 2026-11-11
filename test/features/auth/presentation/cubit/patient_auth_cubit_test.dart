@@ -4,9 +4,7 @@ import 'package:daway_app/core/models/picked_location.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/save_session_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/verify_otp_usecase.dart';
@@ -15,6 +13,7 @@ import 'package:daway_app/features/auth/presentation/cubit/patient_auth_state.da
 import 'package:daway_app/features/patient/domain/repositories/location_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_current_location_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   String? lastSendOtpPhone;
@@ -75,23 +74,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 class _FakeLocationRepository implements LocationRepository {
   ApiResult<PickedLocation> currentLocationResult =
       const Success(PickedLocation(latitude: 31.5, longitude: 34.46, address: 'غزة'));
@@ -112,13 +94,13 @@ class _FakeLocationRepository implements LocationRepository {
 
 void main() {
   late _FakeAuthRepository repository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late _FakeLocationRepository locationRepository;
   late PatientAuthCubit cubit;
 
   setUp(() {
     repository = _FakeAuthRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository();
     locationRepository = _FakeLocationRepository();
     cubit = PatientAuthCubit(
       SendOtpUseCase(repository),

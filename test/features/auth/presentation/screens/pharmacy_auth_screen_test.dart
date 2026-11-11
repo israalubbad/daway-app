@@ -2,9 +2,7 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/pharmacy_login_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/save_session_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/pharmacy_auth_cubit.dart';
@@ -15,6 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   ApiResult<PharmacyAuthResult> loginResult =
@@ -59,23 +58,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(375, 812);
@@ -104,7 +86,7 @@ void main() {
     await setPhoneViewport(tester);
     final cubit = PharmacyAuthCubit(
       PharmacyLoginUseCase(_FakeAuthRepository()),
-      SaveSessionUseCase(_FakeSessionRepository()),
+      SaveSessionUseCase(InMemorySessionRepository()),
     );
     addTearDown(cubit.close);
 
@@ -125,7 +107,7 @@ void main() {
       await setDesignViewport(tester);
       final cubit = PharmacyAuthCubit(
         PharmacyLoginUseCase(_FakeAuthRepository()),
-        SaveSessionUseCase(_FakeSessionRepository()),
+        SaveSessionUseCase(InMemorySessionRepository()),
       );
       addTearDown(cubit.close);
 
@@ -149,7 +131,7 @@ void main() {
       await setPhoneViewport(tester);
       final cubit = PharmacyAuthCubit(
         PharmacyLoginUseCase(_FakeAuthRepository()),
-        SaveSessionUseCase(_FakeSessionRepository()),
+        SaveSessionUseCase(InMemorySessionRepository()),
       );
       addTearDown(cubit.close);
 
@@ -164,7 +146,7 @@ void main() {
       await setPhoneViewport(tester);
       final cubit = PharmacyAuthCubit(
         PharmacyLoginUseCase(_FakeAuthRepository()),
-        SaveSessionUseCase(_FakeSessionRepository()),
+        SaveSessionUseCase(InMemorySessionRepository()),
       );
       addTearDown(cubit.close);
       final opened = <String?>[];
@@ -191,7 +173,7 @@ void main() {
       await setPhoneViewport(tester);
       final cubit = PharmacyAuthCubit(
         PharmacyLoginUseCase(_FakeAuthRepository()),
-        SaveSessionUseCase(_FakeSessionRepository()),
+        SaveSessionUseCase(InMemorySessionRepository()),
       );
       addTearDown(cubit.close);
 
@@ -211,7 +193,7 @@ void main() {
     await setPhoneViewport(tester);
     final cubit = PharmacyAuthCubit(
       PharmacyLoginUseCase(_FakeAuthRepository()),
-      SaveSessionUseCase(_FakeSessionRepository()),
+      SaveSessionUseCase(InMemorySessionRepository()),
     );
     addTearDown(cubit.close);
 
@@ -233,7 +215,7 @@ void main() {
     await setPhoneViewport(tester);
     final cubit = PharmacyAuthCubit(
       PharmacyLoginUseCase(_FakeAuthRepository()),
-      SaveSessionUseCase(_FakeSessionRepository()),
+      SaveSessionUseCase(InMemorySessionRepository()),
     );
     addTearDown(cubit.close);
 

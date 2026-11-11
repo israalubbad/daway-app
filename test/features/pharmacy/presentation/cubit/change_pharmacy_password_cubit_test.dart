@@ -1,12 +1,10 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_password_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/change_pharmacy_password_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/change_pharmacy_password_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakePasswordRepository implements PharmacyPasswordRepository {
   ApiResult<void> result = const Success(null);
@@ -29,18 +27,6 @@ class _FakePasswordRepository implements PharmacyPasswordRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 void main() {
   late _FakePasswordRepository repository;
   late ChangePharmacyPasswordCubit cubit;
@@ -48,7 +34,7 @@ void main() {
   setUp(() {
     repository = _FakePasswordRepository();
     cubit = ChangePharmacyPasswordCubit(
-      ChangePharmacyPasswordUseCase(repository, _FakeSessionRepository()),
+      ChangePharmacyPasswordUseCase(repository, InMemorySessionRepository.pharmacy()),
     );
   });
 

@@ -4,9 +4,6 @@ import 'dart:io';
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/avatar_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/upload_avatar_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_profile.dart';
@@ -17,6 +14,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/update_pharmacy_prof
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _savedProfile = PharmacyProfile(
   pharmacyId: 'PH-1234',
@@ -59,24 +57,6 @@ class _FakePharmacyProfileRepository implements PharmacyProfileRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 class _FakeAvatarRepository implements AvatarRepository {
   ApiResult<String> result = const Success('https://example.com/logo.jpg');
 
@@ -99,7 +79,7 @@ void main() {
   setUp(() async {
     profileRepository = _FakePharmacyProfileRepository();
     logoRepository = _FakeAvatarRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     cubit = PharmacyProfileCubit(
       GetPharmacyProfileUseCase(profileRepository, sessionRepository),
       UpdatePharmacyProfileUseCase(profileRepository, sessionRepository),

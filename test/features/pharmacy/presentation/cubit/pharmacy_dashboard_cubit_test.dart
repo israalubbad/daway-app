@@ -2,15 +2,13 @@ import 'dart:async';
 
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/pharmacy_dashboard_stats.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_dashboard_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_dashboard_stats_usecase.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_dashboard_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_dashboard_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _stats = PharmacyDashboardStats(
   totalMedicines: 10,
@@ -55,26 +53,6 @@ class _FakePharmacyDashboardRepository implements PharmacyDashboardRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePharmacyDashboardRepository repository;
   late PharmacyDashboardCubit cubit;
@@ -82,7 +60,7 @@ void main() {
   setUp(() async {
     repository = _FakePharmacyDashboardRepository();
     cubit = PharmacyDashboardCubit(
-      GetPharmacyDashboardStatsUseCase(repository, _FakeSessionRepository()),
+      GetPharmacyDashboardStatsUseCase(repository, InMemorySessionRepository.pharmacy()),
     );
     await cubit.load();
   });
@@ -161,7 +139,7 @@ void main() {
     test('leaves a load that is still on its way to finish, without a second fetch', () async {
       final slowRepository = _FakePharmacyDashboardRepository()..gate = Completer<void>();
       final slowCubit = PharmacyDashboardCubit(
-        GetPharmacyDashboardStatsUseCase(slowRepository, _FakeSessionRepository()),
+        GetPharmacyDashboardStatsUseCase(slowRepository, InMemorySessionRepository.pharmacy()),
       );
       addTearDown(slowCubit.close);
       await Future<void>.delayed(Duration.zero);

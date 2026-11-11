@@ -2,9 +2,6 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
 import 'package:daway_app/core/routing/routes.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_flow.dart';
 import 'package:daway_app/features/patient/domain/repositories/checkout_flow_repository.dart';
@@ -33,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _items = [
   CartItem(
@@ -277,22 +275,6 @@ class _FakeCheckoutFlowRepository implements CheckoutFlowRepository {
   }) => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.patient,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(440, 956);
@@ -305,13 +287,13 @@ void main() {
   late _FakeCartRepository cartRepository;
   late _FakeAddressesRepository addressesRepository;
   late _FakeOrdersRepository ordersRepository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
 
   setUp(() {
     cartRepository = _FakeCartRepository();
     addressesRepository = _FakeAddressesRepository();
     ordersRepository = _FakeOrdersRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.patient();
 
     getIt.registerFactory<CartCubit>(
       () => CartCubit(

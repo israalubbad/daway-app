@@ -1,8 +1,5 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
@@ -11,6 +8,7 @@ import 'package:daway_app/features/patient/domain/usecases/get_orders_usecase.da
 import 'package:daway_app/features/patient/presentation/cubit/orders_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/orders_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 final _order = Order(
   orderNumber: '1',
@@ -51,26 +49,13 @@ class _FakeOrdersRepository implements OrdersRepository {
       const Success(1);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   late _FakeOrdersRepository repository;
 
   OrdersCubit buildCubit() =>
       OrdersCubit(
-        GetOrdersUseCase(repository, _FakeSessionRepository()),
-        CancelOrderUseCase(repository, _FakeSessionRepository()),
+        GetOrdersUseCase(repository, InMemorySessionRepository.patient()),
+        CancelOrderUseCase(repository, InMemorySessionRepository.patient()),
       );
 
   setUp(() {

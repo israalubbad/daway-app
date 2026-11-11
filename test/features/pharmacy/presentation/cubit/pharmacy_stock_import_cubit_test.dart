@@ -2,9 +2,6 @@ import 'dart:typed_data';
 
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/inventory_import_preview.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_inventory_import_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/analyze_inventory_import_usecase.dart';
@@ -17,6 +14,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicin
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_stock_import_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _preview = InventoryImportPreview(
   importId: 'uuid-7',
@@ -65,25 +63,13 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 void main() {
   late _FakeImportRepository repository;
   late PharmacyStockImportCubit cubit;
 
   setUp(() {
     repository = _FakeImportRepository();
-    final session = _FakeSessionRepository();
+    final session = InMemorySessionRepository.pharmacy();
     cubit = PharmacyStockImportCubit(
       AnalyzeInventoryImportUseCase(repository, session),
       CommitInventoryImportUseCase(repository, session),

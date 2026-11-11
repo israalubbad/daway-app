@@ -2,12 +2,12 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeOrdersRepository implements OrdersRepository {
 
@@ -49,23 +49,10 @@ class _FakeOrdersRepository implements OrdersRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   test('passes the session token, address id and coupon through to the repository', () async {
     final repository = _FakeOrdersRepository();
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = CheckoutUseCase(repository, sessionRepository);
 
@@ -79,7 +66,7 @@ void main() {
 
   test('returns a session failure without calling the repository when logged out', () async {
     final repository = _FakeOrdersRepository();
-    final useCase = CheckoutUseCase(repository, _FakeSessionRepository());
+    final useCase = CheckoutUseCase(repository, InMemorySessionRepository());
 
     final result = await useCase(addressId: 1);
 
@@ -90,7 +77,7 @@ void main() {
   test('surfaces a repository failure (e.g. empty cart) unchanged', () async {
     final repository = _FakeOrdersRepository()
       ..checkoutResult = const ApiError(ApiFailure(message: 'السلة فارغة'));
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = CheckoutUseCase(repository, sessionRepository);
 
@@ -108,7 +95,7 @@ void main() {
       grandTotal: 89,
     );
     final repository = _FakeOrdersRepository();
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = CheckoutUseCase(repository, sessionRepository);
 
@@ -120,7 +107,7 @@ void main() {
 
   test('sends no quote and no key when none is given', () async {
     final repository = _FakeOrdersRepository();
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = CheckoutUseCase(repository, sessionRepository);
 

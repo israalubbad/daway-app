@@ -2,11 +2,11 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/favorite_medicine.dart';
 import 'package:daway_app/features/patient/domain/repositories/favorites_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/add_favorite_medicine_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeFavoritesRepository implements FavoritesRepository {
   ApiResult<void> addResult = const Success(null);
@@ -35,27 +35,10 @@ class _FakeFavoritesRepository implements FavoritesRepository {
       const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   test('passes the session token and medicine id through to the repository', () async {
     final repository = _FakeFavoritesRepository();
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = AddFavoriteMedicineUseCase(repository, sessionRepository);
 
@@ -68,7 +51,7 @@ void main() {
 
   test('returns a session failure without calling the repository when logged out', () async {
     final repository = _FakeFavoritesRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository();
     final useCase = AddFavoriteMedicineUseCase(repository, sessionRepository);
 
     final result = await useCase(1);
@@ -80,7 +63,7 @@ void main() {
   test('surfaces a repository failure unchanged', () async {
     final repository = _FakeFavoritesRepository()
       ..addResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = AddFavoriteMedicineUseCase(repository, sessionRepository);
 

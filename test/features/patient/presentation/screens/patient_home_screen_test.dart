@@ -7,12 +7,9 @@ import 'dart:io';
 
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:daway_app/features/patient/domain/entities/category.dart';
@@ -33,6 +30,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _profile = PatientProfile(
   name: 'فارس حميد',
@@ -82,23 +80,6 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
 }
 
 class _FakePatientProfileRepository implements PatientProfileRepository {
@@ -165,7 +146,7 @@ void main() {
   final getIt = GetIt.instance;
 
   setUp(() {
-    final profileSessionRepository = _FakeSessionRepository();
+    final profileSessionRepository = InMemorySessionRepository.patient();
     final profileRepository = _FakePatientProfileRepository();
     getIt.registerFactory<PatientProfileCubit>(
       () => PatientProfileCubit(
@@ -205,7 +186,7 @@ void main() {
   testWidgets('shows the greeting with the patient name and the loaded categories',
       (tester) async {
     await setPhoneViewport(tester);
-    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository.patient()));
     addTearDown(cubit.close);
 
     await tester.pumpWidget(buildTestableScreen(cubit));
@@ -219,7 +200,7 @@ void main() {
   testWidgets('navigates to the logout farewell screen once LogoutCubit reports logged out',
       (tester) async {
     await setPhoneViewport(tester);
-    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository.patient()));
     addTearDown(cubit.close);
 
     final visitedRoutes = <String>[];
@@ -235,7 +216,7 @@ void main() {
 
   testWidgets('tapping the cart icon navigates to the cart screen', (tester) async {
     await setPhoneViewport(tester);
-    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    final cubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository.patient()));
     addTearDown(cubit.close);
     final visitedRoutes = <String>[];
 

@@ -1,9 +1,6 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/favorite_medicine.dart';
 import 'package:daway_app/features/patient/domain/repositories/favorites_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_favorite_medicines_usecase.dart';
@@ -13,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeFavoritesRepository implements FavoritesRepository {
   ApiResult<List<FavoriteMedicine>> result = const Success([]);
@@ -36,24 +34,6 @@ class _FakeFavoritesRepository implements FavoritesRepository {
       const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(375, 812);
@@ -67,7 +47,7 @@ void main() {
     List<String>? visitedRoutes,
   }) {
     final cubit = FavoriteMedicinesCubit(
-      GetFavoriteMedicinesUseCase(repository, _FakeSessionRepository()),
+      GetFavoriteMedicinesUseCase(repository, InMemorySessionRepository.patient()),
     );
     addTearDown(cubit.close);
 
