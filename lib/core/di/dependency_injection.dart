@@ -649,7 +649,7 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => AccountSettingsCubit(getIt(), getIt()));
 
   // ---------------- Medicine Reminders ----------------
-  getIt.registerLazySingleton(() => ReminderLocalDataSource());
+  getIt.registerLazySingleton(() => ReminderLocalDataSource(getIt()));
   getIt.registerLazySingleton<ReminderRepository>(
     () => ReminderRepositoryImpl(getIt()),
   );
