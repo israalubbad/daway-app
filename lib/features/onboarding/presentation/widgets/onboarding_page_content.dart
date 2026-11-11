@@ -5,8 +5,9 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/onboarding_page.dart';
+import 'artwork/onboarding_artwork_view.dart';
 import 'onboarding_indicator.dart';
-
+
 import '../../../../core/localization/translations.dart';
 class OnboardingPageContent extends StatelessWidget {
 
@@ -14,6 +15,7 @@ class OnboardingPageContent extends StatelessWidget {
   final int pageCount;
   final int currentIndex;
   final bool isLast;
+
   final VoidCallback onActionPressed;
   final VoidCallback onSkipPressed;
 
@@ -42,7 +44,9 @@ class OnboardingPageContent extends StatelessWidget {
                 SizedBox(height: 60.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 37.w),
-                  child: page.illustrationAsset != null
+                  child: page.artwork != null
+                      ? OnboardingArtworkView(artwork: page.artwork!)
+                      : page.illustrationAsset != null
                       ? Image.asset(
                           page.illustrationAsset!,
                           height: 230.h,

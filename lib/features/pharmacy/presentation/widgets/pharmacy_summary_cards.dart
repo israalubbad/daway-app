@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
 import '../../../../core/localization/translations.dart';
 import '../../../../core/widgets/mirror_when_ltr.dart';
 /// The two big cards under the pharmacy home's header: the number of
@@ -19,12 +19,19 @@ class PharmacySummaryCards extends StatelessWidget {
   final double? monthlySales;
   final VoidCallback onProductsTap;
 
+  /// Lets a caller dress the products card from outside (the onboarding picture
+  /// scales it as a finger taps it); the app's own screens leave it out.
+  final Widget Function(Widget card)? productsCardBuilder;
+
   const PharmacySummaryCards({
     super.key,
     required this.totalProducts,
     required this.monthlySales,
     required this.onProductsTap,
+    this.productsCardBuilder,
   });
+
+  Widget _dressed(Widget card) => productsCardBuilder?.call(card) ?? card;
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +42,13 @@ class PharmacySummaryCards extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _SummaryCard(
-              title: 'إجمالي\nالمنتجات'.tr,
-              onTap: onProductsTap,
-              value: Text('$totalProducts', style: AppTextStyles.pharmacySummaryValue),
-              trailing: const _ArrowIcon(),
+            child: _dressed(
+              _SummaryCard(
+                title: 'إجمالي\nالمنتجات'.tr,
+                onTap: onProductsTap,
+                value: Text('$totalProducts', style: AppTextStyles.pharmacySummaryValue),
+                trailing: const _ArrowIcon(),
+              ),
             ),
           ),
           SizedBox(width: 8.w),

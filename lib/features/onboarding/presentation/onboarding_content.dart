@@ -24,14 +24,17 @@ List<OnboardingPage> get patientOnboardingPages => [
 /// renders a placeholder box when `illustrationAsset` is null.
 List<OnboardingPage> get pharmacyOnboardingPages => [
   OnboardingPage(
+    artwork: OnboardingArtwork.pharmacyProducts,
     title: 'تحكم بمنتجات صيدليتك'.tr,
     subtitle: 'حدّث الأسعار والمخزون وتوفر المنتجات بكل سهولة.'.tr,
   ),
   OnboardingPage(
+    artwork: OnboardingArtwork.pharmacyOrders,
     title: 'استقبل طلباتك بسهولة'.tr,
     subtitle: 'استقبل طلبات العملاء وراجع تفاصيلها قبل قبولها أو رفضها.'.tr,
   ),
   OnboardingPage(
+    artwork: OnboardingArtwork.pharmacyChat,
     title: 'تواصل مباشرة مع عملائك'.tr,
     subtitle: 'أجب عن استفسارات العملاء وتابع محادثاتهم من مكان واحد.'.tr,
   ),

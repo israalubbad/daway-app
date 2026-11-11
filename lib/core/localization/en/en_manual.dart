@@ -52,4 +52,13 @@ const Map<String, String> enManual = {
   'المنزل': 'Home',
   'العمل': 'Work',
   'آخر': 'Other',
+  // The pharmacy onboarding pictures (sample pharmacy, area and chat).
+  'صيدلية النور': 'Al-Nour Pharmacy',
+  'غزة - الرمال': 'Gaza - Al-Remal',
+  'غزة - النصر': 'Gaza - Al-Nasr',
+  'نشط الان': 'Active now',
+  'هل بانادول متوفر عندكم؟': 'Do you have Panadol in stock?',
+  'أهلاً فيك، أكيد متوفر': 'Welcome, yes it is in stock',
+  'بكم الشريط؟': 'How much is a strip?',
+  'الشريط بـ 12 شيكل': 'A strip is 12 shekels',
 };
