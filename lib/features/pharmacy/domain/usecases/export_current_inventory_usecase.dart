@@ -7,6 +7,8 @@ import '../../../../core/helpers/api_result.dart';
 import '../entities/medicine.dart';
 import 'get_pharmacy_medicines_usecase.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Builds the pharmacy's current stock as an .xlsx file, one row per medicine.
 /// The backend has no export endpoint, so the list `GET /pharmacy/medicines`
 /// returns is written out here.
@@ -33,7 +35,7 @@ class ExportCurrentInventoryUseCase {
       case Success(:final data):
         final bytes = _build(data);
         if (bytes == null) {
-          return const ApiError(ApiFailure(message: 'تعذر إنشاء ملف المنتجات'));
+          return ApiError(ApiFailure(message: 'تعذر إنشاء ملف المنتجات'.tr));
         }
         return Success(bytes);
     }

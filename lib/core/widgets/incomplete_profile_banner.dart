@@ -32,7 +32,7 @@ class IncompleteProfileBanner extends StatelessWidget {
             child: Text(
               message ?? 'بياناتك غير مكتملة، يرجى تعديل حسابك لإكمالها'.tr,
               style: AppTextStyles.cardDescription.copyWith(color: AppColors.mainTeal),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
             ),
           ),
         ],

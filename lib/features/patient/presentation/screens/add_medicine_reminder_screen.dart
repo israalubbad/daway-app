@@ -95,7 +95,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                 description: 'أضف الادوية لتذكيرك فيها بالوقت المناسب'.tr,
               ),
               SizedBox(height: 24.h),
-              Text('اسم الدواء'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+              Text('اسم الدواء'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
               SizedBox(height: 8.h),
               AppTextField(
                 controller: _nameController,
@@ -105,7 +105,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               SizedBox(height: 24.h),
               Text(
                 'مواعيد التذكير'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.profileFieldLabel,
               ),
               SizedBox(height: 8.h),
@@ -136,7 +136,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               SizedBox(height: 24.h),
               Text(
                 'وقت التذكير'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.profileFieldLabel,
               ),
               SizedBox(height: 8.h),
@@ -154,7 +154,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                       Expanded(
                         child: Text(
                           _selectedTime == null ? '' : formatClockHourMinute(_selectedTime!.hour, _selectedTime!.minute),
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           style: AppTextStyles.profileFieldValue,
                         ),
                       ),

@@ -40,7 +40,7 @@ class HomeSearchBar extends StatelessWidget {
             Expanded(
               child: Text(
                 'ابحث عن دواء او صيدلية'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.homeSearchHint,
               ),
             ),

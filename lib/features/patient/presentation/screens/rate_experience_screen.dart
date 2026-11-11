@@ -161,9 +161,9 @@ class _RatingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(title, textAlign: TextAlign.right, style: AppTextStyles.addressCardTitle),
+          Text(title, textAlign: TextAlign.start, style: AppTextStyles.addressCardTitle),
           SizedBox(height: 4.h),
-          Text(subtitle, textAlign: TextAlign.right, style: AppTextStyles.cardDescription),
+          Text(subtitle, textAlign: TextAlign.start, style: AppTextStyles.cardDescription),
           SizedBox(height: 16.h),
           Center(
             child: StarRating(rating: rating.toDouble(), size: 32, onRatingChanged: onChanged),

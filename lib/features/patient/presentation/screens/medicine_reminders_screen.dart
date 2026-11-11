@@ -40,7 +40,7 @@ class _MedicineRemindersView extends StatelessWidget {
             children: [
               SizedBox(height: 32.h),
               Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerStart,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -66,13 +66,13 @@ class _MedicineRemindersView extends StatelessWidget {
               SizedBox(height: 8.h),
               Text(
                 'تذكيرات الأدوية'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesTitle,
               ),
               SizedBox(height: 8.h),
               Text(
                 'أضف الادوية لتذكيرك فيها بالوقت المناسب'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
               SizedBox(height: 22.h),
@@ -303,7 +303,7 @@ class _AddReminderButton extends StatelessWidget {
             Expanded(
               child: Text(
                 'اضافة تذكير جديد'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.addressCardTitle,
               ),
             ),

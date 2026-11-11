@@ -95,7 +95,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ),
           ),
           SizedBox(height: 32.h),
-          Text('الاسم'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('الاسم'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.edit_outlined,
@@ -112,33 +112,33 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
               padding: EdgeInsets.only(top: 6.h),
               child: Text(
                 'الاسم مطلوب'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.authFieldError,
               ),
             ),
           SizedBox(height: 24.h),
-          Text('تاريخ الميلاد'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('تاريخ الميلاد'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.calendar_today_outlined,
             onTap: () => _pickBirthDate(context, state.birthDate),
             child: Text(
               state.birthDate ?? 'اختر تاريخ ميلادك'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue.copyWith(
                 color: state.birthDate == null ? AppColors.grey : null,
               ),
             ),
           ),
           SizedBox(height: 24.h),
-          Text('رقم الهاتف'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('رقم الهاتف'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.lock_outline,
             locked: true,
             child: Text(
               state.profile.phone,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
@@ -146,7 +146,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             padding: EdgeInsets.only(top: 6.h),
             child: Text(
               'رقم الهاتف مرتبط بحسابك ولا يمكن تغييره من هنا.'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
             ),
           ),
@@ -234,7 +234,7 @@ class _NameInputState extends State<_NameInput> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _controller,
-      textAlign: TextAlign.right,
+      textAlign: TextAlign.start,
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
       style: AppTextStyles.profileFieldValue,

@@ -141,7 +141,7 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                       textDirection: TextDirection.ltr,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       onChanged: widget.cubit.paidChanged,
                       // Left empty, the backend decides: everything for a cash
                       // sale, nothing for a sale on credit.

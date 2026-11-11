@@ -78,7 +78,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                   children: [
                     Text(
                       medicine.displayName,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.favoriteCardName,
@@ -87,7 +87,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                       SizedBox(height: 4.h),
                       Text(
                         medicine.tradeName,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.mutedCaption,
@@ -115,7 +115,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                     hasPharmacies
                         ? pharmaciesAvailabilityLabel(medicine.pharmaciesCount)
                         : 'غير متوفر حالياً'.tr,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.favoriteCardAvailability,

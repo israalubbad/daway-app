@@ -48,7 +48,7 @@ class PharmacyHomeHeader extends StatelessWidget {
                           TextSpan(text: name, style: AppTextStyles.pharmacyGreetingName),
                         ],
                       ),
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     );

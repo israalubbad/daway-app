@@ -162,12 +162,12 @@ class _CartList extends StatelessWidget {
           SizedBox(height: 8.h),
           Text(
             'الاجمالي للمنتجات : {0} \$'.trArgs([formatPrice(state.total)]),
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.profileFieldLabel,
           ),
           SizedBox(height: 16.h),
           Align(
-            alignment: Alignment.centerRight,
+            alignment: AlignmentDirectional.centerStart,
             child: TextButton(
               onPressed: () async {
                 final error = await cubit.clear();

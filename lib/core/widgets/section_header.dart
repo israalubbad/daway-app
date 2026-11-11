@@ -42,7 +42,7 @@ class SectionHeader extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: titleStyle ?? AppTextStyles.homeSectionTitle,
           ),
         ),

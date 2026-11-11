@@ -63,7 +63,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           offer.pharmacyName,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.medicinePharmacyName,
@@ -81,7 +81,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                   SizedBox(height: 2.h),
                   Text(
                     '{0} \$/الشريط'.trArgs([formatPrice(offer.price)]),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.medicinePharmacyPrice,
                   ),
                 ],

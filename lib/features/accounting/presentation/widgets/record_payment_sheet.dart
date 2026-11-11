@@ -105,7 +105,7 @@ class _RecordPaymentSheetState extends State<RecordPaymentSheet> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                 textDirection: TextDirection.ltr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 onChanged: (_) => setState(() => _error = null),
                 decoration: InputDecoration(
                   isDense: true,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/legal_content_screen.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/localization/en/en_legal.dart';
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
@@ -11,7 +12,7 @@ class TermsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LegalContentScreen(
       title: 'الشروط والأحكام'.tr,
-      body: _termsBody,
+      body: Translations.isEnglish ? enLegalBody : _termsBody,
     );
   }
 }

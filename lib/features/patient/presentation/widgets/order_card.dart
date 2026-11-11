@@ -43,12 +43,12 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Text(
                         order.pharmacyName,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         style: AppTextStyles.orderCardPharmacyName,
                       ),
                       Text(
                         '#${order.orderNumber}',
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         style: AppTextStyles.orderCardMuted,
                       ),
                     ],

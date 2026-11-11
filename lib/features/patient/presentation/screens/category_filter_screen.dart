@@ -134,12 +134,12 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
       color: Colors.white,
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 24.h, bottom: 24.h),
+          padding: EdgeInsetsDirectional.only(end: 24.w, start: 24.w, top: 24.h, bottom: 24.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Align(
-                alignment: Alignment.topRight,
+                alignment: AlignmentDirectional.topStart,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -157,11 +157,11 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
                 ),
               ),
               SizedBox(height: 16.h),
-              Text('تصفية النتائج'.tr, textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+              Text('تصفية النتائج'.tr, textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
               SizedBox(height: 8.h),
               Text(
                 'حدد خياراتك للوصول إلى المنتجات المناسبة لك.'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
               SizedBox(height: 40.h),
@@ -250,7 +250,7 @@ class _FilterSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(title, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text(title, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 10.h),
         Wrap(
           alignment: WrapAlignment.start,

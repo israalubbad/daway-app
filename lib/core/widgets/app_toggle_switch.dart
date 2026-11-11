@@ -25,7 +25,7 @@ class AppToggleSwitch extends StatelessWidget {
         width: 50.w,
         height: 28.h,
         padding: EdgeInsets.all(3.r),
-        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+        alignment: value ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
         decoration: BoxDecoration(
           color: value ? AppColors.mainTeal : AppColors.cardBorder,
           borderRadius: BorderRadius.circular(14.r),

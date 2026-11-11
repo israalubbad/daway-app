@@ -9,6 +9,8 @@ import '../datasources/auth_remote_data_source.dart';
 import '../models/patient_auth_response_model.dart';
 import '../models/pharmacy_auth_response_model.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
 
@@ -29,9 +31,9 @@ class AuthRepositoryImpl implements AuthRepository {
       // Plain login for a phone with no account: the OTP would only lead to
       // a "no account" error after the code is typed, so stop here instead.
       if (name == null && data['is_registered'] == false) {
-        return const ApiError(
+        return ApiError(
           ApiFailure(
-            message: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد',
+            message: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد'.tr,
             registrationRequired: true,
           ),
         );

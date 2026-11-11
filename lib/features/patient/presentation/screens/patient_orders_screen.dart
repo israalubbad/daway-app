@@ -171,13 +171,13 @@ class _OrderSheet extends StatelessWidget {
           children: [
             Text(
               'طلب رقم {0} — {1}'.trArgs([order.orderNumber, order.pharmacyName]),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 12.h),
             Text(
               'عدد المنتجات: {0}\nالإجمالي: {1} \$\nالعنوان: {2}'.trArgs([order.itemsCount, order.price, order.address]),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: TextStyle(fontSize: 14.sp, height: 1.6),
             ),
             SizedBox(height: 24.h),

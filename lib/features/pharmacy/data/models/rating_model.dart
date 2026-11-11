@@ -1,6 +1,8 @@
 import '../../domain/entities/rating.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/ratings`. Only `stars` is confirmed
+
 /// against a live response (see PharmacyDashboardRepositoryImpl's average
 /// rating calculation) — no pharmacy on the demo backend has an actual
 /// review yet to confirm `comment`/`created_at`/the reviewer-name key
@@ -45,7 +47,7 @@ class RatingModel {
       // reviews first, so a fallback like DateTime.now() would wrongly sort
       // a corrupted record to the top instead of just being skipped.
       createdAt: DateTime.parse(json['created_at'] as String),
-      patientName: reviewer?['name'] as String? ?? 'مستخدم',
+      patientName: reviewer?['name'] as String? ?? 'مستخدم'.tr,
     );
   }
 

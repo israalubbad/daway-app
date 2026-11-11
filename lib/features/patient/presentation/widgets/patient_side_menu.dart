@@ -111,7 +111,7 @@ class _MenuItem extends StatelessWidget {
       leading: Icon(icon, color: AppColors.textDark),
       title: Text(
         label,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.cardDescription.copyWith(
           color: AppColors.textDark,
           fontWeight: FontWeight.w600,

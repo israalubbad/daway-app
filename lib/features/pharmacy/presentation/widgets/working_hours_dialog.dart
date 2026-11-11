@@ -100,13 +100,13 @@ class _WorkingHoursDialogState extends State<WorkingHoursDialog> {
           children: [
             Text(
               'ساعات العمل'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldLabel,
             ),
             SizedBox(height: 4.h),
             Text(
               'حدد ساعة الفتح والإغلاق لكل يوم'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.settingsMutedText,
             ),
             SizedBox(height: 16.h),

@@ -96,11 +96,11 @@ class PatientAccountScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 32.h),
-              Text('أهلاً في حسابك'.tr, textAlign: TextAlign.right, style: AppTextStyles.authScreenTitle),
+              Text('أهلاً في حسابك'.tr, textAlign: TextAlign.start, style: AppTextStyles.authScreenTitle),
               SizedBox(height: 8.h),
               Text(
                 'من هنا بتقدر تدير كل تفاصيل حسابك.'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.authScreenSubtitle,
               ),
               SizedBox(height: 24.h),

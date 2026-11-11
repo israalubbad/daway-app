@@ -54,11 +54,11 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('معرف الصيدلية (ID)'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('معرف الصيدلية (ID)'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _idController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'معرف الصيدلية مطلوب'.tr : null,
@@ -67,12 +67,12 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
 
           SizedBox(height: 16.h),
 
-          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.isEmpty) ? 'كلمة المرور مطلوبة'.tr : null,
@@ -97,7 +97,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
                 child: Text(
                   state.errorMessage!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },

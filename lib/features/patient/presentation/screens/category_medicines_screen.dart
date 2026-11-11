@@ -189,11 +189,11 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(category.nameAr, textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+        Text(category.nameAr, textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
         SizedBox(height: 8.h),
         Text(
           'تصفح كل خيارات {0} المتوفرة لدينا.'.trArgs([category.nameAr]),
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           style: AppTextStyles.allCategoriesSubtitle,
         ),
       ],
@@ -233,7 +233,7 @@ class _SearchField extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     onChanged: onChanged,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.homeSearchHint.copyWith(color: AppColors.onboardingText),
                     decoration: InputDecoration(
                       isCollapsed: true,
@@ -292,12 +292,12 @@ class _SymptomLandingView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('بماذا تشعر'.tr, textAlign: TextAlign.right, style: AppTextStyles.categorySectionTitle),
+          Text('بماذا تشعر'.tr, textAlign: TextAlign.start, style: AppTextStyles.categorySectionTitle),
           SizedBox(height: 16.h),
           CategorySymptomGrid(symptoms: symptoms, onSymptomTap: onSymptomTap),
           if (medicines.isNotEmpty) ...[
             SizedBox(height: 32.h),
-            Text('أدوية قد تعالجها'.tr, textAlign: TextAlign.right, style: AppTextStyles.categorySectionTitle),
+            Text('أدوية قد تعالجها'.tr, textAlign: TextAlign.start, style: AppTextStyles.categorySectionTitle),
             SizedBox(height: 16.h),
             GridView.builder(
               shrinkWrap: true,

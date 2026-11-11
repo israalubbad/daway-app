@@ -35,18 +35,18 @@ class HomeImageSearchCard extends StatelessWidget {
               children: [
                 Text(
                   'ابحث بالصورة'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.homeImageSearchTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
                   'ارفع روشتتك أو صوّر علبة الدواء للعثور عليه بسهولة'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.homeImageSearchSubtitle,
                 ),
                 const Spacer(),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: AlignmentDirectional.centerStart,
                   child: GestureDetector(
                     onTap: onSearchTap,
                     child: Container(

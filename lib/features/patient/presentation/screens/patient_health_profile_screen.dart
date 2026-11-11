@@ -120,7 +120,7 @@ class _Form extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('فصيلة الدم'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text('فصيلة الدم'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         Wrap(
           alignment: WrapAlignment.start,
@@ -152,7 +152,7 @@ class _Form extends StatelessWidget {
           onRemove: cubit.removeChronicDisease,
         ),
         SizedBox(height: 24.h),
-        Text('ملاحظات'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text('ملاحظات'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         AppTextField(
           controller: notesController,
@@ -213,7 +213,7 @@ class _ListSectionState extends State<_ListSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(widget.title, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text(widget.title, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         Row(
           children: [

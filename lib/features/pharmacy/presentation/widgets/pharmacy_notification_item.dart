@@ -59,12 +59,12 @@ class PharmacyNotificationItem extends StatelessWidget {
                 children: [
                   Text(
                     notificationTitleFor(notification.type),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.notificationTitle,
                   ),
                   Text(
                     notification.message,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.notificationBody,
                   ),
                   SizedBox(height: 7.h),

@@ -117,7 +117,7 @@ class _PhoneFormState extends State<_PhoneForm> {
                   SizedBox(height: 8.h),
                   Text(
                     errorMessage,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authFieldError,
                   ),
                 ],

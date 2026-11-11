@@ -2,8 +2,10 @@ import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../entities/pharmacy_auth_result.dart';
 import '../repositories/auth_repository.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class PharmacyLoginUseCase {
+
   final AuthRepository _repository;
 
   const PharmacyLoginUseCase(this._repository);
@@ -14,7 +16,7 @@ class PharmacyLoginUseCase {
   }) {
     if (pharmacyId.trim().isEmpty || password.isEmpty) {
       return Future.value(
-        const ApiError(ValidationFailure('يرجى إدخال معرف الصيدلية وكلمة المرور')),
+        ApiError(ValidationFailure('يرجى إدخال معرف الصيدلية وكلمة المرور'.tr)),
       );
     }
     return _repository.pharmacyLogin(pharmacyId: pharmacyId, password: password);

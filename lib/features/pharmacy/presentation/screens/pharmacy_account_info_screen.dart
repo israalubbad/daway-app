@@ -183,7 +183,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                 ? TextField(
                     controller: _nameController,
                     focusNode: _nameFocus,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     onChanged: cubit.nameChanged,
                     style: AppTextStyles.profileFieldValue,
                     decoration: const InputDecoration(
@@ -194,7 +194,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                   )
                 : Text(
                     state.name,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.profileFieldValue,
                   ),
           ),
@@ -207,7 +207,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                     controller: _phoneController,
                     focusNode: _phoneFocus,
                     keyboardType: TextInputType.phone,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     textDirection: TextDirection.ltr,
                     onChanged: cubit.phoneChanged,
                     inputFormatters: [
@@ -222,7 +222,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                   )
                 : Text(
                     state.phone,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.profileFieldValue,
                   ),
           ),
@@ -231,7 +231,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
               padding: EdgeInsets.only(top: 8.h),
               child: Text(
                 'أدخل رقم جوال صحيح'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.mutedCaption.copyWith(color: AppColors.error),
               ),
             ),
@@ -243,7 +243,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
               _addressText(state),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
@@ -253,7 +253,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             onEditTap: () => _editWorkingHours(state),
             child: Text(
               summarizeWorkingHours(state.workingHours),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
@@ -263,7 +263,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             onEditTap: () => ChangePasswordSheet.show(context),
             child: Text(
               '*******',
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
@@ -294,7 +294,7 @@ class _FieldLabel extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 8.h),
       child: Text(
         text,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.profileFieldLabel,
       ),
     );

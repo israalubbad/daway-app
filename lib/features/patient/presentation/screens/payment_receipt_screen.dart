@@ -141,7 +141,7 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
                           _hasProblem
                               ? 'اكتب بيانات التحويل لإتمام الطلب'.tr
                               : 'رفع إشعار الدفع'.tr,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           style: _headingStyle,
                         ),
                         SizedBox(height: 8.h),
@@ -149,7 +149,7 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
                           _hasProblem
                               ? 'أدخل بيانات التحويل يدويًا بدلًا من رفع الإشعار.'.tr
                               : 'قم برفع صورة إشعار التحويل لتأكيد عملية الدفع.'.tr,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           style: _bodyStyle,
                         ),
                         SizedBox(height: 16.h),
@@ -452,7 +452,7 @@ class _ManualFields extends StatelessWidget {
 
   Widget _label(String text) => Padding(
     padding: EdgeInsets.only(top: 16.h, bottom: 8.h),
-    child: Text(text, textAlign: TextAlign.right, style: _bodyStyle),
+    child: Text(text, textAlign: TextAlign.start, style: _bodyStyle),
   );
 
   @override
@@ -474,13 +474,13 @@ class _ManualFields extends StatelessWidget {
         _label('اسم صاحب الحساب'.tr),
         TextField(
           controller: holderController,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           decoration: _decoration('أدخل اسم صاحب الحساب'.tr),
         ),
         _label('المبلغ'.tr),
         TextField(
           controller: amountController,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: _decoration('أدخل مبلغ التحويل'.tr),
         ),

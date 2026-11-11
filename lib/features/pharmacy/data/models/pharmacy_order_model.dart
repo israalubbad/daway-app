@@ -2,6 +2,8 @@ import '../../../../core/helpers/json_parsing.dart';
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_order.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// One record of `GET /pharmacy/sub-orders`.
 ///
 /// The response shape has not been seen (no sample, no test account), so the
@@ -111,8 +113,8 @@ class PharmacyOrderModel {
 
   /// Where an order without an address is going, from `fulfillment_method`.
   static String? _fulfillmentLabel(String? method) => switch (method?.toLowerCase()) {
-    'delivery' => 'توصيل',
-    'pickup' => 'استلام من الصيدلية',
+    'delivery' => 'توصيل'.tr,
+    'pickup' => 'استلام من الصيدلية'.tr,
     _ => null,
   };
 

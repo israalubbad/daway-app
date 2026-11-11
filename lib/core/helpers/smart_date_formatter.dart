@@ -95,5 +95,5 @@ String formatClockHourMinute(int hour, int minute) {
   final isAm = hour < 12;
   var hour12 = hour % 12;
   if (hour12 == 0) hour12 = 12;
-  return '$hour12:${minute.toString().padLeft(2, '0')} ${isAm ? 'ص' : 'م'}';
+  return '$hour12:${minute.toString().padLeft(2, '0')} ${isAm ? 'ص'.tr : 'م'.tr}';
 }

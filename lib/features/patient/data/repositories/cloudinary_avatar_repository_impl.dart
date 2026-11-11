@@ -6,8 +6,10 @@ import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../domain/repositories/avatar_repository.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Uploads directly to Cloudinary using an unsigned upload preset — there is
+
 /// no image-upload endpoint on our own backend, and an unsigned preset is the
 /// only Cloudinary credential safe to ship inside a client app (no API secret
 /// involved). [cloudName] and [uploadPreset] are read from .env by the DI setup.
@@ -25,8 +27,8 @@ class CloudinaryAvatarRepositoryImpl implements AvatarRepository {
   @override
   Future<ApiResult<String>> uploadAvatar(File imageFile) async {
     if (cloudName.isEmpty || uploadPreset.isEmpty) {
-      return const ApiError(
-        UnknownFailure('إعدادات رفع الصور غير مكتملة، يرجى التواصل مع الدعم'),
+      return ApiError(
+        UnknownFailure('إعدادات رفع الصور غير مكتملة، يرجى التواصل مع الدعم'.tr),
       );
     }
 
@@ -43,7 +45,7 @@ class CloudinaryAvatarRepositoryImpl implements AvatarRepository {
 
       final url = response.data?['secure_url'] as String?;
       if (url == null || url.isEmpty) {
-        return const ApiError(UnknownFailure('تعذر رفع الصورة، يرجى المحاولة لاحقاً'));
+        return ApiError(UnknownFailure('تعذر رفع الصورة، يرجى المحاولة لاحقاً'.tr));
       }
       return Success(url);
     } catch (e) {

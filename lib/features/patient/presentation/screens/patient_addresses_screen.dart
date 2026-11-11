@@ -176,8 +176,8 @@ class _AddressCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  address.label,
-                  textAlign: TextAlign.right,
+                  address.label.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.addressCardTitle,
                 ),
               ),
@@ -198,7 +198,7 @@ class _AddressCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     address.address,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.profileFieldValue,
@@ -232,7 +232,7 @@ class _AddAddressButton extends StatelessWidget {
         ),
         child: Text(
           'اضافة عنوان'.tr,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           style: AppTextStyles.addressCardTitle,
         ),
       ),

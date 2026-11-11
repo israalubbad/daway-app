@@ -118,7 +118,7 @@ class _CodeFormState extends State<_CodeForm> {
                   Text(
                     errorMessage,
                     style: AppTextStyles.authFieldError.copyWith(fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                   ),
                 ],
               ],

@@ -3,8 +3,10 @@ import '../../../chat/domain/entities/chat_conversation.dart';
 import '../../../chat/domain/entities/chat_message.dart';
 import '../entities/inquiry.dart';
 import 'get_pharmacy_inquiries_usecase.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The pharmacy's conversations: one per patient, however many inquiries they
+
 /// have sent, most recently active first.
 class GetPatientConversationsUseCase implements ConversationsSource {
   final GetPharmacyInquiriesUseCase _getInquiriesUseCase;
@@ -35,7 +37,7 @@ class GetPatientConversationsUseCase implements ConversationsSource {
     return [
       for (final group in groups)
         ChatConversation(
-          title: group.first.patientName.isEmpty ? 'مريض' : group.first.patientName,
+          title: group.first.patientName.isEmpty ? 'مريض'.tr : group.first.patientName,
           lastText: chatPreviewText(group.first.lastMessage ?? group.first.message),
           unreadCount: group.fold(0, (sum, i) => sum + i.unreadCount),
           inquiryIds: [for (final i in group) i.id],

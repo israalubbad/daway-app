@@ -272,7 +272,7 @@ class _InlineRetry extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(message, textAlign: TextAlign.right, style: AppTextStyles.settingsMutedText),
+          child: Text(message, textAlign: TextAlign.start, style: AppTextStyles.settingsMutedText),
         ),
         SizedBox(width: 12.w),
         GestureDetector(

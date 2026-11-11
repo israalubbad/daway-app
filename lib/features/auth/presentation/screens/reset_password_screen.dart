@@ -145,7 +145,7 @@ class _PasswordFormState extends State<_PasswordForm> {
                   SizedBox(height: 8.h),
                   Text(
                     errorMessage,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authFieldError,
                   ),
                 ],

@@ -42,14 +42,14 @@ class PatientAuthScreen extends StatelessWidget {
 
                 Text(
                   'مرحباً بعودتك!'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
 
                 Text(
                   'سجّل دخولك برقم هاتفك للوصول إلى حسابك ومتابعة طلباتك بسهولة.'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),

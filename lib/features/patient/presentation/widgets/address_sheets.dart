@@ -73,11 +73,11 @@ class _AddressLabelSheetState extends State<_AddressLabelSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text('ما نوع هذا العنوان؟'.tr,
-                textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+                textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
             SizedBox(height: 8.h),
             Text(
               'اختر اسماً يسهّل عليك التعرف عليه.'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.allCategoriesSubtitle,
             ),
             SizedBox(height: 24.h),
@@ -128,11 +128,11 @@ class _AddressEditSheetState extends State<_AddressEditSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text('تعديل العنوان'.tr,
-                textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+                textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
             SizedBox(height: 8.h),
             Text(
               widget.address.address,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.allCategoriesSubtitle,
@@ -188,7 +188,7 @@ class _LabelChips extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                label,
+                label.tr,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,

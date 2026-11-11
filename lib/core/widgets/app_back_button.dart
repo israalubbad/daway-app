@@ -16,7 +16,7 @@ class AppBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: AlignmentDirectional.centerStart,
       child: GestureDetector(
         key: const ValueKey('authBackButton'),
         onTap: onTap,

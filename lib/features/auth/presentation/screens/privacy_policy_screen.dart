@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/legal_content_screen.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/localization/en/en_legal.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -11,7 +12,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LegalContentScreen(
       title: 'سياسة الخصوصية'.tr,
-      body: _privacyBody,
+      body: Translations.isEnglish ? enLegalBody : _privacyBody,
     );
   }
 }

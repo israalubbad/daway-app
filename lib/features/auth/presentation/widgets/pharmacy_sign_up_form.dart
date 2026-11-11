@@ -87,11 +87,11 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('اسم الصيدلية'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('اسم الصيدلية'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _nameController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'اسم الصيدلية مطلوب'.tr : null,
@@ -100,7 +100,7 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('رقم الجوال'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('رقم الجوال'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _phoneController,
@@ -120,11 +120,11 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('العنوان'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('العنوان'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _addressController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'العنوان مطلوب'.tr : null,
@@ -133,12 +133,12 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) {
               if (value == null || value.isEmpty) return 'كلمة المرور مطلوبة'.tr;
@@ -168,7 +168,7 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
                 child: Text(
                   state.registerError!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },

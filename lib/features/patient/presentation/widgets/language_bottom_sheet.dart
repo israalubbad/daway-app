@@ -6,6 +6,7 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../localization/domain/entities/app_language.dart';
 
+import '../../../../core/localization/translations.dart';
 export '../../../localization/domain/entities/app_language.dart';
 
 /// "اختر اللغة": lists the [AppLanguage]s with [selected] highlighted;
@@ -36,8 +37,8 @@ class LanguageBottomSheet extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 2.w),
             child: Text(
-              'اختر اللغة',
-              textAlign: TextAlign.right,
+              'اختر اللغة'.tr,
+              textAlign: TextAlign.start,
               style: AppTextStyles.sheetHeading,
             ),
           ),

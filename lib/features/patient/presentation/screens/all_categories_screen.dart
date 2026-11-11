@@ -38,9 +38,9 @@ class _AllCategoriesView extends StatelessWidget {
           children: [
             SizedBox(height: 32.h),
             Padding(
-              padding: EdgeInsets.only(right: 24.w),
+              padding: EdgeInsetsDirectional.only(start: 24.w),
               child: Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerStart,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -69,7 +69,7 @@ class _AllCategoriesView extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
                 'كل احتياجاتك في مكان واحد'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesTitle,
               ),
             ),
@@ -78,7 +78,7 @@ class _AllCategoriesView extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
                 'اختر القسم المناسب وابدأ بالاستكشاف'.tr,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
             ),
@@ -163,20 +163,20 @@ class _AllCategoryCard extends StatelessWidget {
           border: Border.all(color: AppColors.iconBlueBorder),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        padding: EdgeInsets.only(top: 8.h, right: 8.w, left: 4.w, bottom: 4.h),
+        padding: EdgeInsetsDirectional.only(top: 8.h, start: 8.w, end: 4.w, bottom: 4.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               category.nameAr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.homeCategoryLabel,
             ),
             Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: AlignmentDirectional.bottomEnd,
                 child: CategoryIcon(category: category),
               ),
             ),

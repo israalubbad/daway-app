@@ -12,6 +12,8 @@ import '../../domain/repositories/accounting_repository.dart';
 import '../datasources/accounting_remote_data_source.dart';
 import '../models/accounting_parsers.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class AccountingRepositoryImpl implements AccountingRepository {
   final AccountingRemoteDataSource _remote;
 
@@ -190,7 +192,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
   }) async {
     final customerId = invoice.customerId;
     if (customerId == null) {
-      return const ApiError(ApiFailure(message: 'لا يمكن تسجيل دفعة على فاتورة بلا عميل'));
+      return ApiError(ApiFailure(message: 'لا يمكن تسجيل دفعة على فاتورة بلا عميل'.tr));
     }
     try {
       await _remote.createCustomerPayment(

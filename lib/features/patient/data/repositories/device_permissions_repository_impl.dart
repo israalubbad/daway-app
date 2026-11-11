@@ -4,8 +4,10 @@ import '../../../../core/helpers/api_result.dart';
 import '../../domain/entities/device_setting.dart';
 import '../../domain/repositories/device_permissions_repository.dart';
 import '../datasources/device_settings_data_source.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class DevicePermissionsRepositoryImpl implements DevicePermissionsRepository {
+
   final DeviceSettingsDataSource _dataSource;
 
   const DevicePermissionsRepositoryImpl(this._dataSource);
@@ -36,7 +38,7 @@ class DevicePermissionsRepositoryImpl implements DevicePermissionsRepository {
     try {
       final opened = await _open(setting);
       if (opened) return const Success(null);
-      return const ApiError(PermissionFailure('تعذر فتح إعدادات الجهاز'));
+      return ApiError(PermissionFailure('تعذر فتح إعدادات الجهاز'.tr));
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
     }

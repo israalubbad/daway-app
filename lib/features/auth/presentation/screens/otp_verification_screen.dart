@@ -64,7 +64,7 @@ class OtpVerificationScreen extends StatelessWidget {
 
                   Text(
                     'خطوة أخيرة!'.tr,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authScreenTitle,
                   ),
                   SizedBox(height: 8.h),
@@ -73,7 +73,7 @@ class OtpVerificationScreen extends StatelessWidget {
                     selector: (state) => state.phone,
                     builder: (context, phone) => Text(
                       'أدخل رمز التحقق المرسل إلى رقم هاتفك\n للمتابعة {0}'.trArgs([phone]),
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: AppTextStyles.authScreenSubtitle,
                     ),
                   ),

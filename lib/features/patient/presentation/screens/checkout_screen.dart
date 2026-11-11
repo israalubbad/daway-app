@@ -178,7 +178,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                 SizedBox(height: 24.h),
                 Text(
                   'التوصيل'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.profileFieldLabel,
                 ),
                 SizedBox(height: 16.h),
@@ -193,7 +193,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                   value: address == null
                       ? 'اختر عنوان التوصيل'.tr
                       : (address.address.isEmpty
-                            ? address.label
+                            ? address.label.tr
                             : address.address),
                 ),
                 SizedBox(height: 16.h),
@@ -308,7 +308,7 @@ class _InfoCard extends StatelessWidget {
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.left,
+                textAlign: TextAlign.end,
                 style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
               ),
             ),
@@ -352,7 +352,7 @@ class _CouponCard extends StatelessWidget {
             child: TextField(
               controller: controller,
               readOnly: applied,
-              textAlign: TextAlign.left,
+              textAlign: TextAlign.end,
               textDirection: TextDirection.ltr,
               textCapitalization: TextCapitalization.characters,
               textInputAction: TextInputAction.done,
@@ -410,7 +410,7 @@ class _SummaryCard extends StatelessWidget {
         children: [
           Text(
             'ملخص الطلب'.tr,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.profileFieldLabel,
           ),
           for (final item in items) ...[
@@ -428,12 +428,12 @@ class _SummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
             ),
             SizedBox(height: 6.h),
             Text(
               '{0} \$/ الشريط × {1} = {2} \$'.trArgs([formatPrice(item.price), item.quantity, formatPrice(item.lineTotal)]),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.cartItemPharmacyName,
             ),
           ],
@@ -457,14 +457,14 @@ class _TotalsCard extends StatelessWidget {
     if (quote != null) {
       return Text(
         'دليفري : {0} \$'.trArgs([formatPrice(quote.deliveryFee.toDouble())]),
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.cartItemPrice,
       );
     }
     if (state.isQuoting) {
       return Text(
         'دليفري : جارٍ الحساب...'.tr,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.cartItemPrice,
       );
     }
@@ -474,14 +474,14 @@ class _TotalsCard extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: Text(
           'دليفري : تعذر حساب الرسوم، اضغط لإعادة المحاولة'.tr,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           style: AppTextStyles.cartItemPrice.copyWith(color: AppColors.logoutRed),
         ),
       );
     }
     return Text(
       'دليفري : يحدده الأدمن بعد إرسال الطلب'.tr,
-      textAlign: TextAlign.right,
+      textAlign: TextAlign.start,
       style: AppTextStyles.cartItemPrice,
     );
   }
@@ -500,7 +500,7 @@ class _TotalsCard extends StatelessWidget {
         children: [
           Text(
             'سعر الطلبات : {0} \$'.trArgs([formatPrice(state.quote?.subtotal ?? state.subtotal)]),
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.cartItemPrice,
           ),
           SizedBox(height: 8.h),
@@ -509,14 +509,14 @@ class _TotalsCard extends StatelessWidget {
             SizedBox(height: 8.h),
             Text(
               'الخصم : {0} \$'.trArgs([formatPrice(shownDiscount)]),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.cartItemPrice,
             ),
           ],
           SizedBox(height: 12.h),
           Text(
             'الاجمالي : {0} \$'.trArgs([formatPrice(state.grandTotal)]),
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.profileFieldLabel.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -542,7 +542,7 @@ class _AddressSheet extends StatelessWidget {
         children: [
           Text(
             'اختر عنوان التوصيل'.tr,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.profileFieldLabel,
           ),
           SizedBox(height: 12.h),
@@ -550,10 +550,10 @@ class _AddressSheet extends StatelessWidget {
             ListTile(
               contentPadding: EdgeInsets.zero,
               onTap: () => Navigator.of(context).pop(address.id),
-              title: Text(address.label, textAlign: TextAlign.right),
+              title: Text(address.label.tr, textAlign: TextAlign.start),
               subtitle: Text(
                 address.address,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -569,7 +569,7 @@ class _AddressSheet extends StatelessWidget {
             onTap: () => Navigator.of(context).pop(_addNewAddress),
             title: Text(
               'إضافة عنوان جديد'.tr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: TextStyle(color: AppColors.mainTeal),
             ),
             trailing: Icon(

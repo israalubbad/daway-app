@@ -57,7 +57,7 @@ class AlternativeCandidateCard extends StatelessWidget {
                   children: [
                     Text(
                       candidate.displayName,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       textDirection: textDirectionFor(candidate.displayName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -72,7 +72,7 @@ class AlternativeCandidateCard extends StatelessWidget {
                       SizedBox(height: 3.h),
                       Text(
                         candidate.activeIngredient!,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         textDirection: textDirectionFor(
                           candidate.activeIngredient!,
                         ),

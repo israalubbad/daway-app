@@ -45,13 +45,13 @@ class PharmacySignUpScreen extends StatelessWidget {
                 SizedBox(height: 32.h),
                 Text(
                   'أنشئ حسابك'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
                   'ابدأ رحلتك مع دواك واحصل على احتياجاتك من الصيدلية بسهولة.'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),

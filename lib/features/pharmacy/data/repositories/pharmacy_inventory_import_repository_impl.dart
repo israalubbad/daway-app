@@ -8,6 +8,8 @@ import '../../domain/repositories/pharmacy_inventory_import_repository.dart';
 import '../datasources/pharmacy_inventory_import_remote_data_source.dart';
 import '../models/inventory_import_preview_model.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRepository {
   final PharmacyInventoryImportRemoteDataSource _remoteDataSource;
 
@@ -22,12 +24,12 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
       final response = await _remoteDataSource.preview(token: token, filePath: filePath);
       final json = response.data;
       if (json is! Map<String, dynamic>) {
-        return const ApiError(ApiFailure(message: 'تعذر قراءة نتيجة تحليل الملف'));
+        return ApiError(ApiFailure(message: 'تعذر قراءة نتيجة تحليل الملف'.tr));
       }
       final model = InventoryImportPreviewModel.fromJson(json);
       final importId = model.importId;
       if (importId == null) {
-        return const ApiError(ApiFailure(message: 'تعذر قراءة نتيجة تحليل الملف'));
+        return ApiError(ApiFailure(message: 'تعذر قراءة نتيجة تحليل الملف'.tr));
       }
       return Success(model.toEntity(importId));
     } catch (e) {
@@ -41,7 +43,7 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
       final response = await _remoteDataSource.downloadTemplate(token: token);
       final bytes = response.data;
       if (bytes is! List<int> || bytes.isEmpty) {
-        return const ApiError(ApiFailure(message: 'تعذر تنزيل القالب'));
+        return ApiError(ApiFailure(message: 'تعذر تنزيل القالب'.tr));
       }
       return Success(Uint8List.fromList(bytes));
     } catch (e) {

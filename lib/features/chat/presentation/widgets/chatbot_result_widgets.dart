@@ -36,7 +36,7 @@ class ChatbotResults extends StatelessWidget {
         ],
         if (reply.alternatives.isNotEmpty) ...[
           SizedBox(height: 12.h),
-          Text('البدائل'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('البدائل'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
           for (final alternative in reply.alternatives) ...[
             SizedBox(height: 8.h),
             _MedicineCard(

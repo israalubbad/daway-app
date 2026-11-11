@@ -66,7 +66,7 @@ class BirthDateField extends StatelessWidget {
                   fontSize: 16.sp,
                   color: birthDate != null ? AppColors.textDark : AppColors.grey,
                 ),
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
               ),
             ),
           ],

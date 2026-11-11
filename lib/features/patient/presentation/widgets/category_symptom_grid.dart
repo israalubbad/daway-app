@@ -56,20 +56,20 @@ class _SymptomCard extends StatelessWidget {
           border: Border.all(color: AppColors.iconBlueBorder),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        padding: EdgeInsets.only(top: 8.h, right: 8.w, left: 4.w, bottom: 9.h),
+        padding: EdgeInsetsDirectional.only(top: 8.h, start: 8.w, end: 4.w, bottom: 9.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               symptom.nameAr,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.homeCategoryLabel,
             ),
             Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: AlignmentDirectional.bottomEnd,
                 child: _SymptomImage(slug: symptom.slug),
               ),
             ),

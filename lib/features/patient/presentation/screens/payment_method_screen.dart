@@ -151,7 +151,7 @@ class _PaymentMethodView extends StatelessWidget {
                 SizedBox(height: 24.h),
                 Text(
                   'طريقة الدفع'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.profileFieldLabel,
                 ),
                 SizedBox(height: 16.h),
@@ -407,14 +407,14 @@ class _PriceCard extends StatelessWidget {
           if (deliveryFee != null) ...[
             Text(
               'سعر التوصيل : {0} \$'.trArgs([formatPrice(deliveryFee!)]),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.cartItemPrice,
             ),
             SizedBox(height: 8.h),
           ],
           Text(
             'الإجمالي : {0} \$'.trArgs([formatPrice(grandTotal)]),
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.profileFieldLabel.copyWith(
               fontWeight: FontWeight.w700,
             ),

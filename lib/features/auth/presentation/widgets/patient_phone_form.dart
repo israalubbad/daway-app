@@ -44,7 +44,7 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
         children: [
           Text(
             'رقم هاتفك'.tr,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: AppTextStyles.authFieldLabel,
           ),
 
@@ -106,7 +106,7 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
                 child: Text(
                   state.errorMessage!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },

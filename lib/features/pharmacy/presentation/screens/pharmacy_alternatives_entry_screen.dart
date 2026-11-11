@@ -201,7 +201,7 @@ class _MedicineTile extends StatelessWidget {
                 children: [
                   Text(
                     medicine.displayName,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     textDirection: textDirectionFor(medicine.displayName),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -216,7 +216,7 @@ class _MedicineTile extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       medicine.activeIngredient!,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       textDirection: textDirectionFor(
                         medicine.activeIngredient!,
                       ),

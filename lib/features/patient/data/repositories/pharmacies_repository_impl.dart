@@ -7,6 +7,8 @@ import '../../domain/repositories/pharmacies_repository.dart';
 import '../datasources/pharmacies_remote_data_source.dart';
 import '../models/nearby_pharmacy_model.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PharmaciesRepositoryImpl implements PharmaciesRepository {
   final PharmaciesRemoteDataSource _remoteDataSource;
 
@@ -108,7 +110,7 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
     final hour = int.tryParse(parts[0]);
     if (hour == null || hour < 0 || hour > 23) return null;
 
-    final period = hour < 12 ? 'ص' : 'م';
+    final period = hour < 12 ? 'ص'.tr : 'م'.tr;
     final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
     return '$displayHour $period';
   }

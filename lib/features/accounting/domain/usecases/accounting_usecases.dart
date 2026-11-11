@@ -10,6 +10,8 @@ import '../entities/sale_invoice.dart';
 import '../repositories/accounting_repository.dart';
 
 
+import '../../../../core/localization/translations.dart';
+
 ApiResult<T> _refuse<T>(String message) => ApiError(ApiFailure(message: message));
 
 class GetAccountingOverviewUseCase {
@@ -55,7 +57,7 @@ class GetRefundableLinesUseCase {
   /// none to offer.
   Future<ApiResult<List<InvoiceLine>>> call(SaleInvoice invoice) {
     if (invoice.isClosed) {
-      return Future.value(_refuse('الفاتورة ملغاة أو مرجوعة ولا يمكن إرجاع أصناف منها'));
+      return Future.value(_refuse('الفاتورة ملغاة أو مرجوعة ولا يمكن إرجاع أصناف منها'.tr));
     }
     return withSessionToken(
       _sessions,
@@ -98,10 +100,10 @@ class RecordCashMovementUseCase {
     required String reason,
   }) {
     if (!CashMovementRules.isValidAmount(amount)) {
-      return Future.value(_refuse('أدخل مبلغاً أكبر من صفر'));
+      return Future.value(_refuse('أدخل مبلغاً أكبر من صفر'.tr));
     }
     if (!CashMovementRules.isValidReason(reason)) {
-      return Future.value(_refuse('اذكر سبب الحركة (3 أحرف على الأقل)'));
+      return Future.value(_refuse('اذكر سبب الحركة (3 أحرف على الأقل)'.tr));
     }
     return withSessionToken(
       _sessions,
@@ -144,7 +146,7 @@ class FindSaleItemByBarcodeUseCase {
   Future<ApiResult<SaleItemOption?>> call(String barcode) {
     final digits = barcode.replaceAll(RegExp(r'[\s-]'), '');
     if (!RegExp(r'^\d+$').hasMatch(digits) || ![8, 12, 13, 14].contains(digits.length)) {
-      return Future.value(_refuse('صيغة الباركود غير مدعومة'));
+      return Future.value(_refuse('صيغة الباركود غير مدعومة'.tr));
     }
     return withSessionToken(_sessions, (token) => _repository.findByBarcode(token: token, barcode: digits));
   }
@@ -181,16 +183,16 @@ class RecordInvoicePaymentUseCase {
     required PaymentMethod method,
   }) {
     if (invoice.isClosed) {
-      return Future.value(_refuse('الفاتورة ملغاة أو مرجوعة'));
+      return Future.value(_refuse('الفاتورة ملغاة أو مرجوعة'.tr));
     }
     if (invoice.customerId == null) {
-      return Future.value(_refuse('لا يمكن تسجيل دفعة على فاتورة بلا عميل'));
+      return Future.value(_refuse('لا يمكن تسجيل دفعة على فاتورة بلا عميل'.tr));
     }
     if (method == PaymentMethod.credit) {
-      return Future.value(_refuse('اختر طريقة دفع: نقداً أو بطاقة أو حوالة بنكية'));
+      return Future.value(_refuse('اختر طريقة دفع: نقداً أو بطاقة أو حوالة بنكية'.tr));
     }
     if (!PaymentRules.isValidAmount(amount, remaining: invoice.remaining)) {
-      return Future.value(_refuse('أدخل مبلغاً أكبر من صفر ولا يزيد عن المتبقي'));
+      return Future.value(_refuse('أدخل مبلغاً أكبر من صفر ولا يزيد عن المتبقي'.tr));
     }
     return withSessionToken(
       _sessions,
@@ -213,7 +215,7 @@ class CreateRefundUseCase {
 
   Future<ApiResult<void>> call(RefundRequest request) {
     if (!request.isValid) {
-      return Future.value(_refuse('اختر وحدة واحدة على الأقل ولا تتجاوز الكمية المتاحة'));
+      return Future.value(_refuse('اختر وحدة واحدة على الأقل ولا تتجاوز الكمية المتاحة'.tr));
     }
     return withSessionToken(
       _sessions,
@@ -240,10 +242,10 @@ class CreateSaleUseCase {
 
   Future<ApiResult<void>> call(NewSale sale) {
     if (sale.lines.isEmpty) {
-      return Future.value(_refuse('السلة فارغة'));
+      return Future.value(_refuse('السلة فارغة'.tr));
     }
     if (sale.method == PaymentMethod.credit && sale.customerId == null) {
-      return Future.value(_refuse('اختر عميلاً للبيع بالدين'));
+      return Future.value(_refuse('اختر عميلاً للبيع بالدين'.tr));
     }
     final total = sale.lines.fold<double>(0, (sum, line) => sum + line.total);
     final paid = sale.paid;

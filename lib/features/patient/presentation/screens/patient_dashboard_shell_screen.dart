@@ -52,7 +52,7 @@ class _PatientDashboardShellScreenState extends State<PatientDashboardShellScree
         // Only on the messages tab, next to the pharmacy conversations.
         floatingActionButton: _selectedTab == PatientDashboardTab.messages
             ? Padding(
-                padding: EdgeInsets.only(left: 8.w),
+                padding: EdgeInsetsDirectional.only(end: 8.w),
                 child: Builder(
                   builder: (context) => ChatbotButton(
                     onTap: () => Navigator.of(context).push(ChatbotScreen.route()),

@@ -126,7 +126,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
               Text(
                 'أضف أو عدّل كميات الأدوية المتوفرة في الصيدلية'.tr,
                 style: AppTextStyles.cardDescription,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
               ),
               SizedBox(height: 16.h),
               BlocSelector<PharmacyInventoryCubit, PharmacyInventoryState,
@@ -350,7 +350,7 @@ class _InventoryItemTile extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   textDirection: textDirectionFor(medicine.displayName),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -360,7 +360,7 @@ class _InventoryItemTile extends StatelessWidget {
                   Text(
                     medicine.activeIngredient!,
                     style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     textDirection: textDirectionFor(medicine.activeIngredient!),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

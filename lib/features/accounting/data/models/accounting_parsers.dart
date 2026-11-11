@@ -9,6 +9,8 @@ import '../../domain/entities/cash_ledger.dart';
 import '../../domain/entities/refund_record.dart';
 import '../../domain/entities/sale_invoice.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Parsers of the accounting responses, written against the shapes the
 /// "Pharmacy Accounting + Barcode Scanner" Postman collection documents.
 /// Amounts may arrive as numbers or as decimal strings ("25.00").
@@ -328,12 +330,12 @@ ApiResult<SaleItemOption?> barcodeLookupResult(Map<String, dynamic> data, String
         ),
       );
     case 'out_of_stock':
-      return const ApiError(ApiFailure(message: 'هذا الدواء غير متوفر في المخزون'));
+      return ApiError(ApiFailure(message: 'هذا الدواء غير متوفر في المخزون'.tr));
     case 'not_in_stock':
-      return const ApiError(ApiFailure(message: 'هذا الدواء غير مضاف إلى مخزون صيدليتك'));
+      return ApiError(ApiFailure(message: 'هذا الدواء غير مضاف إلى مخزون صيدليتك'.tr));
     case 'ambiguous':
-      return const ApiError(
-        ApiFailure(message: 'أكثر من صنف يطابق هذا الباركود، ابحث عنه بالاسم'),
+      return ApiError(
+        ApiFailure(message: 'أكثر من صنف يطابق هذا الباركود، ابحث عنه بالاسم'.tr),
       );
     default:
       return const Success(null);

@@ -32,9 +32,9 @@ class PatientSubScreenHeader extends StatelessWidget {
           AppBackButton(onTap: () => Navigator.of(context).pop()),
           SizedBox(height: 16.h),
         ],
-        Text(title, textAlign: TextAlign.right, style: AppTextStyles.authScreenTitle),
+        Text(title, textAlign: TextAlign.start, style: AppTextStyles.authScreenTitle),
         SizedBox(height: 8.h),
-        Text(description, textAlign: TextAlign.right, style: AppTextStyles.authScreenSubtitle),
+        Text(description, textAlign: TextAlign.start, style: AppTextStyles.authScreenSubtitle),
       ],
     );
   }

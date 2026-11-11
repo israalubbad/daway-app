@@ -231,7 +231,7 @@ class _MapContentState extends State<_MapContent> {
         ),
         SafeArea(
           child: Padding(
-            padding: EdgeInsets.only(top: 16.h, left: 24.w, right: 24.w),
+            padding: EdgeInsetsDirectional.only(top: 16.h, end: 24.w, start: 24.w),
             child: Column(
               children: [
                 Row(
@@ -356,7 +356,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
               Expanded(
                 child: Text(
                   pharmacy.name,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.pharmacySheetName,
@@ -384,7 +384,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
           SizedBox(height: 24.h),
           if (isLoadingHours)
             const Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerStart,
               child: SizedBox(
                 width: 16,
                 height: 16,
@@ -399,7 +399,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
                   TextSpan(text: workingHoursLabel, style: AppTextStyles.pharmacySheetHoursValue),
                 ],
               ),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
             ),
           SizedBox(height: 24.h),
           Row(

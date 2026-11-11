@@ -51,7 +51,7 @@ class HomeHeader extends StatelessWidget {
                         TextSpan(text: name, style: AppTextStyles.homeGreetingName),
                       ],
                     ),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   );

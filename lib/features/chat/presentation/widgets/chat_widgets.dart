@@ -29,7 +29,7 @@ class ChatHeader extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             title,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 16.sp, color: AppColors.textDark),
@@ -38,7 +38,7 @@ class ChatHeader extends StatelessWidget {
             SizedBox(height: 2.h),
             Text(
               subtitle!,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
@@ -196,7 +196,7 @@ class ChatBubble extends StatelessWidget {
                   if (message.text.isNotEmpty && message.imageUrl != message.text.trim())
                     Text(
                       message.text,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: TextStyle(fontSize: 14.sp, color: textColor, height: 1.4),
                     ),
                 ],

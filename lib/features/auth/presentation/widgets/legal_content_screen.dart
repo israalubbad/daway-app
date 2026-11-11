@@ -24,11 +24,11 @@ class LegalContentScreen extends StatelessWidget {
               SizedBox(height: 48.h),
               AppBackButton(onTap: () => Navigator.of(context).pop()),
               SizedBox(height: 24.h),
-              Text(title, textAlign: TextAlign.right, style: AppTextStyles.authScreenTitle),
+              Text(title, textAlign: TextAlign.start, style: AppTextStyles.authScreenTitle),
               SizedBox(height: 16.h),
               Text(
                 body,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.authScreenSubtitle.copyWith(height: 1.6),
               ),
               SizedBox(height: 24.h),

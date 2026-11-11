@@ -71,7 +71,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                   Text(
                     state.errorMessage!,
                     style: AppTextStyles.authFieldError.copyWith(fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                   ),
                 ],
               ],

@@ -79,7 +79,7 @@ class PharmacyAlternativesScreen extends StatelessWidget {
         Text(
           'بدائل بنفس المادة الفعالة'.tr,
           style: AppTextStyles.cardTitle.copyWith(fontSize: 16.sp),
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
         ),
         SizedBox(height: 12.h),
         if (state.candidates.isEmpty)

@@ -187,7 +187,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                       ? state.address!
                                       : 'اسحب الخريطة لتحديد الموقع'.tr),
                               style: AppTextStyles.authSubtitle,
-                              textAlign: TextAlign.right,
+                              textAlign: TextAlign.start,
                             ),
                           ),
                         ],

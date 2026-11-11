@@ -221,7 +221,7 @@ class _MedicineDetailContentState extends State<_MedicineDetailContent> {
                       SizedBox(height: 24.h),
                       Text(
                         medicine.tradeName,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         style: AppTextStyles.medicineDetailName,
                       ),
                       if (medicine.tags.isNotEmpty) ...[
@@ -237,7 +237,7 @@ class _MedicineDetailContentState extends State<_MedicineDetailContent> {
                       SizedBox(height: 24.h),
                       Text(
                         'اختر الصيدلية المناسبة لك'.tr,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         style: AppTextStyles.medicineDetailSectionLabel,
                       ),
                       SizedBox(height: 16.h),

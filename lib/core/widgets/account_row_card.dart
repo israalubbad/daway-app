@@ -51,7 +51,7 @@ class AccountRowCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.accountMenuLabel.copyWith(color: labelColor),
                 ),
               ),

@@ -1,6 +1,8 @@
 import '../../domain/entities/inquiry.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/inquiries` (confirmed against a live
+
 /// response: `id`, `status`, `message`, `created_at`, nested `user.name`,
 /// nested `medicine.trade_name`). Shared by the dashboard's recent-inquiries
 /// preview and the full الاستفسارات screen so both parse the same shape once.
@@ -51,7 +53,7 @@ class InquiryModel {
     if (value is Map) {
       final text = value['message'];
       if (text is String && text.isNotEmpty) return text;
-      if (value['media_url'] != null) return 'صورة';
+      if (value['media_url'] != null) return 'صورة'.tr;
     }
     return null;
   }

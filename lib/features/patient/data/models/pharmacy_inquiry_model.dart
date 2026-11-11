@@ -1,7 +1,9 @@
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_inquiry.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class PharmacyInquiryModel {
+
   final int id;
   final int pharmacyId;
   final int medicineId;
@@ -58,7 +60,7 @@ class PharmacyInquiryModel {
     if (value is Map) {
       final text = value['message'];
       if (text is String && text.isNotEmpty) return text;
-      if (value['media_url'] != null) return 'صورة';
+      if (value['media_url'] != null) return 'صورة'.tr;
     }
     return null;
   }

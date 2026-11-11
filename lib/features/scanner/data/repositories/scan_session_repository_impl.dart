@@ -5,6 +5,8 @@ import '../../domain/entities/scan_pairing.dart';
 import '../../domain/repositories/scan_session_repository.dart';
 import '../datasources/scan_session_remote_data_source.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class ScanSessionRepositoryImpl implements ScanSessionRepository {
   final ScanSessionRemoteDataSource _remote;
 
@@ -25,7 +27,7 @@ class ScanSessionRepositoryImpl implements ScanSessionRepository {
       final data = body is Map<String, dynamic> ? body['data'] : null;
       final deviceToken = data is Map<String, dynamic> ? data['device_token'] : null;
       if (deviceToken is! String || deviceToken.isEmpty) {
-        return const ApiError(ApiFailure(message: 'تعذر إتمام الاقتران، حاول مرة أخرى'));
+        return ApiError(ApiFailure(message: 'تعذر إتمام الاقتران، حاول مرة أخرى'.tr));
       }
       return Success(PairedScanner(sessionId: pairing.sessionId, deviceToken: deviceToken));
     } catch (e) {

@@ -50,13 +50,13 @@ class OrderConfirmationScreen extends StatelessWidget {
                 SizedBox(height: 32.h),
                 Text(
                   'تم تأكيد طلبك'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
                   'تابع حالة طلبك من هنا.'.tr,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),
@@ -262,7 +262,7 @@ class _Timeline extends StatelessWidget {
     final at = tracking.timeOf(status);
     if (at == null) return null;
     final hour = at.hour % 12 == 0 ? 12 : at.hour % 12;
-    return '$hour:${at.minute.toString().padLeft(2, '0')} ${at.hour < 12 ? 'ص' : 'م'}';
+    return '$hour:${at.minute.toString().padLeft(2, '0')} ${at.hour < 12 ? 'ص'.tr : 'م'.tr}';
   }
 
   @override

@@ -65,7 +65,7 @@ class _ConversationsViewState extends State<ConversationsView> {
                 Expanded(
                   child: Text(
                     widget.title,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authScreenTitle,
                   ),
                 ),
@@ -75,7 +75,7 @@ class _ConversationsViewState extends State<ConversationsView> {
             SizedBox(height: 8.h),
             Text(
               widget.description,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.authScreenSubtitle,
             ),
             SizedBox(height: 24.h),

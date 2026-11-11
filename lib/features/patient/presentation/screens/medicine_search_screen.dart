@@ -155,7 +155,7 @@ class _SearchField extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.homeSearchHint.copyWith(color: AppColors.onboardingText),
               decoration: InputDecoration(
                 isCollapsed: true,
@@ -182,7 +182,7 @@ class _TrendingSearches extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('الأكثر بحثاً'.tr, textAlign: TextAlign.right, style: AppTextStyles.searchSectionTitle),
+          Text('الأكثر بحثاً'.tr, textAlign: TextAlign.start, style: AppTextStyles.searchSectionTitle),
           for (var i = 0; i < _trendingSearches.length; i++)
             _TrendingSearchRow(
               term: _trendingSearches[i],
@@ -230,7 +230,7 @@ class _TrendingSearchRow extends StatelessWidget {
             Expanded(
               child: Text(
                 term,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.searchTermText,

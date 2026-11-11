@@ -78,11 +78,11 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('اسمك كامل'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('اسمك كامل'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _nameController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'الرجاء إدخال اسمك الكامل'.tr : null,
@@ -91,7 +91,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('تاريخ الميلاد'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('تاريخ الميلاد'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           FormField<String>(
             initialValue: context.read<PatientAuthCubit>().state.birthDate,
@@ -118,7 +118,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       child: Text(
                         field.errorText!,
                         style: AppTextStyles.authFieldError,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                       ),
                     ),
                 ],
@@ -128,7 +128,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('رقم هاتفك'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('رقم هاتفك'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _phoneController,
@@ -150,7 +150,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 child: Text(
                   state.errorMessage!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },
