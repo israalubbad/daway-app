@@ -64,8 +64,8 @@ void main() {
   tearDown(() => cubit.close());
 
   test('loadDetails returns the full record, or null on failure', () async {
-    repository.detail = Success(_order(1).withStatus(PharmacyOrderStatus.accepted));
-    expect((await cubit.loadDetails(_order(1)))!.status, PharmacyOrderStatus.accepted);
+    repository.detail = Success(_order(2));
+    expect((await cubit.loadDetails(_order(1)))!.id, 2);
 
     repository.detail = const ApiError(ApiFailure(message: 'x'));
     expect(await cubit.loadDetails(_order(1)), isNull);

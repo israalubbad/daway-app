@@ -12,8 +12,8 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
   const PharmacyOrdersRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<PharmacyOrder>>> getOrders({required String token}) async {
-    try {
+  Future<ApiResult<List<PharmacyOrder>>> getOrders({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getOrders(token: token);
       final json = extractJsonList(response.data, source: 'GET /pharmacy/sub-orders');
       final orders = <PharmacyOrder>[];
@@ -27,14 +27,12 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
         }
       }
       return Success(orders);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<PharmacyOrder>> getOrder({required String token, required int orderId}) async {
-    try {
+  Future<ApiResult<PharmacyOrder>> getOrder({required String token, required int orderId}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getOrder(token: token, orderId: orderId);
       final body = response.data;
       // The record may sit under `data` or be the body itself.
@@ -45,8 +43,6 @@ class PharmacyOrdersRepositoryImpl implements PharmacyOrdersRepository {
         throw FormatException('GET /pharmacy/sub-orders/$orderId: unexpected body $body');
       }
       return Success(PharmacyOrderModel.fromJson(record).order);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

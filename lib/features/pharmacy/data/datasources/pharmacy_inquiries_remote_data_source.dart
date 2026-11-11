@@ -22,15 +22,4 @@ class PharmacyInquiriesRemoteDataSource {
     );
   }
 
-  Future<Response<dynamic>> updateStatus({
-    required String token,
-    required int inquiryId,
-    required String status,
-  }) {
-    return _dio.put(
-      '${ApiConstants.pharmacyInquiries}/$inquiryId',
-      data: {'status': status},
-      options: authOptions(token),
-    );
-  }
 }

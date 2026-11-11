@@ -107,19 +107,7 @@ class _RecordPaymentSheetState extends State<RecordPaymentSheet> {
                 textDirection: TextDirection.ltr,
                 textAlign: TextAlign.start,
                 onChanged: (_) => setState(() => _error = null),
-                decoration: InputDecoration(
-                  isDense: true,
-                  prefixText: '₪ ',
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                    borderSide: BorderSide(color: AppColors.cardBorder),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                    borderSide: BorderSide(color: AppColors.mainTeal),
-                  ),
-                ),
+                decoration: AccountingStyles.inputDecoration(prefixText: '₪ '),
               ),
               SizedBox(height: 12.h),
               Text('طريقة الدفع'.tr, style: AccountingStyles.label),

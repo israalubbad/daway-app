@@ -19,8 +19,8 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
   Future<ApiResult<InventoryImportPreview>> preview({
     required String token,
     required String filePath,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.preview(token: token, filePath: filePath);
       final json = response.data;
       if (json is! Map<String, dynamic>) {
@@ -32,42 +32,34 @@ class PharmacyInventoryImportRepositoryImpl implements PharmacyInventoryImportRe
         return ApiError(ApiFailure(message: 'تعذر قراءة نتيجة تحليل الملف'.tr));
       }
       return Success(model.toEntity(importId));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<Uint8List>> downloadTemplate({required String token}) async {
-    try {
+  Future<ApiResult<Uint8List>> downloadTemplate({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.downloadTemplate(token: token);
       final bytes = response.data;
       if (bytes is! List<int> || bytes.isEmpty) {
         return ApiError(ApiFailure(message: 'تعذر تنزيل القالب'.tr));
       }
       return Success(Uint8List.fromList(bytes));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> commit({required String token, required String importId}) async {
-    try {
+  Future<ApiResult<void>> commit({required String token, required String importId}) {
+    return guardApi(() async {
       await _remoteDataSource.commit(token: token, importId: importId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> cancel({required String token, required String importId}) async {
-    try {
+  Future<ApiResult<void>> cancel({required String token, required String importId}) {
+    return guardApi(() async {
       await _remoteDataSource.cancel(token: token, importId: importId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

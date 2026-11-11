@@ -10,6 +10,7 @@ import '../cubit/pharmacy_auth_cubit.dart';
 import '../cubit/pharmacy_auth_state.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/theming/auth_field_decoration.dart';
 /// Pharmacy ID + password fields shown on [PharmacyAuthScreen].
 
 class PharmacyLoginForm extends StatefulWidget {
@@ -62,7 +63,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'معرف الصيدلية مطلوب'.tr : null,
-            decoration: _fieldDecoration(),
+            decoration: authFieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
@@ -76,7 +77,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.isEmpty) ? 'كلمة المرور مطلوبة'.tr : null,
-            decoration: _fieldDecoration().copyWith(
+            decoration: authFieldDecoration().copyWith(
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -143,31 +144,6 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
           ),
         ],
       ),
-    );
-  }
-
-  InputDecoration _fieldDecoration() {
-    return InputDecoration(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-      fillColor: Colors.white,
-      filled: true,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authInputBorder, width: 1.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.0),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.5),
-      ),
-      errorStyle: AppTextStyles.authFieldError,
     );
   }
 }

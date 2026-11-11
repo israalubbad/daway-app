@@ -9,12 +9,10 @@ class AvailabilityAlertsRepositoryImpl implements AvailabilityAlertsRepository {
   const AvailabilityAlertsRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<void>> subscribe({required String token, required int medicineId}) async {
-    try {
+  Future<ApiResult<void>> subscribe({required String token, required int medicineId}) {
+    return guardApi(() async {
       await _remoteDataSource.create(token: token, medicineId: medicineId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

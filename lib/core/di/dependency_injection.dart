@@ -246,7 +246,6 @@ import '../../features/pharmacy/domain/usecases/get_pharmacy_inventory_usecase.d
 import '../../features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import '../../features/pharmacy/domain/usecases/remove_alternative_usecase.dart';
 import '../../features/pharmacy/domain/usecases/select_alternative_usecase.dart';
-import '../../features/pharmacy/domain/usecases/update_inquiry_status_usecase.dart';
 import '../../features/pharmacy/domain/usecases/update_pharmacy_inventory_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_notifications_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
@@ -282,7 +281,6 @@ import '../../features/pharmacy/presentation/cubit/add_medicine_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/edit_medicine_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_dashboard_cubit.dart';
-import '../../features/pharmacy/presentation/cubit/pharmacy_inquiries_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_inventory_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/notifications_cubit.dart';
@@ -800,10 +798,6 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(
     () => GetPharmacyInquiriesUseCase(getIt(), getIt()),
   );
-  getIt.registerLazySingleton(
-    () => UpdateInquiryStatusUseCase(getIt(), getIt()),
-  );
-  getIt.registerFactory(() => PharmacyInquiriesCubit(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetPatientConversationsUseCase(getIt()));
   getIt.registerFactory<ConversationsCubit>(
     () => ConversationsCubit(getIt<GetPatientConversationsUseCase>(), activity: getIt()),

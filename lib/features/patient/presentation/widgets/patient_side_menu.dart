@@ -40,12 +40,6 @@ class PatientSideMenu extends StatelessWidget {
     navigator.push(PatientSettingsScreen.route(logoutCubit: logoutCubit));
   }
 
-  void _openSupport(BuildContext context) {
-    // Started before the drawer closes, while its context is still alive.
-    openSupportChat(context);
-    Navigator.of(context).pop();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -85,7 +79,7 @@ class PatientSideMenu extends StatelessWidget {
             _MenuItem(
               icon: Icons.support_agent_outlined,
               label: 'المساعدة والدعم'.tr,
-              onTap: () => _openSupport(context),
+              onTap: () => openSupportFromDrawer(context),
             ),
           ],
         ),

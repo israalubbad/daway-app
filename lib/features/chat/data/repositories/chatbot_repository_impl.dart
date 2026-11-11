@@ -10,13 +10,11 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
   const ChatbotRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<ChatbotReply>> send({required String token, required String message}) async {
-    try {
+  Future<ApiResult<ChatbotReply>> send({required String token, required String message}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.chat(token: token, message: message);
       return Success(parseReply(response.data));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// What the assistant answered, exactly as the API sent it: its words

@@ -14,6 +14,7 @@ import 'pharmacy_order_details_screen.dart';
 import '../helpers/notifications_navigation.dart';
 import '../widgets/accounting_entry_card.dart';
 import '../widgets/add_medicines_file_card.dart';
+import '../helpers/stock_import_navigation.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
 import '../widgets/pharmacy_home_header.dart';
 import '../widgets/pharmacy_orders_section.dart';
@@ -106,8 +107,7 @@ class _HomeContent extends StatelessWidget {
   });
 
   Future<void> _openStockImport(BuildContext context) async {
-    final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
-    if (updated == true && context.mounted) {
+    if (await openStockImport(context) && context.mounted) {
       context.read<PharmacyDashboardCubit>().refresh();
     }
   }

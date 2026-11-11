@@ -30,8 +30,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required String token,
     required SalesPeriod period,
     bool useCache = false,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final fetchedAt = _overviewFetchedAt;
       final cached = _overviewBody;
       final fresh = useCache &&
@@ -48,66 +48,54 @@ class AccountingRepositoryImpl implements AccountingRepository {
         _overviewFetchedAt = DateTime.now();
       }
       return Success(parseOverview(_overviewBody!, period));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<List<SaleInvoice>>> getSales({required String token}) async {
-    try {
+  Future<ApiResult<List<SaleInvoice>>> getSales({required String token}) {
+    return guardApi(() async {
       final json = await fetchAllPages(
         source: 'GET /pharmacy/accounting/sales',
         fetchPage: (page) async => (await _remote.getSales(token: token, page: page)).data,
       );
       return Success(_parseEach(json, parseInvoice));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<SaleInvoice>> getInvoice({required String token, required String number}) async {
-    try {
+  Future<ApiResult<SaleInvoice>> getInvoice({required String token, required String number}) {
+    return guardApi(() async {
       final response = await _remote.getSale(token: token, number: number);
       return Success(parseInvoice(dataOf(response.data)));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<List<InvoiceLine>>> getRefundableLines({
     required String token,
     required String number,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remote.getRefundItems(token: token, number: number);
       return Success(parseRefundableLines(dataOf(response.data)));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<List<RefundRecord>>> getRefunds({required String token}) async {
-    try {
+  Future<ApiResult<List<RefundRecord>>> getRefunds({required String token}) {
+    return guardApi(() async {
       final response = await _remote.getRefunds(token: token);
       final json = extractJsonList(response.data, source: 'GET /pharmacy/accounting/refunds');
       return Success(_parseEach(json, parseRefund));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<CashLedger>> getCashLedger({required String token}) async {
-    try {
+  Future<ApiResult<CashLedger>> getCashLedger({required String token}) {
+    return guardApi(() async {
       final response = await _remote.getCash(token: token);
       return Success(parseCashLedger(response.data));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -116,8 +104,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required bool isDeposit,
     required double amount,
     required String reason,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remote.createCashAdjustment(
         token: token,
         body: {
@@ -128,59 +116,49 @@ class AccountingRepositoryImpl implements AccountingRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<List<SaleItemOption>>> searchSaleItems({
     required String token,
     required String query,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remote.searchMedicines(token: token, query: query);
       return Success(parseStockSearch(response.data));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<SaleItemOption?>> findByBarcode({
     required String token,
     required String barcode,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remote.getBarcode(token: token, barcode: barcode);
       return barcodeLookupResult(dataOf(response.data), barcode);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<List<AccountingCustomer>>> searchCustomers({
     required String token,
     required String query,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remote.getCustomers(token: token, search: query);
       final json = extractJsonList(response.data, source: 'GET /pharmacy/accounting/customers');
       return Success(_parseEach(json, parseCustomer));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> createSale({required String token, required NewSale sale}) async {
-    try {
+  Future<ApiResult<void>> createSale({required String token, required NewSale sale}) {
+    return guardApi(() async {
       await _remote.createSale(token: token, body: saleRequestBody(sale));
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -216,8 +194,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required String token,
     required String invoiceNumber,
     required Map<int, int> quantities,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remote.createRefund(
         token: token,
         body: {
@@ -228,9 +206,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// One malformed record is skipped rather than failing the whole list, like

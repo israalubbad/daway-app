@@ -14,8 +14,8 @@ class PatientRatingsRepositoryImpl implements PatientRatingsRepository {
     required int pharmacyId,
     required int stars,
     String? comment,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.submitRating(
         token: token,
         pharmacyId: pharmacyId,
@@ -23,8 +23,6 @@ class PatientRatingsRepositoryImpl implements PatientRatingsRepository {
         comment: comment,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

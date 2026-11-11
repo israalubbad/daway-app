@@ -14,8 +14,8 @@ class OrdersRepositoryImpl implements OrdersRepository {
   const OrdersRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<Order>>> getOrders({required String token}) async {
-    try {
+  Future<ApiResult<List<Order>>> getOrders({required String token}) {
+    return guardApi(() async {
       final ordersJson = await fetchAllPages(
         source: 'GET /patient/orders',
         fetchPage: (page) async =>
@@ -25,19 +25,15 @@ class OrdersRepositoryImpl implements OrdersRepository {
           .map((json) => OrderModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(orders);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> cancelOrder({required String token, required int orderId}) async {
-    try {
+  Future<ApiResult<void>> cancelOrder({required String token, required int orderId}) {
+    return guardApi(() async {
       await _remoteDataSource.cancelOrder(token: token, orderId: orderId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -45,8 +41,8 @@ class OrdersRepositoryImpl implements OrdersRepository {
     required String token,
     required int addressId,
     String? couponCode,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getCheckoutQuote(
         token: token,
         addressId: addressId,
@@ -54,9 +50,7 @@ class OrdersRepositoryImpl implements OrdersRepository {
       );
       final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
       return Success(CheckoutQuoteModel.fromJson(data));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -67,8 +61,8 @@ class OrdersRepositoryImpl implements OrdersRepository {
     String? notes,
     CheckoutQuote? quote,
     String? idempotencyKey,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.checkout(
         token: token,
         addressId: addressId,
@@ -85,8 +79,6 @@ class OrdersRepositoryImpl implements OrdersRepository {
         throw const FormatException('POST /patient/checkout response is missing order_id');
       }
       return Success(orderId);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

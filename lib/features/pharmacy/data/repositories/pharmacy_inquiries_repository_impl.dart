@@ -20,8 +20,8 @@ class PharmacyInquiriesRepositoryImpl implements PharmacyInquiriesRepository {
   @override
   Future<ApiResult<InquiriesOverview>> getInquiries({
     required String token,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getInquiries(token: token);
       final body = response.data as Map<String, dynamic>;
       final inquiriesJson = extractJsonList(
@@ -49,26 +49,7 @@ class PharmacyInquiriesRepositoryImpl implements PharmacyInquiriesRepository {
           closedCount: (counts['closed'] as num?)?.toInt() ?? 0,
         ),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
-  @override
-  Future<ApiResult<void>> updateInquiryStatus({
-    required String token,
-    required int inquiryId,
-    required InquiryStatus status,
-  }) async {
-    try {
-      await _remoteDataSource.updateStatus(
-        token: token,
-        inquiryId: inquiryId,
-        status: inquiryStatusToWire(status),
-      );
-      return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
-  }
 }

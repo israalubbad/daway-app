@@ -39,8 +39,8 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
   /// says (this one has not been checked), so page 1 alone could show a
   /// pharmacy with 120 medicines as having 20.
   @override
-  Future<ApiResult<List<Medicine>>> getMedicines({required String token}) async {
-    try {
+  Future<ApiResult<List<Medicine>>> getMedicines({required String token}) {
+    return guardApi(() async {
       final medicinesJson = await fetchAllPages(
         fetchPage: (page) async =>
             (await _remoteDataSource.getMedicines(token: token, page: page)).data,
@@ -50,26 +50,22 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
           .map((json) => MedicineModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(medicines);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<List<MedicineCatalogItem>>> searchCatalog({
     required String token,
     required String query,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.searchCatalog(token: token, query: query);
       final items = _extractSearchResults(response.data)
           .map((json) =>
               MedicineCatalogItemModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(items);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -81,8 +77,8 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
     required int quantity,
     required bool isAvailable,
     String? imageUrl,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.addMedicine(
         token: token,
         body: {
@@ -95,9 +91,7 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -111,8 +105,8 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
     required int quantity,
     required bool isAvailable,
     String? imageUrl,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.addMedicineByName(
         token: token,
         body: {
@@ -127,22 +121,18 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> deleteMedicine({
     required String token,
     required int pharmacyMedicineId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.deleteMedicine(token: token, pharmacyMedicineId: pharmacyMedicineId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -156,8 +146,8 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
     required double price,
     required int quantity,
     required bool isAvailable,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.updateMedicine(
         token: token,
         pharmacyMedicineId: pharmacyMedicineId,
@@ -172,8 +162,6 @@ class PharmacyMedicineRepositoryImpl implements PharmacyMedicineRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

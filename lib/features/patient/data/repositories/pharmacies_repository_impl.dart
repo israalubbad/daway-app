@@ -18,8 +18,8 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
   Future<ApiResult<List<NearbyPharmacy>>> getNearbyPharmacies({
     double? userLatitude,
     double? userLongitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getPharmacies();
       final pharmaciesJson = extractJsonList(response.data, source: 'GET /pharmacies');
       var pharmacies = pharmaciesJson
@@ -41,22 +41,18 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
       }
 
       return Success(pharmacies);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<String?>> getWorkingHoursLabel(int pharmacyId) async {
-    try {
+  Future<ApiResult<String?>> getWorkingHoursLabel(int pharmacyId) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getPharmacyDetail(pharmacyId);
       final body = response.data;
       final data = body is Map<String, dynamic> ? body['data'] : null;
       final hours = data is Map<String, dynamic> ? data['hours'] : null;
       return Success(_formatTodaysHours(hours));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// Best-effort: every pharmacy seeded on the live backend has an empty

@@ -150,9 +150,8 @@ class MedicineDetailCubit extends Cubit<MedicineDetailState> {
     };
   }
 
-  /// Returns null on success, or a user-facing error message on failure —
-  /// same contract as PharmacyInquiriesCubit.updateStatus, so the screen can
-  /// show a snackbar without the cubit owning UI feedback.
+  /// Returns null on success, or a user-facing error message on failure, so the
+  /// screen can show a snackbar without the cubit owning UI feedback.
   Future<String?> toggleFavorite() async {
     final current = state;
     if (current is! MedicineDetailLoaded || current.isTogglingFavorite) return null;

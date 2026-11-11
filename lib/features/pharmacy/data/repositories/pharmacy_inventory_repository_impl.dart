@@ -21,24 +21,22 @@ class PharmacyInventoryRepositoryImpl implements PharmacyInventoryRepository {
   /// are tallied from these same items client-side (via [Medicine.status]),
   /// so they can't drift from what the list itself shows.
   @override
-  Future<ApiResult<List<Medicine>>> getInventory({required String token}) async {
-    try {
+  Future<ApiResult<List<Medicine>>> getInventory({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getInventory(token: token);
       final medicines = extractJsonList(response.data, source: 'GET /pharmacy/inventory')
           .map((json) => MedicineModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(medicines);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> updateInventory({
     required String token,
     required List<InventoryItemUpdate> items,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.bulkUpdate(
         token: token,
         body: {
@@ -52,8 +50,6 @@ class PharmacyInventoryRepositoryImpl implements PharmacyInventoryRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

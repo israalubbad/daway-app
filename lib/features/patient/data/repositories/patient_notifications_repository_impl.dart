@@ -16,13 +16,11 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
   Future<ApiResult<void>> markAsRead({
     required String token,
     required int notificationId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.markAsRead(token: token, notificationId: notificationId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// One malformed notification record is skipped rather than failing the
@@ -32,8 +30,8 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({
     required String token,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       const source = 'GET /notifications';
       final notificationsJson = await fetchAllPages(
         source: source,
@@ -58,8 +56,6 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
       }
       sortByDateDescending(notifications, (n) => n.createdAt);
       return Success(notifications);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

@@ -13,6 +13,7 @@ import '../screens/privacy_policy_screen.dart';
 import '../screens/terms_screen.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/theming/auth_field_decoration.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -86,7 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'الرجاء إدخال اسمك الكامل'.tr : null,
-            decoration: _fieldDecoration(),
+            decoration: authFieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
@@ -138,7 +139,7 @@ class _SignUpFormState extends State<SignUpForm> {
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'الرجاء إدخال رقم الهاتف'.tr : null,
-            decoration: _fieldDecoration(),
+            decoration: authFieldDecoration(),
           ),
 
           BlocBuilder<PatientAuthCubit, PatientAuthState>(
@@ -198,31 +199,6 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
         ],
       ),
-    );
-  }
-
-  InputDecoration _fieldDecoration() {
-    return InputDecoration(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-      fillColor: Colors.white,
-      filled: true,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authInputBorder, width: 1.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.0),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.5),
-      ),
-      errorStyle: AppTextStyles.authFieldError,
     );
   }
 }

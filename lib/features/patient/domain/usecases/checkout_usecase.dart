@@ -1,8 +1,8 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/checkout_quote.dart';
 import '../repositories/orders_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class CheckoutUseCase {
   final OrdersRepository _repository;
@@ -20,20 +20,17 @@ class CheckoutUseCase {
     String? notes,
     CheckoutQuote? quote,
     String? idempotencyKey,
-  }) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return ApiError(
-        ApiFailure(message: sessionExpiredMessage),
-      );
-    }
-    return _repository.checkout(
-      token: session.token,
-      addressId: addressId,
-      couponCode: couponCode,
-      notes: notes,
-      quote: quote,
-      idempotencyKey: idempotencyKey,
+  }) {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.checkout(
+        token: token,
+        addressId: addressId,
+        couponCode: couponCode,
+        notes: notes,
+        quote: quote,
+        idempotencyKey: idempotencyKey,
+      ),
     );
   }
 }

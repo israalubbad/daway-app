@@ -147,22 +147,6 @@ class _ScanCard extends StatelessWidget {
     required this.onItemTap,
   });
 
-  InputDecoration _decoration(String hint, {Widget? suffix}) {
-    OutlineInputBorder border(Color color) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8.r),
-      borderSide: BorderSide(color: color),
-    );
-    return InputDecoration(
-      isDense: true,
-      hintText: hint,
-      hintStyle: AccountingStyles.muted.copyWith(fontSize: 13.sp),
-      suffixIcon: suffix,
-      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      enabledBorder: border(AppColors.cardBorder),
-      focusedBorder: border(AppColors.mainTeal),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return AccountingCard(
@@ -182,7 +166,7 @@ class _ScanCard extends StatelessWidget {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => onBarcodeSubmitted(),
                   style: AccountingStyles.body.copyWith(fontFamily: 'monospace'),
-                  decoration: _decoration('امسح الباركود أو اكتبه…'.tr),
+                  decoration: AccountingStyles.inputDecoration(hint: 'امسح الباركود أو اكتبه…'.tr),
                 ),
               ),
               SizedBox(width: 8.w),
@@ -241,7 +225,7 @@ class _ScanCard extends StatelessWidget {
           TextField(
             controller: searchController,
             onChanged: onQueryChanged,
-            decoration: _decoration(
+            decoration: AccountingStyles.inputDecoration(hint: 
               'اكتب اسم الدواء أو المادة الفعالة…'.tr,
               suffix: Icon(Icons.search, size: 20.r, color: AppColors.authInputBorder),
             ),

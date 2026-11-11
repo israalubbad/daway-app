@@ -32,3 +32,10 @@ Future<void> openSupportChat(BuildContext context) async {
   }
   AppSnackbar.showOn(messenger, 'تعذر فتح واتساب أو الاتصال'.tr);
 }
+
+/// [openSupportChat] from a drawer's item: started before the drawer closes,
+/// while its context is still alive, and then the drawer is closed.
+void openSupportFromDrawer(BuildContext context) {
+  openSupportChat(context);
+  Navigator.of(context).pop();
+}

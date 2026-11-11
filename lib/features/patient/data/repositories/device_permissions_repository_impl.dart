@@ -13,35 +13,29 @@ class DevicePermissionsRepositoryImpl implements DevicePermissionsRepository {
   const DevicePermissionsRepositoryImpl(this._dataSource);
 
   @override
-  Future<ApiResult<bool>> isNotificationsEnabled() async {
-    try {
+  Future<ApiResult<bool>> isNotificationsEnabled() {
+    return guardApi(() async {
       return Success(await _dataSource.isNotificationPermissionGranted());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// Location counts as enabled only when the device's location service is
   /// on AND this app has been allowed to use it.
   @override
-  Future<ApiResult<bool>> isLocationEnabled() async {
-    try {
+  Future<ApiResult<bool>> isLocationEnabled() {
+    return guardApi(() async {
       if (!await _dataSource.isLocationServiceEnabled()) return const Success(false);
       return Success(await _dataSource.isLocationPermissionGranted());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> openSettings(DeviceSetting setting) async {
-    try {
+  Future<ApiResult<void>> openSettings(DeviceSetting setting) {
+    return guardApi(() async {
       final opened = await _open(setting);
       if (opened) return const Success(null);
       return ApiError(PermissionFailure('تعذر فتح إعدادات الجهاز'.tr));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   Future<bool> _open(DeviceSetting setting) async {

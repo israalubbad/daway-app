@@ -36,21 +36,6 @@ class PharmacyOrder {
   /// Who placed the order; null when the API does not say.
   final String? patientName;
 
-  /// This order with another [status] — what a decision turns it into.
-  PharmacyOrder withStatus(PharmacyOrderStatus status) => PharmacyOrder(
-    id: id,
-    status: status,
-    orderNumber: orderNumber,
-    createdAt: createdAt,
-    itemsCount: itemsCount,
-    total: total,
-    area: area,
-    items: items,
-    deliveryStreet: deliveryStreet,
-    payment: payment,
-    patientName: patientName,
-  );
-
   const PharmacyOrder({
     this.id = 0,
     this.status = PharmacyOrderStatus.pending,

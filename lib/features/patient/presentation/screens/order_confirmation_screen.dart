@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../core/helpers/smart_date_formatter.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/routing/routes.dart';
@@ -261,8 +262,7 @@ class _Timeline extends StatelessWidget {
     final status = _steps[index].status;
     final at = tracking.timeOf(status);
     if (at == null) return null;
-    final hour = at.hour % 12 == 0 ? 12 : at.hour % 12;
-    return '$hour:${at.minute.toString().padLeft(2, '0')} ${at.hour < 12 ? 'ص'.tr : 'م'.tr}';
+    return formatClockTime(at);
   }
 
   @override

@@ -1,10 +1,21 @@
 import 'package:dio/dio.dart';
 
+import '../helpers/api_result.dart';
 import 'api_error_model.dart';
 import 'failure.dart';
 
 import '../../core/localization/translations.dart';
 String get _genericErrorMessage => 'حدث خطأ ما، يرجى المحاولة لاحقاً'.tr;
+
+/// The data layer's boundary: runs [body], and an exception it throws comes back
+/// as the [ApiError] of its [Failure] instead of escaping to the layers above.
+Future<ApiResult<T>> guardApi<T>(Future<ApiResult<T>> Function() body) async {
+  try {
+    return await body();
+  } catch (e) {
+    return ApiError(mapExceptionToFailure(e));
+  }
+}
 
 Failure mapExceptionToFailure(Object error) {
   if (error is DioException) {

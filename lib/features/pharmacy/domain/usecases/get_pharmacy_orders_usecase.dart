@@ -1,8 +1,8 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/pharmacy_order.dart';
 import '../repositories/pharmacy_orders_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class GetPharmacyOrdersUseCase {
   final PharmacyOrdersRepository _repository;
@@ -10,13 +10,10 @@ class GetPharmacyOrdersUseCase {
 
   const GetPharmacyOrdersUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<List<PharmacyOrder>>> call() async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return ApiError(
-        ApiFailure(message: sessionExpiredMessage),
-      );
-    }
-    return _repository.getOrders(token: session.token);
+  Future<ApiResult<List<PharmacyOrder>>> call() {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.getOrders(token: token),
+    );
   }
 }

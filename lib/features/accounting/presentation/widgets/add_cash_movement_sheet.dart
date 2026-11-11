@@ -149,7 +149,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                 textDirection: TextDirection.ltr,
                 textAlign: TextAlign.start,
                 onChanged: (_) => setState(() => _error = null),
-                decoration: _decoration(hint: '0.00', prefix: '₪'),
+                decoration: AccountingStyles.inputDecoration(hint: '0.00', prefixText: '₪ '),
               ),
               if (_exceedsBalance)
                 Padding(
@@ -166,7 +166,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                 controller: _reasonController,
                 maxLines: 3,
                 onChanged: (_) => setState(() => _error = null),
-                decoration: _decoration(hint: 'اذكر سبب الحركة (إلزامي)'.tr),
+                decoration: AccountingStyles.inputDecoration(hint: 'اذكر سبب الحركة (إلزامي)'.tr),
               ),
               SizedBox(height: 12.h),
               Container(
@@ -211,22 +211,6 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
           ),
         ),
       ),
-    );
-  }
-
-  InputDecoration _decoration({required String hint, String? prefix}) {
-    OutlineInputBorder border(Color color) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8.r),
-      borderSide: BorderSide(color: color),
-    );
-    return InputDecoration(
-      isDense: true,
-      hintText: hint,
-      hintStyle: AccountingStyles.muted.copyWith(fontSize: 13.sp),
-      prefixText: prefix == null ? null : '$prefix ',
-      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      enabledBorder: border(AppColors.cardBorder),
-      focusedBorder: border(AppColors.mainTeal),
     );
   }
 }

@@ -26,15 +26,6 @@ class _FakePharmacyInquiriesRepository implements PharmacyInquiriesRepository {
     lastToken = token;
     return getResult;
   }
-
-  @override
-  Future<ApiResult<void>> updateInquiryStatus({
-    required String token,
-    required int inquiryId,
-    required InquiryStatus status,
-  }) async {
-    throw UnimplementedError();
-  }
 }
 
 class _FakeSessionRepository implements SessionRepository {

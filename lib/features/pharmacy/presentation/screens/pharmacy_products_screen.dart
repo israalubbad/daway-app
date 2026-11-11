@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_text_styles.dart';
+import '../helpers/stock_import_navigation.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../../domain/entities/medicine.dart';
@@ -125,8 +126,7 @@ class _Controls extends StatelessWidget {
   }
 
   Future<void> _openStockImport(BuildContext context) async {
-    final updated = await Navigator.of(context).pushNamed(Routes.pharmacyStockImportScreen);
-    if (updated == true && context.mounted) {
+    if (await openStockImport(context) && context.mounted) {
       context.read<PharmacyMedicinesCubit>().refresh();
     }
   }

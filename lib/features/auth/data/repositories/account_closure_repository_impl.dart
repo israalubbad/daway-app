@@ -12,13 +12,11 @@ class AccountClosureRepositoryImpl implements AccountClosureRepository {
   const AccountClosureRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<void>> closePatientAccount({required String token, String? reason}) async {
-    try {
+  Future<ApiResult<void>> closePatientAccount({required String token, String? reason}) {
+    return guardApi(() async {
       await _remoteDataSource.closePatientAccount(token: token, reason: reason);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -38,8 +36,8 @@ class AccountClosureRepositoryImpl implements AccountClosureRepository {
   Future<ApiResult<ClosureRequest>> requestPharmacyClosure({
     required String token,
     String? reason,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.requestPharmacyClosure(token: token, reason: reason);
       // The request was accepted even if the body says nothing more: it is
       // waiting for the admin.
@@ -47,8 +45,6 @@ class AccountClosureRepositoryImpl implements AccountClosureRepository {
         ClosureRequestModel.fromResponse(response.data) ??
             ClosureRequest(status: ClosureRequestStatus.pending, reason: reason),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

@@ -13,8 +13,8 @@ class PharmacyPasswordRepositoryImpl implements PharmacyPasswordRepository {
     required String token,
     required String currentPassword,
     required String newPassword,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.changePassword(
         token: token,
         body: {
@@ -24,8 +24,6 @@ class PharmacyPasswordRepositoryImpl implements PharmacyPasswordRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

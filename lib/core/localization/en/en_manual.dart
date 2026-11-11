@@ -3,7 +3,6 @@ const Map<String, String> enManual = {
   'هذا الدواء غير مضاف إلى مخزون صيدليتك': 'This medicine has not been added to your pharmacy\'s stock',
   'أكثر من صنف يطابق هذا الباركود، ابحث عنه بالاسم': 'More than one item matches this barcode, search for it by name',
   'لا يمكن تسجيل دفعة على فاتورة بلا عميل': 'A payment cannot be recorded on an invoice with no customer',
-  'دفعة على الفاتورة {0}': 'Payment on invoice {0}',
   'الفاتورة ملغاة أو مرجوعة ولا يمكن إرجاع أصناف منها': 'The invoice is cancelled or returned, and items cannot be returned from it',
   'أدخل مبلغاً أكبر من صفر': 'Enter an amount greater than zero',
   'اذكر سبب الحركة (3 أحرف على الأقل)': 'State the reason for the movement (at least 3 characters)',

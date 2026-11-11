@@ -18,8 +18,8 @@ class MedicineDetailRepositoryImpl implements MedicineDetailRepository {
     required int medicineId,
     double? latitude,
     double? longitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getMedicine(
         medicineId: medicineId,
         latitude: latitude,
@@ -27,9 +27,7 @@ class MedicineDetailRepositoryImpl implements MedicineDetailRepository {
       );
       final model = MedicineDetailModel.fromJson(response.data as Map<String, dynamic>);
       return Success(model.toEntity());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -37,8 +35,8 @@ class MedicineDetailRepositoryImpl implements MedicineDetailRepository {
     required int medicineId,
     double? latitude,
     double? longitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getMedicinePharmacies(
         medicineId: medicineId,
         latitude: latitude,
@@ -53,8 +51,6 @@ class MedicineDetailRepositoryImpl implements MedicineDetailRepository {
               MedicinePharmacyOfferModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(offers);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

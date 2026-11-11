@@ -60,23 +60,6 @@ class SaleInvoice {
     lines: lines,
   );
 
-  /// This invoice with [lines] filled in.
-  SaleInvoice withLines(List<InvoiceLine> lines) => SaleInvoice(
-    id: id,
-    number: number,
-    date: date,
-    customerId: customerId,
-    customerName: customerName,
-    itemsCount: itemsCount,
-    subtotal: subtotal,
-    discount: discount,
-    total: total,
-    paid: paid,
-    method: method,
-    statusOverride: statusOverride,
-    lines: lines,
-  );
-
   double get remaining => (total - paid).clamp(0, double.infinity).toDouble();
 
   PaymentStatus get status {

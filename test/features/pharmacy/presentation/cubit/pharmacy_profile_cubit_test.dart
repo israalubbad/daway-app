@@ -150,18 +150,6 @@ void main() {
     expect(state.name, 'صيدلية الأمل');
   });
 
-  test('workingHoursChanged updates only the targeted day', () {
-    cubit.toggleEdit();
-    cubit.workingHoursChanged(WeekDay.tue, open: '10:00', close: '20:00');
-
-    final state = cubit.state as PharmacyProfileLoaded;
-    final tue = state.workingHours.firstWhere((e) => e.day == WeekDay.tue);
-    expect(tue.open, '10:00');
-    expect(tue.close, '20:00');
-    final sat = state.workingHours.firstWhere((e) => e.day == WeekDay.sat);
-    expect(sat.open, '09:00');
-  });
-
   test('canSave requires a location', () async {
     profileRepository.getResult = const Success(
       PharmacyProfile(pharmacyId: 'PH-1', name: 'صيدلية جديدة', phone: '+970591234567'),
@@ -294,7 +282,9 @@ void main() {
     });
 
     test('is true once one day has different hours', () {
-      cubit.workingHoursChanged(WeekDay.sat, open: '10:00', close: '20:00');
+      cubit.workingHoursReplaced(const [
+        WorkingHoursEntry(day: WeekDay.sat, open: '10:00', close: '20:00'),
+      ]);
       expect(loaded().hasChanges, isTrue);
     });
   });
@@ -316,7 +306,9 @@ void main() {
   group('discardEdits', () {
     test('goes back to the saved profile', () {
       cubit.nameChanged('اسم مختلف');
-      cubit.workingHoursChanged(WeekDay.sat, open: '10:00', close: '20:00');
+      cubit.workingHoursReplaced(const [
+        WorkingHoursEntry(day: WeekDay.sat, open: '10:00', close: '20:00'),
+      ]);
 
       cubit.discardEdits();
 

@@ -1,11 +1,8 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/patient_health_profile.dart';
 import '../repositories/health_profile_repository.dart';
-
-ApiError<PatientHealthProfile> get _sessionExpired =>
-    ApiError<PatientHealthProfile>(ApiFailure(message: sessionExpiredMessage));
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class GetHealthProfileUseCase {
   final HealthProfileRepository _repository;
@@ -13,10 +10,11 @@ class GetHealthProfileUseCase {
 
   const GetHealthProfileUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<PatientHealthProfile>> call() async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) return _sessionExpired;
-    return _repository.getHealthProfile(token: session.token);
+  Future<ApiResult<PatientHealthProfile>> call() {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.getHealthProfile(token: token),
+    );
   }
 }
 
@@ -26,9 +24,11 @@ class UpdateHealthProfileUseCase {
 
   const UpdateHealthProfileUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<PatientHealthProfile>> call(PatientHealthProfile profile) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) return _sessionExpired;
-    return _repository.updateHealthProfile(token: session.token, profile: profile);
+  Future<ApiResult<PatientHealthProfile>> call(PatientHealthProfile profile) {
+    return withSessionToken(
+      _sessionRepository,
+      (token) =>
+          _repository.updateHealthProfile(token: token, profile: profile),
+    );
   }
 }

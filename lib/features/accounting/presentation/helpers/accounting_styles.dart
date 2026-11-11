@@ -7,6 +7,26 @@ import '../../../../core/theming/app_fonts.dart';
 /// The text styles of the accounting screens: Tajawal in the app's navy, the
 /// same family and weights the pharmacy home and products pages use.
 abstract class AccountingStyles {
+  /// The look of the accounting forms' text fields: dense, an 8px corner, a grey
+  /// border that turns teal when focused. [hint], [suffix] and [prefixText] are
+  /// what each form adds.
+  static InputDecoration inputDecoration({String? hint, Widget? suffix, String? prefixText}) {
+    OutlineInputBorder border(Color color) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.r),
+      borderSide: BorderSide(color: color),
+    );
+    return InputDecoration(
+      isDense: true,
+      hintText: hint,
+      hintStyle: muted.copyWith(fontSize: 13.sp),
+      suffixIcon: suffix,
+      prefixText: prefixText,
+      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      enabledBorder: border(AppColors.cardBorder),
+      focusedBorder: border(AppColors.mainTeal),
+    );
+  }
+
   static TextStyle get sectionTitle => AppFonts.tajawal(
     TextStyle(fontSize: 16.sp, height: 1.4, color: AppColors.onboardingText),
     FontWeight.w700,

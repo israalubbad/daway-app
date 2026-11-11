@@ -77,16 +77,6 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
     ));
   }
 
-  void workingHoursChanged(WeekDay day, {String? open, String? close}) {
-    final current = state;
-    if (current is! PharmacyProfileLoaded) return;
-    final updated = [
-      for (final entry in current.workingHours)
-        if (entry.day == day) WorkingHoursEntry(day: day, open: open, close: close) else entry,
-    ];
-    emit(current.copyWith(workingHours: updated, clearSaveError: true));
-  }
-
   /// Replaces every day's hours at once — what the working-hours dialog
   /// hands back after the pharmacy edits the whole week.
   void workingHoursReplaced(List<WorkingHoursEntry> entries) {

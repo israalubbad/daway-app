@@ -26,12 +26,6 @@ class PharmacySideMenu extends StatelessWidget {
     PharmacyDashboardTabScope.switchToTabOrShowComingSoon(context, tab);
   }
 
-  void _openSupport(BuildContext context) {
-    // Started before the drawer closes, while its context is still alive.
-    openSupportChat(context);
-    Navigator.of(context).pop();
-  }
-
   void _openAlternatives(BuildContext context) {
     Navigator.of(context).pop();
     Navigator.of(context).pushNamed(Routes.pharmacyAlternativesEntryScreen);
@@ -104,7 +98,7 @@ class PharmacySideMenu extends StatelessWidget {
             _MenuItem(
               icon: Icons.support_agent_outlined,
               label: 'المساعدة والدعم'.tr,
-              onTap: () => _openSupport(context),
+              onTap: () => openSupportFromDrawer(context),
             ),
             const Spacer(),
             Divider(color: AppColors.borderGrey, height: 1),

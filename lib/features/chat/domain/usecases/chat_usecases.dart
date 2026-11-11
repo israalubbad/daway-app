@@ -1,4 +1,3 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/entities/account_type.dart';
 import '../../../auth/domain/entities/user_session.dart';
@@ -6,8 +5,7 @@ import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/chat_message.dart';
 import '../repositories/chat_image_uploader.dart';
 import '../repositories/chat_repository.dart';
-
-ApiFailure get _sessionExpired => ApiFailure(message: sessionExpiredMessage);
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class GetChatMessagesUseCase {
   final ChatRepository _repository;
@@ -15,20 +13,22 @@ class GetChatMessagesUseCase {
 
   const GetChatMessagesUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<List<ChatMessage>>> call(int inquiryId, {bool markRead = true}) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) return ApiError(_sessionExpired);
-
-    final result = await _repository.getMessages(
-      token: session.token,
-      accountType: session.accountType,
-      inquiryId: inquiryId,
-      markRead: markRead,
-    );
-    return switch (result) {
-      ApiError() => result,
-      Success(:final data) => Success(_markMine(data, session)),
-    };
+  Future<ApiResult<List<ChatMessage>>> call(
+    int inquiryId, {
+    bool markRead = true,
+  }) {
+    return withSession(_sessionRepository, (session) async {
+      final result = await _repository.getMessages(
+        token: session.token,
+        accountType: session.accountType,
+        inquiryId: inquiryId,
+        markRead: markRead,
+      );
+      return switch (result) {
+        ApiError() => result,
+        Success(:final data) => Success(_markMine(data, session)),
+      };
+    });
   }
 
   /// A message is mine when, in order of preference: the server says so
@@ -43,14 +43,15 @@ class GetChatMessagesUseCase {
     return [
       for (final message in messages)
         message.copyWith(
-          isMine: message.serverIsMine ??
+          isMine:
+              message.serverIsMine ??
               (message.senderRole != null
                   ? message.senderRole == session.accountType.name
                   : userId != null
-                      ? message.senderUserId == userId
-                      : (session.accountType == AccountType.patient
-                          ? message.senderUserId == patientId
-                          : message.senderUserId != patientId)),
+                  ? message.senderUserId == userId
+                  : (session.accountType == AccountType.patient
+                        ? message.senderUserId == patientId
+                        : message.senderUserId != patientId)),
         ),
     ];
   }
@@ -62,21 +63,20 @@ class SendChatMessageUseCase {
 
   const SendChatMessageUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<ChatMessage>> call(int inquiryId, String text) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) return ApiError(_sessionExpired);
-
-    final result = await _repository.sendMessage(
-      token: session.token,
-      accountType: session.accountType,
-      inquiryId: inquiryId,
-      text: text,
-    );
-    return switch (result) {
-      ApiError() => result,
-      // A message I just sent is mine by definition.
-      Success(:final data) => Success(data.copyWith(isMine: true)),
-    };
+  Future<ApiResult<ChatMessage>> call(int inquiryId, String text) {
+    return withSession(_sessionRepository, (session) async {
+      final result = await _repository.sendMessage(
+        token: session.token,
+        accountType: session.accountType,
+        inquiryId: inquiryId,
+        text: text,
+      );
+      return switch (result) {
+        ApiError() => result,
+        // A message I just sent is mine by definition.
+        Success(:final data) => Success(data.copyWith(isMine: true)),
+      };
+    });
   }
 }
 
@@ -86,5 +86,6 @@ class UploadChatImageUseCase {
 
   const UploadChatImageUseCase(this._uploader);
 
-  Future<ApiResult<String>> call(String imagePath) => _uploader.upload(imagePath);
+  Future<ApiResult<String>> call(String imagePath) =>
+      _uploader.upload(imagePath);
 }

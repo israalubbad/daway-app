@@ -16,8 +16,8 @@ class ScanSessionRepositoryImpl implements ScanSessionRepository {
   Future<ApiResult<PairedScanner>> pair({
     required ScanPairing pairing,
     required String deviceName,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remote.pair(
         sessionId: pairing.sessionId,
         pairingToken: pairing.pairingToken,
@@ -30,25 +30,21 @@ class ScanSessionRepositoryImpl implements ScanSessionRepository {
         return ApiError(ApiFailure(message: 'تعذر إتمام الاقتران، حاول مرة أخرى'.tr));
       }
       return Success(PairedScanner(sessionId: pairing.sessionId, deviceToken: deviceToken));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> sendBarcode({
     required PairedScanner scanner,
     required String barcode,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remote.sendBarcode(
         sessionId: scanner.sessionId,
         deviceToken: scanner.deviceToken,
         barcode: barcode,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

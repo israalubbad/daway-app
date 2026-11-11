@@ -14,8 +14,8 @@ class DeviceTokensRepositoryImpl implements DeviceTokensRepository {
     required String fcmToken,
     required String deviceId,
     required String platform,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.register(
         authToken: authToken,
         fcmToken: fcmToken,
@@ -23,21 +23,17 @@ class DeviceTokensRepositoryImpl implements DeviceTokensRepository {
         platform: platform,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> unregister({
     required String authToken,
     required String deviceId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.unregister(authToken: authToken, deviceId: deviceId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

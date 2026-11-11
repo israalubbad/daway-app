@@ -1,13 +1,16 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../repositories/pharmacy_medicine_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class UpdatePharmacyMedicineUseCase {
   final PharmacyMedicineRepository _repository;
   final SessionRepository _sessionRepository;
 
-  const UpdatePharmacyMedicineUseCase(this._repository, this._sessionRepository);
+  const UpdatePharmacyMedicineUseCase(
+    this._repository,
+    this._sessionRepository,
+  );
 
   Future<ApiResult<void>> call({
     required int pharmacyMedicineId,
@@ -18,23 +21,20 @@ class UpdatePharmacyMedicineUseCase {
     required double price,
     required int quantity,
     required bool isAvailable,
-  }) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return ApiError(
-        ApiFailure(message: sessionExpiredMessage),
-      );
-    }
-    return _repository.updateMedicine(
-      token: session.token,
-      pharmacyMedicineId: pharmacyMedicineId,
-      medicineId: medicineId,
-      tradeName: tradeName,
-      tradeNameAr: tradeNameAr,
-      activeIngredient: activeIngredient,
-      price: price,
-      quantity: quantity,
-      isAvailable: isAvailable,
+  }) {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.updateMedicine(
+        token: token,
+        pharmacyMedicineId: pharmacyMedicineId,
+        medicineId: medicineId,
+        tradeName: tradeName,
+        tradeNameAr: tradeNameAr,
+        activeIngredient: activeIngredient,
+        price: price,
+        quantity: quantity,
+        isAvailable: isAvailable,
+      ),
     );
   }
 }

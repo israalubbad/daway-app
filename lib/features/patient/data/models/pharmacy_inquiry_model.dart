@@ -1,7 +1,7 @@
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_inquiry.dart';
+import '../../../chat/domain/entities/last_message_text.dart';
 
-import '../../../../core/localization/translations.dart';
 class PharmacyInquiryModel {
 
   final int id;
@@ -45,24 +45,13 @@ class PharmacyInquiryModel {
       medicineName: medicine?['trade_name'] as String?,
       pharmacyName: (pharmacy?['pharmacy_name'] ?? pharmacy?['name']) as String?,
       message: json['message'] as String? ?? '',
-      lastMessage: _lastMessageText(json['last_message']),
+      lastMessage: lastMessageText(json['last_message']),
       unreadCount: (json['unread_messages_count'] as num?)?.toInt() ?? 0,
       reply: json['reply'] as String?,
       status: InquiryStatus.fromApi(json['status'] as String?),
       createdAt: tryParseServerTimestamp(createdAtRaw) ?? DateTime.now(),
       repliedAt: tryParseServerTimestamp(repliedAtRaw),
     );
-  }
-
-  /// `last_message` may be the message text or the message object.
-  static String? _lastMessageText(Object? value) {
-    if (value is String) return value.isEmpty ? null : value;
-    if (value is Map) {
-      final text = value['message'];
-      if (text is String && text.isNotEmpty) return text;
-      if (value['media_url'] != null) return 'صورة'.tr;
-    }
-    return null;
   }
 
   PharmacyInquiry toEntity() => PharmacyInquiry(

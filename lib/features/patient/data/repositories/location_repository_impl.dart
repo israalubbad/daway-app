@@ -78,8 +78,8 @@ class LocationRepositoryImpl implements LocationRepository {
   Future<ApiResult<String>> reverseGeocode({
     required double latitude,
     required double longitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final placemarks = await _geocoding.placemarkFromCoordinates(
         latitude,
         longitude,
@@ -94,14 +94,12 @@ class LocationRepositoryImpl implements LocationRepository {
         placemark.country,
       ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
       return Success(parts.isNotEmpty ? parts.join('، '.tr) : (placemark.name ?? ''));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<PickedLocation>> searchAddress(String query) async {
-    try {
+  Future<ApiResult<PickedLocation>> searchAddress(String query) {
+    return guardApi(() async {
       final locations = await _geocoding.locationFromAddress(query, locale: _arabic);
       if (locations.isEmpty) {
         return ApiError(ValidationFailure('لم يتم العثور على هذا العنوان'.tr));
@@ -121,8 +119,6 @@ class LocationRepositoryImpl implements LocationRepository {
         longitude: location.longitude,
         address: address,
       ));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

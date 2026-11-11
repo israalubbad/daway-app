@@ -99,7 +99,7 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                         ? TextField(
                             controller: _customerController,
                             onChanged: widget.cubit.customerQueryChanged,
-                            decoration: _decoration('زائر نقدي · اكتب اسماً لاختيار عميل'.tr),
+                            decoration: AccountingStyles.inputDecoration(hint: 'زائر نقدي · اكتب اسماً لاختيار عميل'.tr),
                           )
                         : _SelectedCustomer(
                             name: state.customer!.name,
@@ -144,7 +144,7 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                       onChanged: widget.cubit.paidChanged,
                       // Left empty, the backend decides: everything for a cash
                       // sale, nothing for a sale on credit.
-                      decoration: _decoration(
+                      decoration: AccountingStyles.inputDecoration(hint: 
                         state.method == PaymentMethod.credit ? '0.00' : state.total.toStringAsFixed(2),
                       ),
                     ),
@@ -185,21 +185,6 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
           },
         ),
       ),
-    );
-  }
-
-  InputDecoration _decoration(String hint) {
-    OutlineInputBorder border(Color color) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8.r),
-      borderSide: BorderSide(color: color),
-    );
-    return InputDecoration(
-      isDense: true,
-      hintText: hint,
-      hintStyle: AccountingStyles.muted.copyWith(fontSize: 13.sp),
-      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      enabledBorder: border(AppColors.cardBorder),
-      focusedBorder: border(AppColors.mainTeal),
     );
   }
 }

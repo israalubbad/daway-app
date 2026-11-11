@@ -19,21 +19,19 @@ class HealthProfileRepositoryImpl implements HealthProfileRepository {
   }
 
   @override
-  Future<ApiResult<PatientHealthProfile>> getHealthProfile({required String token}) async {
-    try {
+  Future<ApiResult<PatientHealthProfile>> getHealthProfile({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getHealthProfile(token: token);
       return Success(_parse(response.data, 'GET /patient/health-profile'));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<PatientHealthProfile>> updateHealthProfile({
     required String token,
     required PatientHealthProfile profile,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.updateHealthProfile(
         token: token,
         allergies: profile.allergies,
@@ -42,8 +40,6 @@ class HealthProfileRepositoryImpl implements HealthProfileRepository {
         notes: profile.notes,
       );
       return Success(_parse(response.data, 'PUT /patient/health-profile'));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

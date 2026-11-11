@@ -1,7 +1,7 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../repositories/pharmacy_alternatives_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class GetMedicineIdsWithAlternativeUseCase {
   final PharmacyAlternativesRepository _repository;
@@ -12,13 +12,10 @@ class GetMedicineIdsWithAlternativeUseCase {
     this._sessionRepository,
   );
 
-  Future<ApiResult<Set<int>>> call() async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return ApiError(
-        ApiFailure(message: sessionExpiredMessage),
-      );
-    }
-    return _repository.getBaseMedicineIdsWithAlternatives(token: session.token);
+  Future<ApiResult<Set<int>>> call() {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.getBaseMedicineIdsWithAlternatives(token: token),
+    );
   }
 }

@@ -21,7 +21,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   /// Only shows the full-screen loading state on a cold start or a retry
-  /// from an error, same reasoning as PharmacyInquiriesCubit.load().
+  /// from an error, so what is on screen is not blanked by a refresh.
   Future<void> load() async {
     final previous = state;
     if (previous is! NotificationsLoaded) {

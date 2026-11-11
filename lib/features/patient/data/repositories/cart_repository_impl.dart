@@ -11,8 +11,8 @@ class CartRepositoryImpl implements CartRepository {
   const CartRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<CartItem>>> getItems({required String token}) async {
-    try {
+  Future<ApiResult<List<CartItem>>> getItems({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getCart(token: token);
       final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;
       final itemsRaw = data['items'];
@@ -23,9 +23,7 @@ class CartRepositoryImpl implements CartRepository {
           .map((json) => CartItemModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(items);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -35,8 +33,8 @@ class CartRepositoryImpl implements CartRepository {
     required int pharmacyId,
     required int medicineId,
     required int quantity,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.addItem(
         token: token,
         pharmacyMedicineId: pharmacyMedicineId,
@@ -45,29 +43,23 @@ class CartRepositoryImpl implements CartRepository {
         quantity: quantity,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> deleteItem({required String token, required int itemId}) async {
-    try {
+  Future<ApiResult<void>> deleteItem({required String token, required int itemId}) {
+    return guardApi(() async {
       await _remoteDataSource.deleteItem(token: token, itemId: itemId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> clearCart({required String token}) async {
-    try {
+  Future<ApiResult<void>> clearCart({required String token}) {
+    return guardApi(() async {
       await _remoteDataSource.clearCart(token: token);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -75,16 +67,14 @@ class CartRepositoryImpl implements CartRepository {
     required String token,
     required int itemId,
     required int quantity,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.updateItemQuantity(
         token: token,
         itemId: itemId,
         quantity: quantity,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }
