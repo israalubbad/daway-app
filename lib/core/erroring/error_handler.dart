@@ -38,9 +38,15 @@ Failure _mapBadResponse(DioException error) {
       ? ApiErrorModel.fromJson(responseData)
       : null;
 
-  final message = apiError?.message ??
-      arabicMessageForErrorCode(apiError?.code, statusCode) ??
-      _genericErrorMessage;
+  // A server-side failure (5xx) says nothing the user can act on, and its text
+  // can carry internals (exception messages, SQL, file paths) when the backend
+  // runs in debug mode: it is never shown, only the app's own wording.
+  final isServerFailure = statusCode != null && statusCode >= 500;
+  final message = isServerFailure
+      ? (arabicMessageForErrorCode(null, statusCode) ?? _genericErrorMessage)
+      : apiError?.message ??
+            arabicMessageForErrorCode(apiError?.code, statusCode) ??
+            _genericErrorMessage;
 
   return ApiFailure(
     message: message,

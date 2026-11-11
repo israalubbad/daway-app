@@ -31,6 +31,32 @@ void main() {
       expect((failure as ApiFailure).code, 'OTP_INVALID');
     });
 
+    test('a 5xx never shows the server\'s own text, only the app\'s wording', () {
+      for (final status in [500, 502, 503, 504]) {
+        final failure = mapExceptionToFailure(
+          _badResponse(
+            statusCode: status,
+            data: {'message': 'SQLSTATE[42S02]: Base table not found in /var/www/app/Order.php'},
+          ),
+        );
+
+        expect(failure.message, isNot(contains('SQLSTATE')), reason: '$status');
+        expect(failure.message, isNot(contains('/var/www')), reason: '$status');
+      }
+      expect(
+        mapExceptionToFailure(_badResponse(statusCode: 500, data: {'message': 'trace'})).message,
+        'حدث خطأ في الخادم، يرجى المحاولة لاحقاً',
+      );
+    });
+
+    test('a 4xx still shows the server\'s message, which is meant for the user', () {
+      final failure = mapExceptionToFailure(
+        _badResponse(statusCode: 422, data: {'message': 'الكمية غير متوفرة'}),
+      );
+
+      expect(failure.message, 'الكمية غير متوفرة');
+    });
+
     test('falls back to the known error-code message when no server message is given', () {
       final failure = mapExceptionToFailure(
         _badResponse(statusCode: 400, data: {'code': 'OTP_EXPIRED'}),
