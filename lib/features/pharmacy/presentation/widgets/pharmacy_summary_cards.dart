@@ -7,6 +7,7 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// The two big cards under the pharmacy home's header: the number of
 
 /// products (which opens the products tab) and the month's sales.
@@ -111,7 +112,7 @@ class _ArrowIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsetsDirectional.only(end: 8.w),
-      child: SvgPicture.asset('assets/icons/arrow_left_icon.svg', width: 24.w, height: 24.w),
+      child: MirrorWhenLtr(child: SvgPicture.asset('assets/icons/arrow_left_icon.svg', width: 24.w, height: 24.w)),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 
+import '../../core/widgets/mirror_when_ltr.dart';
 /// One tappable card on the account hub and the account-settings screen: an
 /// optional [leading] icon, the [label], and an optional [trailing] widget (a
 /// value, a chevron, a switch). Laid out right-to-left like the rest of the
@@ -92,7 +93,7 @@ class AccountRowChevron extends StatelessWidget {
     return SizedBox(
       width: 18.r,
       height: 18.r,
-      child: Center(child: SvgPicture.asset('assets/icons/left_icon.svg', height: 10.h)),
+      child: Center(child: MirrorWhenLtr(child: SvgPicture.asset('assets/icons/left_icon.svg', height: 10.h))),
     );
   }
 }

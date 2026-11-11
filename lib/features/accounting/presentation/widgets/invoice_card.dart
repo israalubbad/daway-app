@@ -66,7 +66,6 @@ class InvoiceCard extends StatelessWidget {
               const Spacer(),
               Text(
                 invoice.discount > 0 ? 'خصم {0}'.trArgs([formatMoney(invoice.discount)]) : 'خصم –'.tr,
-                textDirection: TextDirection.rtl,
                 style: AccountingStyles.muted,
               ),
             ],

@@ -13,6 +13,7 @@ import '../cubit/reminders_state.dart';
 import 'add_medicine_reminder_screen.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 class MedicineRemindersScreen extends StatelessWidget {
 
   const MedicineRemindersScreen({super.key});
@@ -53,13 +54,13 @@ class _MedicineRemindersView extends StatelessWidget {
                       border: Border.all(color: AppColors.iconBlueBorder),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    child: SvgPicture.asset(
+                    child: MirrorWhenLtr(child: SvgPicture.asset(
                       'assets/icons/back_icon.svg',
                       colorFilter: const ColorFilter.mode(
                         AppColors.mainTeal,
                         BlendMode.srcIn,
                       ),
-                    ),
+                    )),
                   ),
                 ),
               ),

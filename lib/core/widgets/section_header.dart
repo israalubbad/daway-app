@@ -6,6 +6,7 @@ import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 
 import '../../core/localization/translations.dart';
+import '../../core/widgets/mirror_when_ltr.dart';
 /// Section title + "عرض الكل" chip, shared by the patient home's sections and
 
 /// the pharmacy home's orders section.
@@ -64,14 +65,14 @@ class SectionHeader extends StatelessWidget {
               children: [
                 Text(actionLabel ?? 'عرض الكل'.tr, style: actionStyle ?? AppTextStyles.homeSectionChip),
                 SizedBox(width: 4.w),
-                SvgPicture.asset(
+                MirrorWhenLtr(child: SvgPicture.asset(
                   'assets/icons/arrow_icon.svg',
                   width: chevronSize.w,
                   height: chevronSize.w,
                   colorFilter: chevronTint == null
                       ? null
                       : ColorFilter.mode(chevronTint, BlendMode.srcIn),
-                ),
+                )),
               ],
             ),
           ),

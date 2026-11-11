@@ -120,7 +120,6 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                             if (customer.balance > 0)
                               Text(
                                 'عليه {0}'.trArgs([formatMoney(customer.balance)]),
-                                textDirection: TextDirection.rtl,
                                 style: AccountingStyles.muted,
                               ),
                           ],

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../theming/app_colors.dart';
 
+import '../../core/widgets/mirror_when_ltr.dart';
 /// The small square "back" chip used at the top of sub-screens across
 /// features (auth's OTP/terms/privacy screens, patient's account-info and
 /// addresses screens, ...) — right-aligned, pointing right to read as "back"
@@ -29,11 +30,11 @@ class AppBackButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.iconBlueBorder, width: 1.0),
           ),
-          child: SvgPicture.asset(
+          child: MirrorWhenLtr(child: SvgPicture.asset(
             'assets/icons/back_icon.svg',
             width: 18.w,
             height: 18.h,
-          ),
+          )),
         ),
       ),
     );

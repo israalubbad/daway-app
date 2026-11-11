@@ -6,6 +6,7 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// "الصيدليات" section — a single discovery card (no nearby-pharmacies API
 
 /// yet, so it just hands off to [onDiscoverTap]) plus its plain section
@@ -57,7 +58,7 @@ class HomePharmaciesSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 12.w),
-                SvgPicture.asset('assets/icons/arrow_icon.svg', width: 16.w, height: 16.w),
+                MirrorWhenLtr(child: SvgPicture.asset('assets/icons/arrow_icon.svg', width: 16.w, height: 16.w)),
               ],
             ),
           ),

@@ -10,6 +10,7 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/pharmacy_order.dart';
 
 import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// One order on the pharmacy home: its number and how long ago it came in, a
 
 /// strip with what is in it, and a "عرض الطلب" button.
@@ -213,12 +214,12 @@ class _ViewOrderButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('عرض الطلب'.tr, style: AppTextStyles.pharmacyOrderButton),
-            SvgPicture.asset(
+            MirrorWhenLtr(child: SvgPicture.asset(
               'assets/icons/arrow_icon.svg',
               width: 20.w,
               height: 20.w,
               colorFilter: const ColorFilter.mode(AppColors.mainTeal, BlendMode.srcIn),
-            ),
+            )),
           ],
         ),
       ),
