@@ -6,8 +6,10 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../domain/entities/pharmacy_order.dart';
 import 'pharmacy_order_card.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The "الطلبات" block of the pharmacy home: a header with a "عرض الكل" chip,
+
 /// then one card per order.
 class PharmacyOrdersSection extends StatelessWidget {
   final List<PharmacyOrder> orders;
@@ -27,7 +29,7 @@ class PharmacyOrdersSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SectionHeader(
-          title: 'الطلبات',
+          title: 'الطلبات'.tr,
           onActionTap: onViewAllTap,
           titleStyle: AppTextStyles.pharmacySectionTitle,
           actionStyle: AppTextStyles.pharmacySectionAction,

@@ -15,8 +15,10 @@ import '../widgets/product_action_card.dart';
 import '../widgets/product_card.dart';
 import '../widgets/product_filter_chips.dart';
 import '../widgets/product_search_field.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// "اجمالي المنتجات": the pharmacy's medicines, opened from the الرئيسية card
+
 /// of the same name. A search box, stock filters, the two actions for adding
 /// and updating, and a card per medicine whose stepper changes its stock.
 ///
@@ -25,14 +27,15 @@ import '../widgets/product_search_field.dart';
 /// marked, and the back chip returns there. The same page is also the root of
 /// the المنتجات tab, as "المنتجات" and without the back chip.
 class PharmacyProductsScreen extends StatelessWidget {
-  final String title;
+  /// Defaults to "اجمالي المنتجات", looked up when built so it follows the language.
+  final String? title;
 
   /// False for the المنتجات tab, which has nothing to go back to.
   final bool showBackButton;
 
   const PharmacyProductsScreen({
     super.key,
-    this.title = 'اجمالي المنتجات',
+    this.title,
     this.showBackButton = true,
   });
 
@@ -55,7 +58,7 @@ class PharmacyProductsScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 0),
                 sliver: SliverToBoxAdapter(
                   child: PharmacyProductsHeader(
-                    title: title,
+                    title: title ?? 'اجمالي المنتجات'.tr,
                     onBack: showBackButton
                         ? () => PharmacyDashboardTabScope.switchToTabOrShowComingSoon(
                             context,
@@ -163,14 +166,14 @@ class _Controls extends StatelessWidget {
           children: [
             Expanded(
               child: ProductActionCard(
-                label: 'أضف منتج جديد',
+                label: 'أضف منتج جديد'.tr,
                 onTap: () => _openAddMedicine(context),
               ),
             ),
             SizedBox(width: 8.w),
             Expanded(
               child: ProductActionCard(
-                label: 'تحديث المنتجات',
+                label: 'تحديث المنتجات'.tr,
                 onTap: () => _openStockImport(context),
               ),
             ),
@@ -213,7 +216,7 @@ class _ProductList extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(top: 32.h),
               child: Text(
-                state.medicines.isEmpty ? 'لا توجد منتجات بعد' : 'لا توجد منتجات مطابقة',
+                state.medicines.isEmpty ? 'لا توجد منتجات بعد'.tr : 'لا توجد منتجات مطابقة'.tr,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.cardDescription,
               ),

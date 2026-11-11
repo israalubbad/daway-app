@@ -6,6 +6,8 @@ import '../../domain/entities/sale_invoice.dart';
 import '../../domain/usecases/accounting_usecases.dart';
 import 'sales_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class SalesCubit extends Cubit<SalesState> {
   final GetSalesUseCase _getSales;
   final GetInvoiceUseCase _getInvoice;
@@ -85,7 +87,7 @@ class SalesCubit extends Cubit<SalesState> {
     return switch (result) {
       Success(:final data) when data.isEmpty => (
         lines: null,
-        error: 'لا توجد أصناف متاحة للإرجاع',
+        error: 'لا توجد أصناف متاحة للإرجاع'.tr,
       ),
       Success(:final data) => (lines: data, error: null),
       ApiError(:final failure) => (lines: null, error: failure.message),

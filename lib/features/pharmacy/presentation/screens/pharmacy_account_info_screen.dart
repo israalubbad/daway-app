@@ -18,6 +18,8 @@ import '../helpers/working_hours_format.dart';
 import '../widgets/change_password_sheet.dart';
 import '../widgets/working_hours_dialog.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "معلومات الحساب": the pharmacy's logo, name, phone, address, working hours
 /// and password, each on a row with a "تعديل" chip, and one save button.
 ///
@@ -98,7 +100,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
     if (state.hasLocation) {
       return '${state.latitude!.toStringAsFixed(5)}, ${state.longitude!.toStringAsFixed(5)}';
     }
-    return 'اختر موقعك على الخريطة';
+    return 'اختر موقعك على الخريطة'.tr;
   }
 
   @override
@@ -149,9 +151,9 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PatientSubScreenHeader(
-            title: 'معلومات الحساب',
-            description: 'إدارة معلومات صيدليتك وتفاصيلها',
+          PatientSubScreenHeader(
+            title: 'معلومات الحساب'.tr,
+            description: 'إدارة معلومات صيدليتك وتفاصيلها'.tr,
           ),
           SizedBox(height: 32.h),
           Center(
@@ -174,7 +176,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('الاسم'),
+          _FieldLabel('الاسم'.tr),
           ProfileFieldRow(
             onEditTap: () => _editName(state),
             child: _editingName
@@ -197,7 +199,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                   ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('رقم الهاتف'),
+          _FieldLabel('رقم الهاتف'.tr),
           ProfileFieldRow(
             onEditTap: () => _editPhone(state),
             child: _editingPhone
@@ -228,13 +230,13 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             Padding(
               padding: EdgeInsets.only(top: 8.h),
               child: Text(
-                'أدخل رقم جوال صحيح',
+                'أدخل رقم جوال صحيح'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.mutedCaption.copyWith(color: AppColors.error),
               ),
             ),
           SizedBox(height: 24.h),
-          _FieldLabel('العنوان'),
+          _FieldLabel('العنوان'.tr),
           ProfileFieldRow(
             onEditTap: () => _editAddress(state),
             child: Text(
@@ -246,7 +248,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('ساعات العمل'),
+          _FieldLabel('ساعات العمل'.tr),
           ProfileFieldRow(
             onEditTap: () => _editWorkingHours(state),
             child: Text(
@@ -256,7 +258,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('كلمة المرور'),
+          _FieldLabel('كلمة المرور'.tr),
           ProfileFieldRow(
             onEditTap: () => ChangePasswordSheet.show(context),
             child: Text(
@@ -267,7 +269,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
           ),
           SizedBox(height: 32.h),
           AppCustomButton(
-            text: 'حفظ التعديلات',
+            text: 'حفظ التعديلات'.tr,
             isLoading: state.isSaving,
             backgroundColor: canSave
                 ? AppColors.mainTeal

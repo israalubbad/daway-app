@@ -6,6 +6,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../widgets/permission_icon_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Final step of the pharmacy sign-up flow. The create-account API always
 /// leaves a new pharmacy pending admin approval — there is no token to log
 /// in with yet, so this screen (rather than the home dashboard) is the
@@ -26,16 +28,15 @@ class PharmacyPendingApprovalScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 32.h),
-                const PermissionIconHeader(
+                PermissionIconHeader(
                   icon: Icons.hourglass_top_outlined,
-                  title: 'حسابك قيد المراجعة',
+                  title: 'حسابك قيد المراجعة'.tr,
                   subtitle:
-                      'تم استلام طلب إنشاء حسابك وهو الآن بانتظار موافقة الإدارة. '
-                      'سنرسل لك معرّف الصيدلية وكلمة المرور عند تفعيل الحساب.',
+                      'تم استلام طلب إنشاء حسابك وهو الآن بانتظار موافقة الإدارة. سنرسل لك معرّف الصيدلية وكلمة المرور عند تفعيل الحساب.'.tr,
                 ),
                 SizedBox(height: 24.h),
                 AppCustomButton(
-                  text: 'العودة لتسجيل الدخول',
+                  text: 'العودة لتسجيل الدخول'.tr,
                   backgroundColor: AppColors.mainTeal,
                   onPressed: () => Navigator.of(context)
                       .pushNamedAndRemoveUntil(Routes.pharmacyAuthScreen, (route) => false),

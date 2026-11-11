@@ -20,6 +20,8 @@ import '../cubit/medicine_detail_state.dart';
 import '../widgets/medicine_pharmacy_option_card.dart';
 import '../widgets/single_pharmacy_dialogs.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "صفحة المنتج" — a medicine's detail: its image, name, use tags, and the
 /// pharmacies stocking it (radio-selectable — the current pick is what
 /// "أضف الى السلة" adds).
@@ -52,7 +54,7 @@ class _MedicineDetailView extends StatelessWidget {
     MedicinePharmacyOffer? offer,
   ) async {
     if (offer == null) {
-      AppSnackbar.show(context, 'لا توجد صيدلية متوفرة للإضافة إلى السلة');
+      AppSnackbar.show(context, 'لا توجد صيدلية متوفرة للإضافة إلى السلة'.tr);
       return;
     }
     final cubit = context.read<MedicineDetailCubit>();
@@ -77,7 +79,7 @@ class _MedicineDetailView extends StatelessWidget {
       AppSnackbar.show(context, error);
       return;
     }
-    AppSnackbar.show(context, 'تمت إضافة الدواء إلى السلة');
+    AppSnackbar.show(context, 'تمت إضافة الدواء إلى السلة'.tr);
     Navigator.of(context).pushNamed(Routes.patientCartScreen);
   }
 
@@ -87,7 +89,7 @@ class _MedicineDetailView extends StatelessWidget {
     MedicineDetail medicine,
   ) {
     if (offer == null) {
-      AppSnackbar.show(context, 'لا توجد صيدلية متوفرة لإرسال الاستفسار');
+      AppSnackbar.show(context, 'لا توجد صيدلية متوفرة لإرسال الاستفسار'.tr);
       return;
     }
     Navigator.of(context).pushNamed(
@@ -234,7 +236,7 @@ class _MedicineDetailContentState extends State<_MedicineDetailContent> {
                       ),
                       SizedBox(height: 24.h),
                       Text(
-                        'اختر الصيدلية المناسبة لك',
+                        'اختر الصيدلية المناسبة لك'.tr,
                         textAlign: TextAlign.right,
                         style: AppTextStyles.medicineDetailSectionLabel,
                       ),
@@ -245,7 +247,7 @@ class _MedicineDetailContentState extends State<_MedicineDetailContent> {
                           child: Column(
                             children: [
                               Text(
-                                'لا توجد صيدليات متوفرة لهذا الدواء حالياً',
+                                'لا توجد صيدليات متوفرة لهذا الدواء حالياً'.tr,
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.homePharmacyCardSubtitle,
                               ),
@@ -309,7 +311,7 @@ class _AvailabilityAlertButton extends StatelessWidget {
                     if (context.mounted) {
                       AppSnackbar.show(
                         context,
-                        error ?? 'سنخبرك عند توفر الدواء',
+                        error ?? 'سنخبرك عند توفر الدواء'.tr,
                       );
                     }
                   }
@@ -321,7 +323,7 @@ class _AvailabilityAlertButton extends StatelessWidget {
               color: AppColors.mainTeal,
             ),
             label: Text(
-              subscribed ? 'سنخبرك عند التوفر' : 'نبّهني عند التوفر',
+              subscribed ? 'سنخبرك عند التوفر'.tr : 'نبّهني عند التوفر'.tr,
               style: TextStyle(color: AppColors.mainTeal),
             ),
           );
@@ -381,7 +383,7 @@ class _MedicineImageHeader extends StatelessWidget {
             iconSize: 24,
             backgroundColor: AppColors.accountIconBg,
             iconColor: AppColors.mainTeal,
-            semanticLabel: 'رجوع',
+            semanticLabel: 'رجوع'.tr,
             onTap: onBackTap,
           ),
         ),
@@ -414,8 +416,8 @@ class _MedicineImageHeader extends StatelessWidget {
                       : 'assets/icons/bookmark_icon.svg',
                   iconSize: 20,
                   semanticLabel: isFavorite
-                      ? 'إزالة من المحفوظات'
-                      : 'حفظ في المفضلة',
+                      ? 'إزالة من المحفوظات'.tr
+                      : 'حفظ في المفضلة'.tr,
                   onTap: onFavoriteTap,
                 ),
         ),
@@ -483,13 +485,13 @@ class _BottomActionsRow extends StatelessWidget {
         // The design dropped the separate cart-icon shortcut that used to
         // sit beside this button — the home header's cart icon is still
         // there, so nothing is unreachable, just less cluttered here.
-        AppCustomButton(text: 'أضف الى السلة', onPressed: onAddToCartTap),
+        AppCustomButton(text: 'أضف الى السلة'.tr, onPressed: onAddToCartTap),
         SizedBox(height: 16.h),
         // "اسأل الصيدلية قبل الشراء" — opens MedicineInquiryScreen for the
         // selected pharmacy + this medicine (see PharmacyInquiry's doc
         // comment: one question, one reply, not a live chat).
         AppCustomButton(
-          text: 'اسأل الصيدلية قبل الشراء',
+          text: 'اسأل الصيدلية قبل الشراء'.tr,
           backgroundColor: Colors.white,
           textColor: AppColors.onboardingText,
           borderColor: AppColors.iconBlueBorder,

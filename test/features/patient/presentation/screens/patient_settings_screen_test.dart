@@ -23,9 +23,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:daway_app/core/di/dependency_injection.dart';
+import 'package:daway_app/core/localization/translations.dart';
+import 'package:daway_app/features/localization/domain/entities/app_language.dart';
+import 'package:daway_app/features/localization/presentation/cubit/language_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../auth/account_closure_test_fakes.dart';
+import '../../../localization/language_test_fakes.dart';
 
 class _FakePermissions implements DevicePermissionsRepository {
   ApiResult<bool> notifications = const Success(true);
@@ -78,7 +83,10 @@ void main() {
   late FakeAccountClosureRepository closureRepository;
   late FakeClosureSessionRepository closureSession;
 
+  tearDown(() => Translations.use('ar'));
+
   setUp(() {
+    registerLanguageCubit(getIt);
     permissions = _FakePermissions();
     appInfo = _FakeAppInfo();
     logoutUseCase = _FakeLogoutUseCase();
@@ -338,9 +346,7 @@ void main() {
       expect(find.text('قريباً'), findsNothing);
     });
 
-    testWidgets('picking English shows the "قريباً" cue, as there is no translation yet', (
-      tester,
-    ) async {
+    testWidgets('picking English switches the app language', (tester) async {
       await openScreen(tester);
       await tester.tap(find.text('اللغة'));
       await tester.pumpAndSettle();
@@ -349,8 +355,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('اختر اللغة'), findsNothing);
-      expect(find.text('قريباً'), findsOneWidget);
-      expect(find.text('العربية'), findsOneWidget); // still Arabic
+      expect(getIt<LanguageCubit>().state, AppLanguage.english);
+      expect(Translations.isEnglish, isTrue);
     });
   });
 

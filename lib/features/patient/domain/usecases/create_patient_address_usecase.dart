@@ -21,7 +21,7 @@ class CreatePatientAddressUseCase {
   }) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(
+      return ApiError(
         ApiFailure(message: sessionExpiredMessage),
       );
     }

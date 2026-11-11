@@ -16,8 +16,10 @@ import '../cubit/patient_addresses_state.dart';
 import '../widgets/address_sheets.dart';
 import '../../../../core/widgets/edit_chip.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// "عناويني" — backed by the real `/patient/addresses` endpoints. The screen
+
 /// has no name/phone fields of its own, so [PatientAddressesCubit] borrows
 /// the patient's profile for those on a new address, and keeps an edited
 /// one's existing name/phone unchanged.
@@ -78,16 +80,16 @@ class _AddressesViewState extends State<_AddressesView> {
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (dialogContext) => AlertDialog(
-            title: const Text('حذف العنوان'),
-            content: Text('هل تريد حذف عنوان "${existing.label}"؟'),
+            title: Text('حذف العنوان'.tr),
+            content: Text('هل تريد حذف عنوان "{0}"؟'.trArgs([existing.label])),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text('إلغاء'),
+                child: Text('إلغاء'.tr),
               ),
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: Text('حذف', style: TextStyle(color: AppColors.logoutRed)),
+                child: Text('حذف'.tr, style: TextStyle(color: AppColors.logoutRed)),
               ),
             ],
           ),
@@ -107,9 +109,9 @@ class _AddressesViewState extends State<_AddressesView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const PatientSubScreenHeader(
-                title: 'عناويني',
-                description: 'أدر عناوين التوصيل الخاصة بك',
+              PatientSubScreenHeader(
+                title: 'عناويني'.tr,
+                description: 'أدر عناوين التوصيل الخاصة بك'.tr,
               ),
               SizedBox(height: 32.h),
               BlocBuilder<PatientAddressesCubit, PatientAddressesState>(
@@ -124,8 +126,8 @@ class _AddressesViewState extends State<_AddressesView> {
                     PatientAddressesLoaded(:final addresses) when addresses.isEmpty =>
                       EmptyStateView(
                         imageAsset: 'assets/images/empty_addresses.png',
-                        title: 'لا يوجد عناوين محفوظة',
-                        actionLabel: 'أضف عنوان',
+                        title: 'لا يوجد عناوين محفوظة'.tr,
+                        actionLabel: 'أضف عنوان'.tr,
                         onActionTap: _addAddress,
                       ),
                     PatientAddressesLoaded(:final addresses) => Column(
@@ -229,7 +231,7 @@ class _AddAddressButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Text(
-          'اضافة عنوان',
+          'اضافة عنوان'.tr,
           textAlign: TextAlign.right,
           style: AppTextStyles.addressCardTitle,
         ),

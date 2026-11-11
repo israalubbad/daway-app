@@ -11,6 +11,8 @@ import '../cubit/sales_state.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// What the sales filters sheet hands back.
 class SalesFilters {
   final DateRangeFilter range;
@@ -66,26 +68,26 @@ class _SalesFiltersSheetState extends State<SalesFiltersSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _SheetTitle('فلاتر'),
+          _SheetTitle('فلاتر'.tr),
           _ChipGroup<DateRangeFilter>(
-            title: 'الفترة',
+            title: 'الفترة'.tr,
             options: [for (final r in DateRangeFilter.values) (r, dateRangeLabel(r))],
             selected: _range,
             onSelected: (value) => setState(() => _range = value),
           ),
           _ChipGroup<PaymentMethod?>(
-            title: 'طريقة الدفع',
+            title: 'طريقة الدفع'.tr,
             options: [
-              (null, 'الكل'),
+              (null, 'الكل'.tr),
               for (final m in PaymentMethod.values) (m, paymentMethodLabel(m)),
             ],
             selected: _method,
             onSelected: (value) => setState(() => _method = value),
           ),
           _ChipGroup<PaymentStatus?>(
-            title: 'الحالة',
+            title: 'الحالة'.tr,
             options: [
-              (null, 'الكل'),
+              (null, 'الكل'.tr),
               for (final s in PaymentStatus.values) (s, paymentStatusLabel(s)),
             ],
             selected: _status,
@@ -133,15 +135,15 @@ class _CashFiltersSheetState extends State<CashFiltersSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _SheetTitle('فلاتر'),
+          _SheetTitle('فلاتر'.tr),
           _ChipGroup<CashTypeFilter>(
-            title: 'النوع',
+            title: 'النوع'.tr,
             options: [for (final t in CashTypeFilter.values) (t, cashTypeFilterLabel(t))],
             selected: _type,
             onSelected: (value) => setState(() => _type = value),
           ),
           _ChipGroup<DateRangeFilter>(
-            title: 'الفترة',
+            title: 'الفترة'.tr,
             options: [for (final r in DateRangeFilter.values) (r, dateRangeLabel(r))],
             selected: _range,
             onSelected: (value) => setState(() => _range = value),
@@ -236,11 +238,11 @@ class _ApplyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: AppCustomButton(text: 'تطبيق', height: 48.h, onPressed: onApply)),
+        Expanded(child: AppCustomButton(text: 'تطبيق'.tr, height: 48.h, onPressed: onApply)),
         SizedBox(width: 8.w),
         Expanded(
           child: AppCustomButton(
-            text: 'إعادة تعيين',
+            text: 'إعادة تعيين'.tr,
             height: 48.h,
             backgroundColor: Colors.white,
             textColor: AppColors.mainTeal,

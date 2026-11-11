@@ -9,6 +9,8 @@ import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 import 'accounting_empty_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The month's expenses by category: a donut with its legend. With no expenses
 /// it shows the empty state.
 class ExpenseDonut extends StatelessWidget {
@@ -31,7 +33,7 @@ class ExpenseDonut extends StatelessWidget {
   Widget build(BuildContext context) {
     final total = slices.fold<double>(0, (sum, s) => sum + s.amount);
     if (slices.isEmpty || total <= 0) {
-      return const AccountingEmptyState(icon: Icons.pie_chart_outline_rounded, title: 'لا توجد مصروفات مسجلة');
+      return AccountingEmptyState(icon: Icons.pie_chart_outline_rounded, title: 'لا توجد مصروفات مسجلة'.tr);
     }
     return Row(
       children: [

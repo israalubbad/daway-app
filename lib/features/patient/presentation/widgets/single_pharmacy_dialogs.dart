@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// An order can only be placed with one pharmacy: the pharmacies are far from
 /// each other, so one delivery cannot serve two of them. These dialogs are
 /// where the patient is told, and asked what to do about it.
@@ -18,12 +20,10 @@ Future<bool> confirmReplaceCart(
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (_) => _DialogFrame(
-      title: 'صيدلية مختلفة',
+      title: 'صيدلية مختلفة'.tr,
       message:
-          'سلتك فيها منتجات من $currentPharmacy، والصيدليات بعيدة عن بعضها، '
-          'فلا يمكن طلب منتجات من أكثر من صيدلية في طلب واحد.\n\n'
-          'هل تريد تفريغ السلة وإضافة المنتج من $newPharmacy؟',
-      confirmLabel: 'تفريغ السلة وإضافة',
+          'سلتك فيها منتجات من {0}، والصيدليات بعيدة عن بعضها، فلا يمكن طلب منتجات من أكثر من صيدلية في طلب واحد.\n\nهل تريد تفريغ السلة وإضافة المنتج من {1}؟'.trArgs([currentPharmacy, newPharmacy]),
+      confirmLabel: 'تفريغ السلة وإضافة'.tr,
       child: null,
     ),
   );
@@ -58,11 +58,10 @@ class _PharmacyChoiceDialogState extends State<_PharmacyChoiceDialog> {
   @override
   Widget build(BuildContext context) {
     return _DialogFrame(
-      title: 'اختر صيدلية واحدة',
+      title: 'اختر صيدلية واحدة'.tr,
       message:
-          'سلتك فيها منتجات من أكثر من صيدلية، والصيدليات بعيدة عن بعضها. '
-          'اختر الصيدلية التي تريد الطلب منها، وسيتم حذف منتجات الصيدليات الأخرى من السلة.',
-      confirmLabel: 'متابعة',
+          'سلتك فيها منتجات من أكثر من صيدلية، والصيدليات بعيدة عن بعضها. اختر الصيدلية التي تريد الطلب منها، وسيتم حذف منتجات الصيدليات الأخرى من السلة.'.tr,
+      confirmLabel: 'متابعة'.tr,
       onConfirm: () => Navigator.of(context).pop(_selected),
       child: RadioGroup<int>(
         groupValue: _selected,
@@ -153,7 +152,7 @@ class _DialogFrame extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                   ),
-                  child: Text('إلغاء', style: AppTextStyles.sheetButtonLabel),
+                  child: Text('إلغاء'.tr, style: AppTextStyles.sheetButtonLabel),
                 ),
               ),
             ],

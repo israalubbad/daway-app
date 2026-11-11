@@ -16,6 +16,8 @@ import '../widgets/pharmacy_form_field.dart';
 import '../widgets/pharmacy_products_header.dart';
 import 'search_medicine_catalog_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "إضافة منتج جديد": the photo, the names, the active ingredient, the
 /// category, and the stock and price. The medicine is added by name from what
 /// is typed here, unless it was picked from the catalog on the search page —
@@ -97,8 +99,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   PharmacyProductsHeader(
-                    title: 'إضافة منتج جديد',
-                    subtitle: 'أضف بيانات الدواء او المنتج',
+                    title: 'إضافة منتج جديد'.tr,
+                    subtitle: 'أضف بيانات الدواء او المنتج'.tr,
                     onBack: () => Navigator.of(context).pop(false),
                   ),
                   SizedBox(height: 16.h),
@@ -117,19 +119,19 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                   ),
                   SizedBox(height: 24.h),
                   PharmacyFormField(
-                    label: 'اسم الدواء/ المنتج (بالإنجليزي)',
+                    label: 'اسم الدواء/ المنتج (بالإنجليزي)'.tr,
                     controller: _nameController,
                     readOnly: isFromCatalog,
                     onChanged: cubit.nameChanged,
                     errorText: formData.nameHasArabicChars
-                        ? 'يجب أن يكون الاسم بالإنجليزي فقط'
+                        ? 'يجب أن يكون الاسم بالإنجليزي فقط'.tr
                         : (_attemptedSave && formData.nameQuery.trim().isEmpty
-                              ? 'هذا الحقل مطلوب'
+                              ? 'هذا الحقل مطلوب'.tr
                               : null),
                   ),
                   SizedBox(height: 16.h),
                   PharmacyFormField(
-                    label: 'المادة الفعالة',
+                    label: 'المادة الفعالة'.tr,
                     controller: _activeIngredientController,
                     readOnly: isFromCatalog,
                     onChanged: cubit.activeIngredientChanged,
@@ -149,20 +151,20 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                     children: [
                       Expanded(
                         child: PharmacyFormField(
-                          label: 'الكمية المتوفرة',
+                          label: 'الكمية المتوفرة'.tr,
                           controller: _quantityController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [DigitsOnlyFormatter()],
                           onChanged: cubit.quantityChanged,
                           errorText: _attemptedSave && (formData.quantityValue ?? 0) <= 0
-                              ? 'هذا الحقل مطلوب'
+                              ? 'هذا الحقل مطلوب'.tr
                               : null,
                         ),
                       ),
                       SizedBox(width: 16.w),
                       Expanded(
                         child: PharmacyFormField(
-                          label: 'السعر',
+                          label: 'السعر'.tr,
                           controller: _priceController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
@@ -170,7 +172,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                           ],
                           onChanged: cubit.priceChanged,
                           errorText: _attemptedSave && (formData.priceValue ?? 0) <= 0
-                              ? 'هذا الحقل مطلوب'
+                              ? 'هذا الحقل مطلوب'.tr
                               : null,
                         ),
                       ),
@@ -178,7 +180,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                   ),
                   SizedBox(height: 32.h),
                   AppCustomButton(
-                    text: 'حفظ المنتج',
+                    text: 'حفظ المنتج'.tr,
                     isLoading: state is AddMedicineSaving,
                     textStyle: AppTextStyles.pharmacyPageSubtitle,
                     onPressed: () {
@@ -231,7 +233,7 @@ class _SearchEntry extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 6.h),
                       child: Text(
-                        'الدواء موجود في القائمة؟ ابحث عنه',
+                        'الدواء موجود في القائمة؟ ابحث عنه'.tr,
                         style: AppTextStyles.pharmacySearchText.copyWith(
                           color: AppColors.mainTeal,
                         ),
@@ -247,7 +249,7 @@ class _SearchEntry extends StatelessWidget {
           ),
           if (name != null)
             IconButton(
-              tooltip: 'إلغاء الاختيار',
+              tooltip: 'إلغاء الاختيار'.tr,
               onPressed: onClearTap,
               icon: Icon(Icons.close, size: 20.sp, color: AppColors.mainTeal),
             ),
@@ -277,20 +279,20 @@ class _CategoryField extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('التصنيف', style: AppTextStyles.pharmacySearchText),
+          Text('التصنيف'.tr, style: AppTextStyles.pharmacySearchText),
           SizedBox(height: 8.h),
           Text(error, style: AppTextStyles.errorText),
           Align(
             alignment: AlignmentDirectional.centerStart,
-            child: TextButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
+            child: TextButton(onPressed: onRetry, child: Text('إعادة المحاولة'.tr)),
           ),
         ],
       );
     }
 
     return PharmacyDropdownField<int>(
-      label: 'التصنيف',
-      hintText: formData.isLoadingCategories ? 'جارٍ التحميل...' : 'اختر التصنيف',
+      label: 'التصنيف'.tr,
+      hintText: formData.isLoadingCategories ? 'جارٍ التحميل...'.tr : 'اختر التصنيف'.tr,
       value: formData.categoryId,
       items: [
         for (final category in formData.categories)
@@ -301,7 +303,7 @@ class _CategoryField extends StatelessWidget {
           : (value) {
               if (value != null) onChanged(value);
             },
-      errorText: showRequiredError && formData.categoryId == null ? 'اختر التصنيف' : null,
+      errorText: showRequiredError && formData.categoryId == null ? 'اختر التصنيف'.tr : null,
     );
   }
 }

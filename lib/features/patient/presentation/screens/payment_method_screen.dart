@@ -17,6 +17,8 @@ import '../widgets/patient_sub_screen_header.dart';
 import 'order_confirmation_screen.dart';
 import 'payment_receipt_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "طريقة الدفع" — the banks / wallets the order's total can be transferred
 /// to, as listed by the server, and the amount to pay.
 class PaymentMethodScreen extends StatelessWidget {
@@ -81,9 +83,9 @@ class _PaymentMethodView extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: const PatientSubScreenHeader(
-                title: 'أكمل طلبك',
-                description: 'راجع تفاصيل الطلب واختر طريقة الدفع والتوصيل.',
+              child: PatientSubScreenHeader(
+                title: 'أكمل طلبك'.tr,
+                description: 'راجع تفاصيل الطلب واختر طريقة الدفع والتوصيل.'.tr,
               ),
             ),
             Expanded(
@@ -148,7 +150,7 @@ class _PaymentMethodView extends StatelessWidget {
                 ),
                 SizedBox(height: 24.h),
                 Text(
-                  'طريقة الدفع',
+                  'طريقة الدفع'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.profileFieldLabel,
                 ),
@@ -157,7 +159,7 @@ class _PaymentMethodView extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 32.h),
                     child: Text(
-                      'لا توجد طرق دفع متاحة حالياً',
+                      'لا توجد طرق دفع متاحة حالياً'.tr,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.emptyStateSubtitle,
                     ),
@@ -178,8 +180,8 @@ class _PaymentMethodView extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
           child: AppCustomButton(
             text: state.payment.canSubmitReceipt
-                ? 'ادفع ${formatPrice(state.payment.grandTotal)} \$'
-                : 'تتبع الطلب',
+                ? 'ادفع {0} \$'.trArgs([formatPrice(state.payment.grandTotal)])
+                : 'تتبع الطلب'.tr,
             onPressed: () => _pay(context, state),
           ),
         ),
@@ -313,7 +315,7 @@ class BankLogo extends StatelessWidget {
                 color: AppColors.permissionIconBg,
                 child: Center(
                   child: Text(
-                    name.trim().isEmpty ? '؟' : name.trim().characters.first,
+                    name.trim().isEmpty ? '؟'.tr : name.trim().characters.first,
                     style: TextStyle(
                       fontSize: 24.sp,
                       fontWeight: FontWeight.w700,
@@ -356,19 +358,18 @@ class _AwaitingAdmin extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24.h),
-          Text('بانتظار موافقة الأدمن', style: AppTextStyles.emptyStateTitle),
+          Text('بانتظار موافقة الأدمن'.tr, style: AppTextStyles.emptyStateTitle),
           SizedBox(height: 12.h),
           Text(
-            'سيحدد الأدمن سعر التوصيل ويوافق على طلبك، وبعدها تتمكن من الدفع. '
-            'نحدّث هذه الصفحة تلقائياً.',
+            'سيحدد الأدمن سعر التوصيل ويوافق على طلبك، وبعدها تتمكن من الدفع. نحدّث هذه الصفحة تلقائياً.'.tr,
             textAlign: TextAlign.center,
             style: AppTextStyles.emptyStateSubtitle,
           ),
           const Spacer(),
-          AppCustomButton(text: 'تحديث', onPressed: onRefresh),
+          AppCustomButton(text: 'تحديث'.tr, onPressed: onRefresh),
           SizedBox(height: 8.h),
           AppCustomButton(
-            text: 'العودة للرئيسية',
+            text: 'العودة للرئيسية'.tr,
             backgroundColor: Colors.white,
             textColor: AppColors.onboardingText,
             borderColor: AppColors.cardBorder,
@@ -405,14 +406,14 @@ class _PriceCard extends StatelessWidget {
         children: [
           if (deliveryFee != null) ...[
             Text(
-              'سعر التوصيل : ${formatPrice(deliveryFee!)} \$',
+              'سعر التوصيل : {0} \$'.trArgs([formatPrice(deliveryFee!)]),
               textAlign: TextAlign.right,
               style: AppTextStyles.cartItemPrice,
             ),
             SizedBox(height: 8.h),
           ],
           Text(
-            'الإجمالي : ${formatPrice(grandTotal)} \$',
+            'الإجمالي : {0} \$'.trArgs([formatPrice(grandTotal)]),
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel.copyWith(
               fontWeight: FontWeight.w700,

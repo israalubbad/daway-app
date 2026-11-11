@@ -8,6 +8,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/chatbot_reply.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// What the assistant found, under its message: the medicine, the pharmacies
 /// that have it, and the alternatives. Tapping any of them opens the medicine.
 class ChatbotResults extends StatelessWidget {
@@ -34,7 +36,7 @@ class ChatbotResults extends StatelessWidget {
         ],
         if (reply.alternatives.isNotEmpty) ...[
           SizedBox(height: 12.h),
-          Text('البدائل', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('البدائل'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           for (final alternative in reply.alternatives) ...[
             SizedBox(height: 8.h),
             _MedicineCard(
@@ -92,7 +94,7 @@ class _MedicineCard extends StatelessWidget {
                   if (medicine.isAvailable != null) ...[
                     SizedBox(height: 4.h),
                     Text(
-                      medicine.isAvailable! ? 'متوفر' : 'غير متوفر',
+                      medicine.isAvailable! ? 'متوفر'.tr : 'غير متوفر'.tr,
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w700,
@@ -158,7 +160,7 @@ class _PharmacyTile extends StatelessWidget {
     final isOpen = pharmacy.isOpenNow;
     final details = [
       if (pharmacy.address != null) pharmacy.address!,
-      if (pharmacy.distanceKm != null) '${pharmacy.distanceKm!.toStringAsFixed(1)} كم',
+      if (pharmacy.distanceKm != null) '{0} كم'.trArgs([pharmacy.distanceKm!.toStringAsFixed(1)]),
     ].join(' · ');
     return GestureDetector(
       onTap: onTap,
@@ -189,7 +191,7 @@ class _PharmacyTile extends StatelessWidget {
                         if (label != null && isOpen != null) SizedBox(width: 8.w),
                         if (isOpen != null)
                           _Chip(
-                            text: isOpen ? 'مفتوحة الآن' : 'مغلقة الآن',
+                            text: isOpen ? 'مفتوحة الآن'.tr : 'مغلقة الآن'.tr,
                             color: isOpen ? AppColors.productAvailableText : AppColors.grey,
                           ),
                       ],

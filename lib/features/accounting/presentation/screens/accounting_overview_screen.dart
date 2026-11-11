@@ -16,6 +16,8 @@ import '../widgets/expense_donut.dart';
 import '../widgets/overview_widgets.dart';
 import '../widgets/sales_line_chart.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "المحاسبة — نظرة عامة": the day's figures, the sales chart, the month's
 /// expenses, what needs attention and the latest transactions.
 ///
@@ -47,8 +49,8 @@ class AccountingOverviewScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 24.h),
                 children: [
                   PharmacyProductsHeader(
-                    title: 'المحاسبة',
-                    subtitle: 'ملخص مالي لصيدليتك',
+                    title: 'المحاسبة'.tr,
+                    subtitle: 'ملخص مالي لصيدليتك'.tr,
                     onBack: onBack,
                   ),
                   SizedBox(height: 16.h),
@@ -56,7 +58,7 @@ class AccountingOverviewScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: AppCustomButton(
-                          text: 'المبيعات',
+                          text: 'المبيعات'.tr,
                           height: 44.h,
                           backgroundColor: Colors.white,
                           textColor: AppColors.mainTeal,
@@ -67,7 +69,7 @@ class AccountingOverviewScreen extends StatelessWidget {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: AppCustomButton(
-                          text: 'فاتورة بيع جديدة',
+                          text: 'فاتورة بيع جديدة'.tr,
                           height: 44.h,
                           onPressed: onNewSale,
                         ),
@@ -85,9 +87,9 @@ class AccountingOverviewScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('المسح بالهاتف', style: AccountingStyles.cardTitle),
+                              Text('المسح بالهاتف'.tr, style: AccountingStyles.cardTitle),
                               Text(
-                                'استخدم هاتفك كماسح باركود لشاشة البيع في الموقع',
+                                'استخدم هاتفك كماسح باركود لشاشة البيع في الموقع'.tr,
                                 style: AccountingStyles.muted,
                               ),
                             ],
@@ -138,8 +140,8 @@ class AccountingOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('حركة المبيعات', style: AccountingStyles.sectionTitle),
-            Text('إجمالي المبيعات خلال الفترة المختارة', style: AccountingStyles.muted),
+            Text('حركة المبيعات'.tr, style: AccountingStyles.sectionTitle),
+            Text('إجمالي المبيعات خلال الفترة المختارة'.tr, style: AccountingStyles.muted),
             SizedBox(height: 12.h),
             SalesPeriodChips(
               selected: overview.period,
@@ -156,8 +158,8 @@ class AccountingOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('توزيع المصروفات', style: AccountingStyles.sectionTitle),
-            Text('المصروفات حسب الفئة خلال الشهر الحالي', style: AccountingStyles.muted),
+            Text('توزيع المصروفات'.tr, style: AccountingStyles.sectionTitle),
+            Text('المصروفات حسب الفئة خلال الشهر الحالي'.tr, style: AccountingStyles.muted),
             SizedBox(height: 12.h),
             ExpenseDonut(slices: overview.expenses),
           ],
@@ -165,8 +167,8 @@ class AccountingOverviewScreen extends StatelessWidget {
       ),
       if (overview.alerts.isNotEmpty) ...[
         SizedBox(height: 24.h),
-        Text('تنبيهات', style: AccountingStyles.sectionTitle),
-        Text('أمور تحتاج انتباهك', style: AccountingStyles.muted),
+        Text('تنبيهات'.tr, style: AccountingStyles.sectionTitle),
+        Text('أمور تحتاج انتباهك'.tr, style: AccountingStyles.muted),
         SizedBox(height: 12.h),
         for (final alert in overview.alerts) ...[
           AlertTile(
@@ -181,11 +183,11 @@ class AccountingOverviewScreen extends StatelessWidget {
         ],
       ],
       SizedBox(height: 16.h),
-      Text('آخر الحركات', style: AccountingStyles.sectionTitle),
-      Text('أحدث العمليات المالية المسجلة', style: AccountingStyles.muted),
+      Text('آخر الحركات'.tr, style: AccountingStyles.sectionTitle),
+      Text('أحدث العمليات المالية المسجلة'.tr, style: AccountingStyles.muted),
       SizedBox(height: 12.h),
       if (overview.recentTransactions.isEmpty)
-        Text('لا توجد حركات بعد', style: AccountingStyles.muted)
+        Text('لا توجد حركات بعد'.tr, style: AccountingStyles.muted)
       else
         for (final transaction in overview.recentTransactions) ...[
           TransactionCard(transaction: transaction),

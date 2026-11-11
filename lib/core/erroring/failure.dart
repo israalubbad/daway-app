@@ -1,3 +1,5 @@
+import '../../core/localization/translations.dart';
+
 sealed class Failure {
   final String message;
   const Failure(this.message);
@@ -42,8 +44,12 @@ class PermissionFailure extends Failure {
 /// the screen answers with the app's "قريباً" rather than an error.
 class ComingSoonFailure extends Failure {
   const ComingSoonFailure() : super('قريباً');
+
+  /// Looked up when read, so it follows the language picked since the failure was made.
+  @override
+  String get message => 'قريباً'.tr;
 }
 
 /// What is shown when a request needs the signed-in account and there is no
 /// stored session any more.
-const String sessionExpiredMessage = 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى';
+String get sessionExpiredMessage => 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'.tr;

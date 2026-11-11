@@ -12,7 +12,7 @@ Future<ApiResult<T>> withSessionToken<T>(
 ) async {
   final session = await sessions.getSession();
   if (session == null) {
-    return const ApiError(ApiFailure(message: sessionExpiredMessage));
+    return ApiError(ApiFailure(message: sessionExpiredMessage));
   }
   return action(session.token);
 }

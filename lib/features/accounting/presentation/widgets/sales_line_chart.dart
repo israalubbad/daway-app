@@ -5,6 +5,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/accounting_overview.dart';
 import '../helpers/accounting_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The overview's sales chart: a line over a soft area, the day labels along
 /// the bottom and three amount guides. With no sales at all it says so.
 class SalesLineChart extends StatelessWidget {
@@ -18,7 +20,7 @@ class SalesLineChart extends StatelessWidget {
     return SizedBox(
       height: 170.h,
       child: points.isEmpty || !hasSales
-          ? Center(child: Text('لا توجد مبيعات في هذه الفترة', style: AccountingStyles.muted))
+          ? Center(child: Text('لا توجد مبيعات في هذه الفترة'.tr, style: AccountingStyles.muted))
           : CustomPaint(
               size: Size.infinite,
               painter: _SalesChartPainter(

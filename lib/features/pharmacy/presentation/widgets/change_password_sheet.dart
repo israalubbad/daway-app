@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/auth_text_field.dart';
 import '../cubit/change_pharmacy_password_cubit.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "تعديل كلمة المرور": the current password, the new one and its repeat, in a
 /// bottom sheet. Closes by itself, with a confirmation, once the backend
 /// accepts the change.
@@ -65,7 +67,7 @@ class _ChangePasswordSheetState extends State<ChangePasswordSheet> {
     return BlocConsumer<ChangePharmacyPasswordCubit, ChangePharmacyPasswordState>(
       listener: (context, state) {
         if (state is ChangePasswordSuccess) {
-          AppSnackbar.show(context, 'تم تغيير كلمة المرور');
+          AppSnackbar.show(context, 'تم تغيير كلمة المرور'.tr);
           Navigator.of(context).pop();
         }
       },
@@ -80,24 +82,24 @@ class _ChangePasswordSheetState extends State<ChangePasswordSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('تعديل كلمة المرور', style: AppTextStyles.pharmacyPageSubtitle),
+                  Text('تعديل كلمة المرور'.tr, style: AppTextStyles.pharmacyPageSubtitle),
                   SizedBox(height: 16.h),
                   AuthTextField(
-                    label: 'كلمة المرور الحالية',
+                    label: 'كلمة المرور الحالية'.tr,
                     controller: _current,
                     obscureText: true,
                     textInputAction: TextInputAction.next,
                   ),
                   SizedBox(height: 12.h),
                   AuthTextField(
-                    label: 'كلمة المرور الجديدة',
+                    label: 'كلمة المرور الجديدة'.tr,
                     controller: _new,
                     obscureText: true,
                     textInputAction: TextInputAction.next,
                   ),
                   SizedBox(height: 12.h),
                   AuthTextField(
-                    label: 'تأكيد كلمة المرور الجديدة',
+                    label: 'تأكيد كلمة المرور الجديدة'.tr,
                     controller: _confirm,
                     obscureText: true,
                     textInputAction: TextInputAction.done,
@@ -108,7 +110,7 @@ class _ChangePasswordSheetState extends State<ChangePasswordSheet> {
                   ],
                   SizedBox(height: 20.h),
                   AppCustomButton(
-                    text: 'حفظ كلمة المرور',
+                    text: 'حفظ كلمة المرور'.tr,
                     isLoading: state is ChangePasswordSaving,
                     onPressed: _submit,
                   ),

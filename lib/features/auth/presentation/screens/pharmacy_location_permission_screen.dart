@@ -8,6 +8,8 @@ import '../cubit/pharmacy_sign_up_state.dart';
 import '../widgets/location_permission_view.dart';
 import 'pharmacy_notifications_permission_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Pushed by [PharmacySignUpForm] once the account-details step is
 /// validated — mirrors [LocationPermissionScreen] from the patient flow via
 /// the shared [LocationPermissionView].
@@ -52,14 +54,14 @@ class PharmacyLocationPermissionScreen extends StatelessWidget {
                 previous.locationError != current.locationError,
             builder: (context, state) {
               return LocationPermissionView(
-                subtitle: 'فعّل موقعك لمساعدة المرضى في العثور على صيدليتك بسهولة.',
+                subtitle: 'فعّل موقعك لمساعدة المرضى في العثور على صيدليتك بسهولة.'.tr,
                 buttonColor: AppColors.mainTeal,
                 errorText: state.locationError,
                 isBusy: state.isFetchingLocation,
                 onAllow: () => context.read<PharmacySignUpCubit>().useCurrentLocation(),
                 onSkip: () => AppSnackbar.show(
                   context,
-                  'الموقع مطلوب لإتمام إنشاء حسابك',
+                  'الموقع مطلوب لإتمام إنشاء حسابك'.tr,
                 ),
               );
             },

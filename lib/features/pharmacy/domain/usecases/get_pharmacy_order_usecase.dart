@@ -14,7 +14,7 @@ class GetPharmacyOrderUseCase {
   Future<ApiResult<PharmacyOrder>> call({required int orderId}) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(ApiFailure(message: sessionExpiredMessage));
+      return ApiError(ApiFailure(message: sessionExpiredMessage));
     }
     return _repository.getOrder(token: session.token, orderId: orderId);
   }

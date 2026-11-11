@@ -11,6 +11,7 @@ import 'package:daway_app/features/auth/domain/usecases/request_pharmacy_closure
 import 'package:daway_app/features/auth/presentation/cubit/account_closure_cubit.dart';
 import 'package:daway_app/features/auth/presentation/cubit/pharmacy_closure_cubit.dart';
 import 'package:get_it/get_it.dart';
+import '../localization/language_test_fakes.dart';
 
 const pendingRequest = ClosureRequest(status: ClosureRequestStatus.pending, reason: 'إغلاق نهائي');
 
@@ -74,6 +75,7 @@ const refusedClosure = ApiError<void>(ApiFailure(message: 'لديك طلبات �
 /// Puts the two closure cubits in [getIt] over fakes, for a test that opens a
 /// settings screen through its route or inside the dashboard shell.
 void registerClosureCubits(GetIt getIt) {
+  registerLanguageCubit(getIt);
   final repository = FakeAccountClosureRepository();
   final session = FakeClosureSessionRepository();
   getIt.registerFactory<AccountClosureCubit>(

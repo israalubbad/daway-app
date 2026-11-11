@@ -9,6 +9,8 @@ import '../widgets/record_payment_sheet.dart';
 import '../widgets/refund_sheet.dart';
 import 'share_invoice.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Runs [work] while a spinner covers the screen: what an action does before it
 /// has anything to show (fetching an invoice's lines).
 Future<T> _whileBusy<T>(BuildContext context, Future<T> work) async {
@@ -47,7 +49,7 @@ Future<bool> runInvoiceAction(
       if (!context.mounted) return false;
       final loaded = details.invoice;
       if (loaded == null) {
-        AppSnackbar.show(context, details.error ?? 'تعذر تحميل الفاتورة');
+        AppSnackbar.show(context, details.error ?? 'تعذر تحميل الفاتورة'.tr);
         return false;
       }
       await InvoiceDetailsScreen.open(
@@ -64,26 +66,26 @@ Future<bool> runInvoiceAction(
       return false;
     case InvoiceAction.recordPayment:
       if (invoice.isClosed || invoice.remaining <= 0) {
-        AppSnackbar.show(context, 'لا يوجد مبلغ متبقٍ على هذه الفاتورة');
+        AppSnackbar.show(context, 'لا يوجد مبلغ متبقٍ على هذه الفاتورة'.tr);
         return false;
       }
       final saved = await RecordPaymentSheet.show(context, invoice, cubit);
       if (saved != true || !context.mounted) return false;
       onChanged();
-      AppSnackbar.show(context, 'تم تسجيل الدفعة');
+      AppSnackbar.show(context, 'تم تسجيل الدفعة'.tr);
       return true;
     case InvoiceAction.refund:
       final refundable = await _whileBusy(context, cubit.loadRefundableLines(invoice));
       if (!context.mounted) return false;
       final lines = refundable.lines;
       if (lines == null) {
-        AppSnackbar.show(context, refundable.error ?? 'تعذر تحميل أصناف الفاتورة');
+        AppSnackbar.show(context, refundable.error ?? 'تعذر تحميل أصناف الفاتورة'.tr);
         return false;
       }
       final saved = await RefundSheet.show(context, invoice, lines, cubit);
       if (saved != true || !context.mounted) return false;
       onChanged();
-      AppSnackbar.show(context, 'تم تسجيل الإرجاع');
+      AppSnackbar.show(context, 'تم تسجيل الإرجاع'.tr);
       return true;
     case InvoiceAction.share:
       // Share what is known: the lines only if the details were opened.

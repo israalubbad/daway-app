@@ -12,6 +12,8 @@ import '../cubit/categories_cubit.dart';
 import '../cubit/categories_state.dart';
 import '../widgets/category_icon.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class AllCategoriesScreen extends StatelessWidget {
   const AllCategoriesScreen({super.key});
 
@@ -66,7 +68,7 @@ class _AllCategoriesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
-                'كل احتياجاتك في مكان واحد',
+                'كل احتياجاتك في مكان واحد'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.allCategoriesTitle,
               ),
@@ -75,7 +77,7 @@ class _AllCategoriesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
-                'اختر القسم المناسب وابدأ بالاستكشاف',
+                'اختر القسم المناسب وابدأ بالاستكشاف'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
@@ -99,7 +101,7 @@ class _AllCategoriesView extends StatelessWidget {
                         when categories.isEmpty =>
                       Center(
                         child: Text(
-                          'لا توجد أقسام متاحة حالياً',
+                          'لا توجد أقسام متاحة حالياً'.tr,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.homePharmacyCardSubtitle,
                         ),

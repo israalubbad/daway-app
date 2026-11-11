@@ -8,6 +8,8 @@ import '../../../../core/widgets/app_toggle_switch.dart';
 import '../../domain/entities/working_hours_entry.dart';
 import '../helpers/working_hours_format.dart';
 
+import '../../../../core/localization/translations.dart';
+
 const _defaultOpen = '09:00';
 const _defaultClose = '22:00';
 
@@ -97,13 +99,13 @@ class _WorkingHoursDialogState extends State<WorkingHoursDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'ساعات العمل',
+              'ساعات العمل'.tr,
               textAlign: TextAlign.right,
               style: AppTextStyles.profileFieldLabel,
             ),
             SizedBox(height: 4.h),
             Text(
-              'حدد ساعة الفتح والإغلاق لكل يوم',
+              'حدد ساعة الفتح والإغلاق لكل يوم'.tr,
               textAlign: TextAlign.right,
               style: AppTextStyles.settingsMutedText,
             ),
@@ -124,7 +126,7 @@ class _WorkingHoursDialogState extends State<WorkingHoursDialog> {
               ),
             SizedBox(height: 20.h),
             AppCustomButton(
-              text: 'تم',
+              text: 'تم'.tr,
               backgroundColor: _isValid
                   ? AppColors.mainTeal
                   : AppColors.borderGrey,
@@ -136,7 +138,7 @@ class _WorkingHoursDialogState extends State<WorkingHoursDialog> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'إلغاء',
+                'إلغاء'.tr,
                 style: AppTextStyles.settingsMutedText.copyWith(
                   color: AppColors.mainTeal,
                 ),
@@ -183,7 +185,7 @@ class _DayRow extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _TimeChip(
-                          prefix: 'من',
+                          prefix: 'من'.tr,
                           label: formatWorkingTimeArabic(entry.open!),
                           onTap: onPickOpen,
                         ),
@@ -191,14 +193,14 @@ class _DayRow extends StatelessWidget {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: _TimeChip(
-                          prefix: 'إلى',
+                          prefix: 'إلى'.tr,
                           label: formatWorkingTimeArabic(entry.close!),
                           onTap: onPickClose,
                         ),
                       ),
                     ],
                   )
-                : Text('مغلق', style: AppTextStyles.settingsMutedText),
+                : Text('مغلق'.tr, style: AppTextStyles.settingsMutedText),
           ),
           SizedBox(width: 8.w),
           GestureDetector(

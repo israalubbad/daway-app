@@ -6,6 +6,8 @@ import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../cubit/pharmacy_closure_cubit.dart';
 import '../cubit/pharmacy_closure_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The pharmacy's "ask to close my account" confirmation. A pharmacy cannot
 /// delete itself — the admin reviews the request — so the wording says so, and
 /// the sheet closes by itself once the request has been sent.
@@ -29,10 +31,9 @@ class PharmacyClosureSheet extends StatelessWidget {
       builder: (context, state) {
         final loaded = state is PharmacyClosureLoaded ? state : null;
         return AccountClosureSheet(
-          title: 'طلب إغلاق الحساب؟',
-          message: 'سيصل طلبك إلى إدارة التطبيق لمراجعته، ويبقى حسابك يعمل '
-              'حتى يتم قبوله. بعد الإغلاق لا يمكن استرجاع الحساب.',
-          confirmLabel: 'إرسال الطلب',
+          title: 'طلب إغلاق الحساب؟'.tr,
+          message: 'سيصل طلبك إلى إدارة التطبيق لمراجعته، ويبقى حسابك يعمل حتى يتم قبوله. بعد الإغلاق لا يمكن استرجاع الحساب.'.tr,
+          confirmLabel: 'إرسال الطلب'.tr,
           isSubmitting: loaded?.isSubmitting ?? false,
           errorMessage: loaded?.errorMessage,
           onConfirm: (reason) => cubit.submit(reason: reason),

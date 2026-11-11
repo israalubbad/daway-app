@@ -7,7 +7,7 @@ import '../entities/chat_message.dart';
 import '../repositories/chat_image_uploader.dart';
 import '../repositories/chat_repository.dart';
 
-const _sessionExpired = ApiFailure(message: sessionExpiredMessage);
+ApiFailure get _sessionExpired => ApiFailure(message: sessionExpiredMessage);
 
 class GetChatMessagesUseCase {
   final ChatRepository _repository;
@@ -17,7 +17,7 @@ class GetChatMessagesUseCase {
 
   Future<ApiResult<List<ChatMessage>>> call(int inquiryId, {bool markRead = true}) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
 
     final result = await _repository.getMessages(
       token: session.token,
@@ -64,7 +64,7 @@ class SendChatMessageUseCase {
 
   Future<ApiResult<ChatMessage>> call(int inquiryId, String text) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
 
     final result = await _repository.sendMessage(
       token: session.token,

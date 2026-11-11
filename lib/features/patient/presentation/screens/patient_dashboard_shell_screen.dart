@@ -12,8 +12,10 @@ import 'medicine_search_screen.dart';
 import 'patient_account_screen.dart';
 import 'patient_conversations_screen.dart';
 import 'patient_home_screen.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Bottom-nav shell for the logged-in patient area. Each tab keeps its own
+
 /// Scaffold/AppBar/Drawer (see [PatientSideMenu]'s doc comment) — this shell
 /// only owns which tab is selected, a piece of purely local UI state.
 class PatientDashboardShellScreen extends StatefulWidget {
@@ -32,8 +34,8 @@ class _PatientDashboardShellScreenState extends State<PatientDashboardShellScree
     final tabs = [
       const PatientHomeScreen(),
       const MedicineSearchScreen(),
-      const ComingSoonTabScreen(
-        title: 'المسح الضوئي',
+      ComingSoonTabScreen(
+        title: 'المسح الضوئي'.tr,
         icon: Icons.crop_free,
         drawer: PatientSideMenu(),
       ),

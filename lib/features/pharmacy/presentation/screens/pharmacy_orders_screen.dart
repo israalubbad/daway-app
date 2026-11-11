@@ -8,6 +8,8 @@ import '../widgets/pharmacy_order_card.dart';
 import '../widgets/pharmacy_products_header.dart';
 import 'pharmacy_order_details_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The pharmacy's الطلبات tab: every order as a card, newest first as handed
 /// in, and "عرض الطلب" opens its details. A tab's root, so no back chip.
 ///
@@ -37,9 +39,9 @@ class PharmacyOrdersScreen extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 24.h),
           children: [
-            const PharmacyProductsHeader(
-              title: 'الطلبات',
-              subtitle: 'أدر المنتجات الخاصة بك',
+            PharmacyProductsHeader(
+              title: 'الطلبات'.tr,
+              subtitle: 'أدر المنتجات الخاصة بك'.tr,
             ),
             SizedBox(height: 24.h),
             if (isLoading)
@@ -53,7 +55,7 @@ class PharmacyOrdersScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(top: 80.h),
                 child: Text(
-                  'لا توجد طلبات بعد.',
+                  'لا توجد طلبات بعد.'.tr,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.settingsMutedText,
                 ),

@@ -5,6 +5,8 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import 'permission_icon_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Shared "allow notifications" layout used by both the patient and pharmacy
 /// sign-up flows — each screen wires this to its own finishing logic and
 /// supplies the copy/color that differs between them.
@@ -32,12 +34,12 @@ class NotificationsPermissionView extends StatelessWidget {
           SizedBox(height: 32.h),
           PermissionIconHeader(
             icon: Icons.notifications_none_rounded,
-            title: 'ابق على اطلاع دائم',
+            title: 'ابق على اطلاع دائم'.tr,
             subtitle: subtitle,
           ),
           SizedBox(height: 24.h),
           AppCustomButton(
-            text: 'السماح بالإشعارات',
+            text: 'السماح بالإشعارات'.tr,
             backgroundColor: buttonColor,
             onPressed: onAllow,
           ),
@@ -45,7 +47,7 @@ class NotificationsPermissionView extends StatelessWidget {
           GestureDetector(
             onTap: onSkip,
             child: Text(
-              'تخطي',
+              'تخطي'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.authFooterMuted,
             ),

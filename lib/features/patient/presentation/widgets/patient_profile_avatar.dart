@@ -10,6 +10,8 @@ import '../../../../core/helpers/image_source_picker.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Account-info screen's avatar: a 96x96 circle (falling back to the
 /// patient's first initial when no picture is set) with a small upload
 /// badge.
@@ -41,7 +43,7 @@ class PatientProfileAvatar extends StatelessWidget {
 
   Widget _buildInitial() {
     final trimmed = name.trim();
-    final letter = trimmed.isNotEmpty ? trimmed[0] : '؟';
+    final letter = trimmed.isNotEmpty ? trimmed[0] : '؟'.tr;
     return Text(
       letter,
       style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: AppColors.mainTeal),

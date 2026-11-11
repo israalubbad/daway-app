@@ -20,7 +20,7 @@ class GetAlternativesOverviewUseCase {
   Future<ApiResult<AlternativesOverview>> call(Medicine baseMedicine) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(
+      return ApiError(
         ApiFailure(message: sessionExpiredMessage),
       );
     }

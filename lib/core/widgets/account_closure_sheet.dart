@@ -6,6 +6,8 @@ import '../theming/app_text_styles.dart';
 import 'app_bottom_sheet.dart';
 import 'app_text_field.dart';
 
+import '../../core/localization/translations.dart';
+
 /// The bottom sheet that asks for the last confirmation before an account is
 /// deleted (a patient) or its closure is requested (a pharmacy), with an
 /// optional reason. Purely presentational: the caller owns the request, and
@@ -75,7 +77,7 @@ class _AccountClosureSheetState extends State<AccountClosureSheet> {
               SizedBox(height: 20.h),
               AppTextField(
                 controller: _reasonController,
-                hintText: 'السبب (اختياري)',
+                hintText: 'السبب (اختياري)'.tr,
                 maxLines: 3,
                 readOnly: widget.isSubmitting,
               ),
@@ -124,7 +126,7 @@ class _AccountClosureSheetState extends State<AccountClosureSheet> {
                     side: const BorderSide(color: AppColors.sheetOutlineBorder),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                   ),
-                  child: Text('إلغاء', style: AppTextStyles.sheetButtonLabel),
+                  child: Text('إلغاء'.tr, style: AppTextStyles.sheetButtonLabel),
                 ),
               ),
             ],

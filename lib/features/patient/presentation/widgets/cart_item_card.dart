@@ -7,6 +7,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/cart_item.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// One row in "السلة" — the medicine/pharmacy line, its price, and a
 /// quantity stepper. No per-line delete here (the design has none): the
 /// minus button just stops at a quantity of 1 (see CartCubit.decrementQuantity).
@@ -58,7 +60,7 @@ class CartItemCard extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  '${formatPrice(item.price)} \$/الشريط',
+                  '{0} \$/الشريط'.trArgs([formatPrice(item.price)]),
                   textAlign: TextAlign.right,
                   style: AppTextStyles.cartItemPrice,
                 ),

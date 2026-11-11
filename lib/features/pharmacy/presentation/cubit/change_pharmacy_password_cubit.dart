@@ -4,6 +4,8 @@ import '../../../../core/helpers/api_result.dart';
 import '../../../../core/helpers/validators.dart';
 import '../../domain/usecases/change_pharmacy_password_usecase.dart';
 
+import '../../../../core/localization/translations.dart';
+
 sealed class ChangePharmacyPasswordState {
   const ChangePharmacyPasswordState();
 }
@@ -36,23 +38,23 @@ class ChangePharmacyPasswordCubit extends Cubit<ChangePharmacyPasswordState> {
     if (state is ChangePasswordSaving) return;
 
     if (currentPassword.isEmpty) {
-      emit(const ChangePasswordIdle(message: 'أدخل كلمة المرور الحالية'));
+      emit(ChangePasswordIdle(message: 'أدخل كلمة المرور الحالية'.tr));
       return;
     }
     if (!Validators.isValidPassword(newPassword)) {
       emit(
-        const ChangePasswordIdle(
-          message: 'كلمة المرور الجديدة يجب أن تكون ${Validators.minPasswordLength} أحرف على الأقل',
+        ChangePasswordIdle(
+          message: 'كلمة المرور الجديدة يجب أن تكون {0} أحرف على الأقل'.trArgs([Validators.minPasswordLength]),
         ),
       );
       return;
     }
     if (newPassword != confirmation) {
-      emit(const ChangePasswordIdle(message: 'كلمتا المرور غير متطابقتين'));
+      emit(ChangePasswordIdle(message: 'كلمتا المرور غير متطابقتين'.tr));
       return;
     }
     if (newPassword == currentPassword) {
-      emit(const ChangePasswordIdle(message: 'كلمة المرور الجديدة هي نفسها الحالية'));
+      emit(ChangePasswordIdle(message: 'كلمة المرور الجديدة هي نفسها الحالية'.tr));
       return;
     }
 

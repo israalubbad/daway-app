@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../widgets/legal_content_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const LegalContentScreen(
-      title: 'سياسة الخصوصية',
+    return LegalContentScreen(
+      title: 'سياسة الخصوصية'.tr,
       body: _privacyBody,
     );
   }

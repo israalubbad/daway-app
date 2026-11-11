@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The pharmacy home's way into the accounting area: a tinted card with an
 /// icon, "المحاسبة", a line about what is inside, and an arrow.
 class AccountingEntryCard extends StatelessWidget {
@@ -15,7 +17,7 @@ class AccountingEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'المحاسبة',
+      label: 'المحاسبة'.tr,
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -43,9 +45,9 @@ class AccountingEntryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('المحاسبة', style: AppTextStyles.pharmacyOrderNumber),
+                    Text('المحاسبة'.tr, style: AppTextStyles.pharmacyOrderNumber),
                     Text(
-                      'المبيعات والإرجاعات والصندوق',
+                      'المبيعات والإرجاعات والصندوق'.tr,
                       style: AppTextStyles.pharmacyOrderTime,
                     ),
                   ],

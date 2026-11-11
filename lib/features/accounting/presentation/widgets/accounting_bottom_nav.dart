@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 enum AccountingTab { overview, sales, refunds, cash }
 
 /// The 4-item bottom bar of the accounting area, drawn like the pharmacy
@@ -14,11 +16,11 @@ class AccountingBottomNav extends StatelessWidget {
 
   const AccountingBottomNav({super.key, required this.selected, required this.onSelected});
 
-  static const _items = [
-    (AccountingTab.overview, 'نظرة عامة', Icons.space_dashboard_outlined),
-    (AccountingTab.sales, 'المبيعات', Icons.receipt_long_outlined),
-    (AccountingTab.refunds, 'الإرجاعات', Icons.assignment_return_outlined),
-    (AccountingTab.cash, 'الصندوق', Icons.account_balance_wallet_outlined),
+  static List<(AccountingTab, String, IconData)> get _items => [
+    (AccountingTab.overview, 'نظرة عامة'.tr, Icons.space_dashboard_outlined),
+    (AccountingTab.sales, 'المبيعات'.tr, Icons.receipt_long_outlined),
+    (AccountingTab.refunds, 'الإرجاعات'.tr, Icons.assignment_return_outlined),
+    (AccountingTab.cash, 'الصندوق'.tr, Icons.account_balance_wallet_outlined),
   ];
 
   @override

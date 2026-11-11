@@ -8,8 +8,10 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../cubit/pharmacy_auth_cubit.dart';
 import '../cubit/pharmacy_auth_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Pharmacy ID + password fields shown on [PharmacyAuthScreen].
+
 class PharmacyLoginForm extends StatefulWidget {
   const PharmacyLoginForm({super.key});
 
@@ -52,20 +54,20 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('معرف الصيدلية (ID)', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('معرف الصيدلية (ID)'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _idController,
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'معرف الصيدلية مطلوب' : null,
+                (value == null || value.trim().isEmpty) ? 'معرف الصيدلية مطلوب'.tr : null,
             decoration: _fieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
 
-          Text('كلمة المرور', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _passwordController,
@@ -73,7 +75,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.isEmpty) ? 'كلمة المرور مطلوبة' : null,
+                (value == null || value.isEmpty) ? 'كلمة المرور مطلوبة'.tr : null,
             decoration: _fieldDecoration().copyWith(
               suffixIcon: IconButton(
                 icon: Icon(
@@ -107,7 +109,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
             alignment: AlignmentDirectional.centerStart,
             child: GestureDetector(
               onTap: () => Navigator.pushNamed(context, Routes.pharmacyForgotPasswordScreen),
-              child: Text('نسيت كلمة المرور؟', style: AppTextStyles.authForgotPasswordLink),
+              child: Text('نسيت كلمة المرور؟'.tr, style: AppTextStyles.authForgotPasswordLink),
             ),
           ),
 
@@ -117,7 +119,7 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
             buildWhen: (previous, current) => previous.isLoggingIn != current.isLoggingIn,
             builder: (context, state) {
               return AppCustomButton(
-                text: 'التالي',
+                text: 'التالي'.tr,
                 backgroundColor: AppColors.mainTeal,
                 isLoading: state.isLoggingIn,
                 onPressed: () => _submit(context),
@@ -130,12 +132,12 @@ class _PharmacyLoginFormState extends State<PharmacyLoginForm> {
           Wrap(
             alignment: WrapAlignment.center,
             children: [
-              Text('ليس لديك حساب ؟ ', style: AppTextStyles.authFooterMuted),
+              Text('ليس لديك حساب ؟ '.tr, style: AppTextStyles.authFooterMuted),
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, Routes.pharmacySignUpScreen);
                 },
-                child: Text('أنشئ حساب', style: AppTextStyles.authLinkText),
+                child: Text('أنشئ حساب'.tr, style: AppTextStyles.authLinkText),
               ),
             ],
           ),

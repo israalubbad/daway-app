@@ -18,6 +18,8 @@ import '../cubit/pharmacy_stock_import_cubit.dart';
 import '../cubit/pharmacy_stock_import_state.dart';
 import '../widgets/pharmacy_products_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "تحديث المنتجات": pick a stock spreadsheet, have it analysed, and confirm
 /// the update. Pops `true` once the update went through.
 ///
@@ -49,12 +51,12 @@ class PharmacyStockImportScreen extends StatelessWidget {
     switch (result) {
       case Success(:final data):
         final saved = await FilePicker.saveFile(
-          dialogTitle: 'حفظ ملف Excel',
+          dialogTitle: 'حفظ ملف Excel'.tr,
           fileName: fileName,
           bytes: data,
         );
         if (saved != null && context.mounted) {
-          AppSnackbar.show(context, 'تم حفظ الملف');
+          AppSnackbar.show(context, 'تم حفظ الملف'.tr);
         }
       case ApiError(:final failure):
         AppSnackbar.show(context, failure.message);
@@ -65,11 +67,11 @@ class PharmacyStockImportScreen extends StatelessWidget {
     final cubit = context.read<PharmacyStockImportCubit>();
     switch (state) {
       case StockImportIdle(file: null):
-        AppSnackbar.show(context, 'اختر ملف المنتجات أولاً');
+        AppSnackbar.show(context, 'اختر ملف المنتجات أولاً'.tr);
       case StockImportIdle():
         cubit.analyze();
       case StockImportAnalyzed(:final preview) when !preview.canCommit:
-        AppSnackbar.show(context, 'لا يمكن تحديث المنتجات من هذا الملف، راجع الأخطاء فيه');
+        AppSnackbar.show(context, 'لا يمكن تحديث المنتجات من هذا الملف، راجع الأخطاء فيه'.tr);
       case StockImportAnalyzed():
         cubit.update();
       case StockImportAnalyzing() || StockImportUpdating() || StockImportUpdated():
@@ -112,8 +114,8 @@ class PharmacyStockImportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         PharmacyProductsHeader(
-                          title: 'تحديث المنتجات',
-                          subtitle: 'حدث قائمة منتجاتك بسهولة',
+                          title: 'تحديث المنتجات'.tr,
+                          subtitle: 'حدث قائمة منتجاتك بسهولة'.tr,
                           onBack: () => Navigator.of(context).pop(false),
                         ),
                         SizedBox(height: 24.h),
@@ -124,8 +126,8 @@ class PharmacyStockImportScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 24.h),
                         _DownloadCard(
-                          title: 'تنزيل قالب Excel',
-                          subtitle: 'استخدم القالب لإضافة منتجاتك بالصيغة المطلوبة.',
+                          title: 'تنزيل قالب Excel'.tr,
+                          subtitle: 'استخدم القالب لإضافة منتجاتك بالصيغة المطلوبة.'.tr,
                           leading: _DownloadCardIcon(
                             background: AppColors.accountIconBg,
                             size: 40,
@@ -142,11 +144,11 @@ class PharmacyStockImportScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
-                        Text('ملف المنتجات الحالي', style: AppTextStyles.pharmacySearchText),
+                        Text('ملف المنتجات الحالي'.tr, style: AppTextStyles.pharmacySearchText),
                         SizedBox(height: 12.h),
                         _DownloadCard(
                           title: 'inventory-current-${_todayStamp()}.xlsx',
-                          subtitle: 'كل منتجاتك الحالية مع الأسعار والكميات',
+                          subtitle: 'كل منتجاتك الحالية مع الأسعار والكميات'.tr,
                           ltrTitle: true,
                           leading: _DownloadCardIcon(
                             background: const Color(0xFFEBF8F2),
@@ -178,8 +180,8 @@ class PharmacyStockImportScreen extends StatelessWidget {
                   child: AppCustomButton(
                     text: switch (state) {
                       StockImportAnalyzed() || StockImportUpdating() || StockImportUpdated() =>
-                        'تحديث المنتجات',
-                      _ => 'تحليل الملف',
+                        'تحديث المنتجات'.tr,
+                      _ => 'تحليل الملف'.tr,
                     },
                     isLoading: state is StockImportAnalyzing || state is StockImportUpdating,
                     textStyle: AppTextStyles.pharmacyPageSubtitle,
@@ -240,12 +242,12 @@ class _UploadBox extends StatelessWidget {
             SizedBox(height: 13.h),
             if (file == null) ...[
               Text(
-                'رفع ملف منتجاتك',
+                'رفع ملف منتجاتك'.tr,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.pharmacyUploadTitle,
               ),
               Text(
-                'ارفع ملف Excel يحتوي على منتجات الصيدلية.',
+                'ارفع ملف Excel يحتوي على منتجات الصيدلية.'.tr,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.pharmacyUploadSubtitle,
               ),
@@ -261,7 +263,7 @@ class _UploadBox extends StatelessWidget {
                 ),
               ),
               Text(
-                'جاهز للتحليل · ${_formatSize(file.sizeBytes)}',
+                'جاهز للتحليل · {0}'.trArgs([_formatSize(file.sizeBytes)]),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.pharmacyUploadSubtitle,
               ),
@@ -281,7 +283,7 @@ class _UploadBox extends StatelessWidget {
                   border: Border.all(color: AppColors.iconBlueBorder, width: 0.8),
                 ),
                 child: Text(
-                  file == null ? 'اختيار ملف' : 'استبدال الملف',
+                  file == null ? 'اختيار ملف'.tr : 'استبدال الملف'.tr,
                   style: AppTextStyles.pharmacyUploadButton,
                 ),
               ),
@@ -289,7 +291,7 @@ class _UploadBox extends StatelessWidget {
             if (file != null) ...[
               SizedBox(height: 8.h),
               Text(
-                'XLSX أو XLS',
+                'XLSX أو XLS'.tr,
                 style: AppTextStyles.pharmacyUploadSubtitle.copyWith(fontSize: 11.sp),
               ),
             ],
@@ -427,7 +429,7 @@ class _AnalysisCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'تم تحليل الملف بنجاح',
+                      'تم تحليل الملف بنجاح'.tr,
                       style: AppFonts.tajawal(
                         TextStyle(
                           fontSize: 15.sp,
@@ -438,7 +440,7 @@ class _AnalysisCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'تم العثور على ${preview.totalCount} منتجًا ويمكنك تحديث قائمة منتجاتك.',
+                      'تم العثور على {0} منتجًا ويمكنك تحديث قائمة منتجاتك.'.trArgs([preview.totalCount]),
                       style: AppTextStyles.pharmacyUploadSubtitle.copyWith(fontSize: 11.sp),
                     ),
                   ],
@@ -449,17 +451,17 @@ class _AnalysisCard extends StatelessWidget {
           SizedBox(height: 14.h),
           Row(
             children: [
-              Expanded(child: _StatTile(value: preview.totalCount, label: 'عدد المنتجات')),
+              Expanded(child: _StatTile(value: preview.totalCount, label: 'عدد المنتجات'.tr)),
               SizedBox(width: 8.w),
-              Expanded(child: _StatTile(value: preview.updatedCount, label: 'منتجات محدثة')),
+              Expanded(child: _StatTile(value: preview.updatedCount, label: 'منتجات محدثة'.tr)),
             ],
           ),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Expanded(child: _StatTile(value: preview.newCount, label: 'منتجات جديدة')),
+              Expanded(child: _StatTile(value: preview.newCount, label: 'منتجات جديدة'.tr)),
               SizedBox(width: 8.w),
-              Expanded(child: _StatTile(value: preview.errorCount, label: 'تحتوي على اخطاء')),
+              Expanded(child: _StatTile(value: preview.errorCount, label: 'تحتوي على اخطاء'.tr)),
             ],
           ),
         ],

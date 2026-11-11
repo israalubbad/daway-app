@@ -15,6 +15,8 @@ import '../widgets/accounting_filter_sheets.dart';
 import '../widgets/accounting_search_bar.dart';
 import '../widgets/invoice_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "المبيعات": every sales invoice with its search, filters, totals and the
 /// button that starts a new invoice.
 ///
@@ -52,7 +54,7 @@ class AccountingSalesScreen extends StatelessWidget {
         backgroundColor: AppColors.mainTeal,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
-        label: Text('فاتورة جديدة', style: AccountingStyles.body.copyWith(color: Colors.white)),
+        label: Text('فاتورة جديدة'.tr, style: AccountingStyles.body.copyWith(color: Colors.white)),
       ),
       body: SafeArea(
         child: BlocBuilder<SalesCubit, SalesState>(
@@ -64,8 +66,8 @@ class AccountingSalesScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 96.h),
                 children: [
                   PharmacyProductsHeader(
-                    title: 'المبيعات',
-                    subtitle: 'كل فواتير البيع وقيم التحصيل',
+                    title: 'المبيعات'.tr,
+                    subtitle: 'كل فواتير البيع وقيم التحصيل'.tr,
                     onBack: onBack,
                   ),
                   SizedBox(height: 16.h),
@@ -101,7 +103,7 @@ class AccountingSalesScreen extends StatelessWidget {
     final visible = state.visible;
     return [
       AccountingSearchBar(
-        hint: 'ابحث برقم الفاتورة أو اسم العميل…',
+        hint: 'ابحث برقم الفاتورة أو اسم العميل…'.tr,
         onChanged: context.read<SalesCubit>().queryChanged,
         onFiltersTap: () => _openFilters(context, state),
         activeFilters: state.activeFilters,
@@ -109,16 +111,16 @@ class AccountingSalesScreen extends StatelessWidget {
       SizedBox(height: 16.h),
       Row(
         children: [
-          Expanded(child: Text('المبيعات', style: AccountingStyles.sectionTitle)),
-          Text('${visible.length} نتيجة', style: AccountingStyles.muted),
+          Expanded(child: Text('المبيعات'.tr, style: AccountingStyles.sectionTitle)),
+          Text('{0} نتيجة'.trArgs([visible.length]), style: AccountingStyles.muted),
         ],
       ),
       SizedBox(height: 12.h),
       if (visible.isEmpty)
-        const AccountingEmptyState(
+        AccountingEmptyState(
           icon: Icons.receipt_long_outlined,
-          title: 'لا توجد فواتير',
-          hint: 'غيّر البحث أو الفلاتر، أو أنشئ فاتورة بيع جديدة.',
+          title: 'لا توجد فواتير'.tr,
+          hint: 'غيّر البحث أو الفلاتر، أو أنشئ فاتورة بيع جديدة.'.tr,
         )
       else ...[
         _TotalsCard(state: state),
@@ -168,10 +170,10 @@ class _TotalsCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          figure('الإجمالي', state.totalAmount),
-          figure('المدفوع', state.paidAmount),
+          figure('الإجمالي'.tr, state.totalAmount),
+          figure('المدفوع'.tr, state.paidAmount),
           figure(
-            'المتبقي',
+            'المتبقي'.tr,
             state.remainingAmount,
             color: state.remainingAmount > 0 ? AppColors.logoutRed : null,
           ),

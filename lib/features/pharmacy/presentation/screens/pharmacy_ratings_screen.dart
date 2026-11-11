@@ -9,6 +9,8 @@ import '../cubit/pharmacy_ratings_cubit.dart';
 import '../cubit/pharmacy_ratings_state.dart';
 import '../widgets/rating_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "التقييمات": what patients wrote about the pharmacy, newest first, straight
 /// under the title.
 class PharmacyRatingsScreen extends StatelessWidget {
@@ -42,16 +44,16 @@ class PharmacyRatingsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PatientSubScreenHeader(
-            title: 'التقييمات',
-            description: 'آراء عملائك في صيدليتك',
+          PatientSubScreenHeader(
+            title: 'التقييمات'.tr,
+            description: 'آراء عملائك في صيدليتك'.tr,
           ),
           SizedBox(height: 24.h),
           Expanded(
             child: state.ratings.isEmpty
                 ? Center(
                     child: Text(
-                      'لا توجد مراجعات بعد',
+                      'لا توجد مراجعات بعد'.tr,
                       style: AppTextStyles.cardDescription,
                     ),
                   )

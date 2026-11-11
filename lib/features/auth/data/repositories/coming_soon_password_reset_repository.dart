@@ -14,16 +14,16 @@ class ComingSoonPasswordResetRepository implements PasswordResetRepository {
 
   @override
   Future<ApiResult<void>> sendCode({required String phone}) async =>
-      const ApiError(ComingSoonFailure());
+      ApiError(ComingSoonFailure());
 
   @override
   Future<ApiResult<String>> verifyCode({required String phone, required String code}) async =>
-      const ApiError(ComingSoonFailure());
+      ApiError(ComingSoonFailure());
 
   @override
   Future<ApiResult<void>> resetPassword({
     required String phone,
     required String resetToken,
     required String password,
-  }) async => const ApiError(ComingSoonFailure());
+  }) async => ApiError(ComingSoonFailure());
 }

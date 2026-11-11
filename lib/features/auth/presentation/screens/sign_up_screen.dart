@@ -10,6 +10,8 @@ import '../cubit/patient_auth_state.dart';
 import '../widgets/sign_up_form.dart';
 import 'otp_verification_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Sign-up entry point: collects name/birth date/phone up front, then sends
 /// the OTP and pushes [OtpVerificationScreen] sharing this same
 /// [PatientAuthCubit] instance — the same merged verify call either logs the
@@ -43,13 +45,13 @@ class SignUpScreen extends StatelessWidget {
                 const Center(child: AppLogo()),
                 SizedBox(height: 32.h),
                 Text(
-                  'أنشئ حسابك',
+                  'أنشئ حسابك'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'ابدأ رحلتك مع دواك واحصل على احتياجاتك من الصيدلية بسهولة.',
+                  'ابدأ رحلتك مع دواك واحصل على احتياجاتك من الصيدلية بسهولة.'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
@@ -59,11 +61,11 @@ class SignUpScreen extends StatelessWidget {
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
-                    Text('لديك حساب بالفعل ؟ ', style: AppTextStyles.authFooterMuted),
+                    Text('لديك حساب بالفعل ؟ '.tr, style: AppTextStyles.authFooterMuted),
                     GestureDetector(
                       onTap: () => Navigator.of(context)
                           .pushReplacementNamed(Routes.patientAuthScreen),
-                      child: Text('سجّل دخولك', style: AppTextStyles.authLinkText),
+                      child: Text('سجّل دخولك'.tr, style: AppTextStyles.authLinkText),
                     ),
                   ],
                 ),

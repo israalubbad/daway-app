@@ -5,6 +5,8 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Shown right after a successful logout, in place of jumping the user
 /// straight back to [Routes.accountTypeScreen] — pushed with
 /// `pushNamedAndRemoveUntil` (same as the old direct navigation) so the
@@ -37,7 +39,7 @@ class LogoutFarewellScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: 76.h),
                   Text(
-                    'سوف نفتقدك',
+                    'سوف نفتقدك'.tr,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.farewellTitle,
                   ),
@@ -45,7 +47,7 @@ class LogoutFarewellScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Text(
-                      'يمكنك العودة دائمًا متى احتجت إلينا.',
+                      'يمكنك العودة دائمًا متى احتجت إلينا.'.tr,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.farewellSubtitle,
                     ),
@@ -54,7 +56,7 @@ class LogoutFarewellScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 37.h),
                     child: AppCustomButton(
-                      text: 'العودة للتطبيق',
+                      text: 'العودة للتطبيق'.tr,
                       onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
                           Routes.accountTypeScreen, (route) => false),
                     ),

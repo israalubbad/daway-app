@@ -15,6 +15,8 @@ import '../widgets/accounting_card.dart';
 import '../widgets/accounting_empty_state.dart';
 import '../widgets/accounting_search_bar.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "الإرجاعات": the log of sales returns, searchable and filterable by status.
 /// A return is started from an invoice's menu in المبيعات.
 ///
@@ -37,8 +39,8 @@ class AccountingRefundsScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 24.h),
                 children: [
                   PharmacyProductsHeader(
-                    title: 'الإرجاعات',
-                    subtitle: 'سجل مرتجعات البيع لهذه الصيدلية',
+                    title: 'الإرجاعات'.tr,
+                    subtitle: 'سجل مرتجعات البيع لهذه الصيدلية'.tr,
                     onBack: onBack,
                   ),
                   SizedBox(height: 16.h),
@@ -75,14 +77,14 @@ class AccountingRefundsScreen extends StatelessWidget {
     final visible = state.visible;
     return [
       AccountingSearchBar(
-        hint: 'ابحث برقم الإرجاع أو الفاتورة…',
+        hint: 'ابحث برقم الإرجاع أو الفاتورة…'.tr,
         onChanged: cubit.queryChanged,
       ),
       SizedBox(height: 12.h),
       Wrap(
         spacing: 8.w,
         children: [
-          AppFilterChip(label: 'الكل', selected: state.status == null, onTap: () => cubit.statusChanged(null)),
+          AppFilterChip(label: 'الكل'.tr, selected: state.status == null, onTap: () => cubit.statusChanged(null)),
           for (final status in RefundStatus.values)
             AppFilterChip(
               label: refundStatusLabel(status),
@@ -95,10 +97,10 @@ class AccountingRefundsScreen extends StatelessWidget {
       if (visible.isEmpty)
         AccountingEmptyState(
           icon: Icons.assignment_return_outlined,
-          title: 'لا توجد إرجاعات',
+          title: 'لا توجد إرجاعات'.tr,
           hint: state.all.isEmpty
-              ? 'ستظهر هنا كل عمليات الإرجاع التي تُنفّذ على فواتير البيع.'
-              : 'لا توجد نتائج مطابقة لبحثك.',
+              ? 'ستظهر هنا كل عمليات الإرجاع التي تُنفّذ على فواتير البيع.'.tr
+              : 'لا توجد نتائج مطابقة لبحثك.'.tr,
         )
       else
         for (final refund in visible) ...[
@@ -149,7 +151,7 @@ class _RefundCard extends StatelessWidget {
             ],
           ),
           Text(
-            'على الفاتورة ${refund.invoiceNumber} · ${refund.customerName ?? 'زائر نقدي'}',
+            'على الفاتورة {0} · {1}'.trArgs([refund.invoiceNumber, refund.customerName ?? 'زائر نقدي']),
             style: AccountingStyles.muted,
           ),
           SizedBox(height: 8.h),

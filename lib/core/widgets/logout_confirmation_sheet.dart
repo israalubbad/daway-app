@@ -5,8 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 import 'app_bottom_sheet.dart';
-
+
+import '../../core/localization/translations.dart';
 /// Bottom-sheet confirmation shown before ending the user's session. Purely
+
 /// presentational: the caller decides what happens when the user confirms.
 class LogoutConfirmationSheet extends StatelessWidget {
   final VoidCallback onConfirm;
@@ -31,13 +33,13 @@ class LogoutConfirmationSheet extends StatelessWidget {
           const Center(child: _LogoutIconCircle()),
           SizedBox(height: 24.h),
           Text(
-            'تسجيل الخروج؟',
+            'تسجيل الخروج؟'.tr,
             textAlign: TextAlign.center,
             style: AppTextStyles.confirmSheetTitle,
           ),
           SizedBox(height: 16.h),
           Text(
-            'هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟',
+            'هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟'.tr,
             textAlign: TextAlign.center,
             style: AppTextStyles.confirmSheetMessage,
           ),
@@ -55,7 +57,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
               ),
-              child: Text('تسجيل الخروج', style: AppTextStyles.sheetButtonLabel),
+              child: Text('تسجيل الخروج'.tr, style: AppTextStyles.sheetButtonLabel),
             ),
           ),
           SizedBox(height: 8.h),
@@ -68,7 +70,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
                 side: const BorderSide(color: AppColors.sheetOutlineBorder),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
               ),
-              child: Text('إلغاء', style: AppTextStyles.sheetButtonLabel),
+              child: Text('إلغاء'.tr, style: AppTextStyles.sheetButtonLabel),
             ),
           ),
         ],

@@ -19,6 +19,8 @@ import '../cubit/checkout_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
 import 'payment_method_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "أكمل طلبك" — delivery address, coupon and the order summary, before the
 /// order is created and paid. [items] are the cart lines being ordered (all
 /// from one pharmacy: see the cart screen).
@@ -73,7 +75,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
       _couponController.text,
     );
     if (!context.mounted) return;
-    AppSnackbar.show(context, error ?? 'تم تطبيق كود الخصم');
+    AppSnackbar.show(context, error ?? 'تم تطبيق كود الخصم'.tr);
   }
 
   void _removeCoupon(BuildContext context) {
@@ -138,9 +140,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: const PatientSubScreenHeader(
-                title: 'أكمل طلبك',
-                description: 'راجع تفاصيل الطلب واختر طريقة الدفع والتوصيل.',
+              child: PatientSubScreenHeader(
+                title: 'أكمل طلبك'.tr,
+                description: 'راجع تفاصيل الطلب واختر طريقة الدفع والتوصيل.'.tr,
               ),
             ),
             Expanded(
@@ -175,7 +177,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
               children: [
                 SizedBox(height: 24.h),
                 Text(
-                  'التوصيل',
+                  'التوصيل'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.profileFieldLabel,
                 ),
@@ -186,10 +188,10 @@ class _CheckoutViewState extends State<_CheckoutView> {
                 ),
                 SizedBox(height: 16.h),
                 _InfoCard(
-                  label: 'العنوان',
+                  label: 'العنوان'.tr,
                   onTap: () => _chooseAddress(context, state),
                   value: address == null
-                      ? 'اختر عنوان التوصيل'
+                      ? 'اختر عنوان التوصيل'.tr
                       : (address.address.isEmpty
                             ? address.label
                             : address.address),
@@ -217,13 +219,13 @@ class _CheckoutViewState extends State<_CheckoutView> {
         Padding(
           padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
           child: AppCustomButton(
-            text: 'التالي',
+            text: 'التالي'.tr,
             // Also held while the price is read: an order is only confirmed
             // against the total the patient can see.
             isLoading: state.isSubmitting || state.isQuoting,
             onPressed: () {
               if (state.selectedAddressId == null) {
-                AppSnackbar.show(context, 'اختر عنوان التوصيل أولاً');
+                AppSnackbar.show(context, 'اختر عنوان التوصيل أولاً'.tr);
                 return;
               }
               _next(context);
@@ -264,7 +266,7 @@ class _DeliveryButton extends StatelessWidget {
             ),
             SizedBox(width: 10.w),
             Text(
-              'دليفري',
+              'دليفري'.tr,
               style: TextStyle(fontSize: 14.sp, color: Colors.white),
             ),
           ],
@@ -344,7 +346,7 @@ class _CouponCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text('كود الخصم', style: AppTextStyles.profileFieldLabel),
+          Text('كود الخصم'.tr, style: AppTextStyles.profileFieldLabel),
           SizedBox(width: 12.w),
           Expanded(
             child: TextField(
@@ -361,7 +363,7 @@ class _CouponCard extends StatelessWidget {
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: 'أدخل الكود',
+                hintText: 'أدخل الكود'.tr,
                 hintStyle: TextStyle(fontSize: 12.sp, color: AppColors.grey),
               ),
             ),
@@ -376,7 +378,7 @@ class _CouponCard extends StatelessWidget {
             GestureDetector(
               onTap: applied ? onRemove : onApply,
               child: Text(
-                applied ? 'إزالة' : 'تطبيق',
+                applied ? 'إزالة'.tr : 'تطبيق'.tr,
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
@@ -407,7 +409,7 @@ class _SummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'ملخص الطلب',
+            'ملخص الطلب'.tr,
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel,
           ),
@@ -430,7 +432,7 @@ class _SummaryCard extends StatelessWidget {
             ),
             SizedBox(height: 6.h),
             Text(
-              '${formatPrice(item.price)} \$/ الشريط × ${item.quantity} = ${formatPrice(item.lineTotal)} \$',
+              '{0} \$/ الشريط × {1} = {2} \$'.trArgs([formatPrice(item.price), item.quantity, formatPrice(item.lineTotal)]),
               textAlign: TextAlign.right,
               style: AppTextStyles.cartItemPharmacyName,
             ),
@@ -454,14 +456,14 @@ class _TotalsCard extends StatelessWidget {
     final quote = state.quote;
     if (quote != null) {
       return Text(
-        'دليفري : ${formatPrice(quote.deliveryFee.toDouble())} \$',
+        'دليفري : {0} \$'.trArgs([formatPrice(quote.deliveryFee.toDouble())]),
         textAlign: TextAlign.right,
         style: AppTextStyles.cartItemPrice,
       );
     }
     if (state.isQuoting) {
       return Text(
-        'دليفري : جارٍ الحساب...',
+        'دليفري : جارٍ الحساب...'.tr,
         textAlign: TextAlign.right,
         style: AppTextStyles.cartItemPrice,
       );
@@ -471,14 +473,14 @@ class _TotalsCard extends StatelessWidget {
         onTap: onRetryQuote,
         behavior: HitTestBehavior.opaque,
         child: Text(
-          'دليفري : تعذر حساب الرسوم، اضغط لإعادة المحاولة',
+          'دليفري : تعذر حساب الرسوم، اضغط لإعادة المحاولة'.tr,
           textAlign: TextAlign.right,
           style: AppTextStyles.cartItemPrice.copyWith(color: AppColors.logoutRed),
         ),
       );
     }
     return Text(
-      'دليفري : يحدده الأدمن بعد إرسال الطلب',
+      'دليفري : يحدده الأدمن بعد إرسال الطلب'.tr,
       textAlign: TextAlign.right,
       style: AppTextStyles.cartItemPrice,
     );
@@ -497,7 +499,7 @@ class _TotalsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'سعر الطلبات : ${formatPrice(state.quote?.subtotal ?? state.subtotal)} \$',
+            'سعر الطلبات : {0} \$'.trArgs([formatPrice(state.quote?.subtotal ?? state.subtotal)]),
             textAlign: TextAlign.right,
             style: AppTextStyles.cartItemPrice,
           ),
@@ -506,14 +508,14 @@ class _TotalsCard extends StatelessWidget {
           if (shownDiscount > 0) ...[
             SizedBox(height: 8.h),
             Text(
-              'الخصم : ${formatPrice(shownDiscount)} \$',
+              'الخصم : {0} \$'.trArgs([formatPrice(shownDiscount)]),
               textAlign: TextAlign.right,
               style: AppTextStyles.cartItemPrice,
             ),
           ],
           SizedBox(height: 12.h),
           Text(
-            'الاجمالي : ${formatPrice(state.grandTotal)} \$',
+            'الاجمالي : {0} \$'.trArgs([formatPrice(state.grandTotal)]),
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel.copyWith(
               fontWeight: FontWeight.w700,
@@ -539,7 +541,7 @@ class _AddressSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'اختر عنوان التوصيل',
+            'اختر عنوان التوصيل'.tr,
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel,
           ),
@@ -566,7 +568,7 @@ class _AddressSheet extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             onTap: () => Navigator.of(context).pop(_addNewAddress),
             title: Text(
-              'إضافة عنوان جديد',
+              'إضافة عنوان جديد'.tr,
               textAlign: TextAlign.right,
               style: TextStyle(color: AppColors.mainTeal),
             ),

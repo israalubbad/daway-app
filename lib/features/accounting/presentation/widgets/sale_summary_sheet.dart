@@ -12,6 +12,8 @@ import '../cubit/new_sale_state.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "ملخص الفاتورة": customer, the totals, what was paid, what remains and how.
 /// Pops with true once the sale is saved.
 class SaleSummarySheet extends StatefulWidget {
@@ -55,10 +57,10 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('إتمام البيع بإجمالي ${formatMoney(total)}؟', style: AccountingStyles.cardTitle),
+        title: Text('إتمام البيع بإجمالي {0}؟'.trArgs([formatMoney(total)]), style: AccountingStyles.cardTitle),
         actions: [
-          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: const Text('إلغاء')),
-          TextButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: const Text('تأكيد')),
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: Text('إلغاء'.tr)),
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: Text('تأكيد'.tr)),
         ],
       ),
     );
@@ -83,21 +85,21 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text('ملخص الفاتورة', style: AccountingStyles.sectionTitle)),
+                      Expanded(child: Text('ملخص الفاتورة'.tr, style: AccountingStyles.sectionTitle)),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded),
-                        tooltip: 'إغلاق',
+                        tooltip: 'إغلاق'.tr,
                       ),
                     ],
                   ),
                   _Field(
-                    label: 'العميل',
+                    label: 'العميل'.tr,
                     child: state.customer == null
                         ? TextField(
                             controller: _customerController,
                             onChanged: widget.cubit.customerQueryChanged,
-                            decoration: _decoration('زائر نقدي · اكتب اسماً لاختيار عميل'),
+                            decoration: _decoration('زائر نقدي · اكتب اسماً لاختيار عميل'.tr),
                           )
                         : _SelectedCustomer(
                             name: state.customer!.name,
@@ -117,7 +119,7 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                             Expanded(child: Text(customer.name, style: AccountingStyles.body)),
                             if (customer.balance > 0)
                               Text(
-                                'عليه ${formatMoney(customer.balance)}',
+                                'عليه {0}'.trArgs([formatMoney(customer.balance)]),
                                 textDirection: TextDirection.rtl,
                                 style: AccountingStyles.muted,
                               ),
@@ -126,14 +128,14 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                       ),
                     ),
                   SizedBox(height: 12.h),
-                  _Row('المجموع الفرعي', formatMoney(state.subtotal)),
-                  _Row('الخصم', '−${formatMoney(0)}'),
-                  _Row('الضريبة', 'غير مدعومة في النظام الحالي', ltr: false),
+                  _Row('المجموع الفرعي'.tr, formatMoney(state.subtotal)),
+                  _Row('الخصم'.tr, '−${formatMoney(0)}'),
+                  _Row('الضريبة'.tr, 'غير مدعومة في النظام الحالي'.tr, ltr: false),
                   const Divider(),
-                  _Row('الإجمالي', formatMoney(state.total), strong: true),
+                  _Row('الإجمالي'.tr, formatMoney(state.total), strong: true),
                   SizedBox(height: 12.h),
                   _Field(
-                    label: 'المدفوع',
+                    label: 'المدفوع'.tr,
                     child: TextField(
                       controller: _paidController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -149,9 +151,9 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  _Row('المتبقي', formatMoney(state.remaining)),
+                  _Row('المتبقي'.tr, formatMoney(state.remaining)),
                   SizedBox(height: 12.h),
-                  Text('طريقة الدفع', style: AccountingStyles.label),
+                  Text('طريقة الدفع'.tr, style: AccountingStyles.label),
                   SizedBox(height: 6.h),
                   Wrap(
                     spacing: 8.w,
@@ -173,7 +175,7 @@ class _SaleSummarySheetState extends State<SaleSummarySheet> {
                   ],
                   SizedBox(height: 16.h),
                   AppCustomButton(
-                    text: 'إتمام البيع',
+                    text: 'إتمام البيع'.tr,
                     isLoading: state.isSaving,
                     backgroundColor: state.canSubmit ? AppColors.mainTeal : AppColors.borderGrey,
                     onPressed: state.canSubmit ? _complete : () {},

@@ -9,6 +9,8 @@ import '../cubit/sales_cubit.dart';
 import '../helpers/accounting_styles.dart';
 import 'accounting_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "إرجاع" on an invoice: how many units of each line come back, the amount
 /// that adds up to, and a confirmation before it is saved. Pops with true once
 /// the return is saved.
@@ -62,11 +64,11 @@ class _RefundSheetState extends State<RefundSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('تأكيد إرجاع ${request.amount.toStringAsFixed(2)} ₪؟', style: AccountingStyles.cardTitle),
-        content: Text('سيتم تسجيل الإرجاع على الفاتورة ${widget.invoice.number}.', style: AccountingStyles.body),
+        title: Text('تأكيد إرجاع {0} ₪؟'.trArgs([request.amount.toStringAsFixed(2)]), style: AccountingStyles.cardTitle),
+        content: Text('سيتم تسجيل الإرجاع على الفاتورة {0}.'.trArgs([widget.invoice.number]), style: AccountingStyles.body),
         actions: [
-          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: const Text('إلغاء')),
-          TextButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: const Text('تأكيد')),
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: Text('إلغاء'.tr)),
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: Text('تأكيد'.tr)),
         ],
       ),
     );
@@ -100,15 +102,15 @@ class _RefundSheetState extends State<RefundSheet> {
           children: [
             Row(
               children: [
-                Expanded(child: Text('إرجاع', style: AccountingStyles.sectionTitle)),
+                Expanded(child: Text('إرجاع'.tr, style: AccountingStyles.sectionTitle)),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close_rounded),
-                  tooltip: 'إغلاق',
+                  tooltip: 'إغلاق'.tr,
                 ),
               ],
             ),
-            Text('الفاتورة ${widget.invoice.number} · اختر الكمية المرجعة من كل صنف', style: AccountingStyles.muted),
+            Text('الفاتورة {0} · اختر الكمية المرجعة من كل صنف'.trArgs([widget.invoice.number]), style: AccountingStyles.muted),
             SizedBox(height: 12.h),
             for (final line in widget.lines)
               Padding(
@@ -122,7 +124,7 @@ class _RefundSheetState extends State<RefundSheet> {
             SizedBox(height: 8.h),
             Row(
               children: [
-                Expanded(child: Text('مبلغ الإرجاع', style: AccountingStyles.body)),
+                Expanded(child: Text('مبلغ الإرجاع'.tr, style: AccountingStyles.body)),
                 MoneyText(request.amount, style: AccountingStyles.amount),
               ],
             ),
@@ -132,13 +134,13 @@ class _RefundSheetState extends State<RefundSheet> {
             ],
             SizedBox(height: 16.h),
             AppCustomButton(
-              text: 'تأكيد الإرجاع',
+              text: 'تأكيد الإرجاع'.tr,
               isLoading: _isSaving,
               backgroundColor: request.isValid ? AppColors.mainTeal : AppColors.borderGrey,
               // Said under the lines: a snackbar would sit behind this sheet.
               onPressed: request.isValid
                   ? _save
-                  : () => setState(() => _error = 'اختر وحدة واحدة على الأقل للإرجاع'),
+                  : () => setState(() => _error = 'اختر وحدة واحدة على الأقل للإرجاع'.tr),
             ),
           ],
         ),
@@ -191,12 +193,12 @@ class _RefundLineTile extends StatelessWidget {
               ],
             ),
           ),
-          step(Icons.remove, () => onChange(-1), 'تقليل'),
+          step(Icons.remove, () => onChange(-1), 'تقليل'.tr),
           SizedBox(
             width: 32.w,
             child: Text('$returned', textAlign: TextAlign.center, style: AccountingStyles.cardTitle),
           ),
-          step(Icons.add, () => onChange(1), 'زيادة'),
+          step(Icons.add, () => onChange(1), 'زيادة'.tr),
         ],
       ),
     );

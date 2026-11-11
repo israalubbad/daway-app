@@ -5,6 +5,8 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../chat/presentation/cubit/conversations_cubit.dart';
 import '../../../chat/presentation/widgets/conversations_view.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "الاستفسارات" tab: the pharmacy's conversations with patients, in the same
 /// design as the patient's list.
 class PharmacyConversationsScreen extends StatelessWidget {
@@ -15,10 +17,10 @@ class PharmacyConversationsScreen extends StatelessWidget {
     return Scaffold(
       body: BlocProvider(
         create: (_) => getIt<ConversationsCubit>(instanceName: 'pharmacy'),
-        child: const ConversationsView(
-          title: 'الاستفسارات',
-          description: 'راجع استفسارات المرضى وردّ عليها.',
-          emptyText: 'لا توجد استفسارات بعد.',
+        child: ConversationsView(
+          title: 'الاستفسارات'.tr,
+          description: 'راجع استفسارات المرضى وردّ عليها.'.tr,
+          emptyText: 'لا توجد استفسارات بعد.'.tr,
         ),
       ),
     );

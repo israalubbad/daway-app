@@ -7,6 +7,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/medicine_pharmacy_offer.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// One selectable row in "اختر الصيدلية المناسبة لك" — a radio-style choice,
 /// not a navigation target, so selection is the screen's own local UI state
 /// (project rule B1: setState is for exactly this — a toggle — not a cubit).
@@ -70,7 +72,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                       if (distanceKm != null) ...[
                         SizedBox(width: 8.w),
                         Text(
-                          'يبعد عنك ${distanceKm.toStringAsFixed(1)} كيلو',
+                          'يبعد عنك {0} كيلو'.trArgs([distanceKm.toStringAsFixed(1)]),
                           style: AppTextStyles.medicinePharmacyDistance,
                         ),
                       ],
@@ -78,7 +80,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '${formatPrice(offer.price)} \$/الشريط',
+                    '{0} \$/الشريط'.trArgs([formatPrice(offer.price)]),
                     textAlign: TextAlign.right,
                     style: AppTextStyles.medicinePharmacyPrice,
                   ),

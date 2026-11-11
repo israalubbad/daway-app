@@ -1,18 +1,20 @@
 import 'arabic_plural.dart';
 
-const _arabicMonths = [
-  'يناير',
-  'فبراير',
-  'مارس',
-  'أبريل',
-  'مايو',
-  'يونيو',
-  'يوليو',
-  'أغسطس',
-  'سبتمبر',
-  'أكتوبر',
-  'نوفمبر',
-  'ديسمبر',
+import '../../core/localization/translations.dart';
+
+List<String> get _arabicMonths => [
+  'يناير'.tr,
+  'فبراير'.tr,
+  'مارس'.tr,
+  'أبريل'.tr,
+  'مايو'.tr,
+  'يونيو'.tr,
+  'يوليو'.tr,
+  'أغسطس'.tr,
+  'سبتمبر'.tr,
+  'أكتوبر'.tr,
+  'نوفمبر'.tr,
+  'ديسمبر'.tr,
 ];
 
 /// "اليوم، 9:40 ص" / "أمس، 4:20 م" / "3 مايو 2025، 11:15 ص" — shared by every
@@ -28,10 +30,10 @@ String smartDate(DateTime dateTime, {DateTime? now}) {
   now ??= DateTime.now();
   final time = formatClockTime(dateTime);
 
-  if (_isSameDate(dateTime, now)) return 'اليوم، $time';
+  if (_isSameDate(dateTime, now)) return 'اليوم، {0}'.trArgs([time]);
   final yesterday = DateTime(now.year, now.month, now.day - 1);
-  if (_isSameDate(dateTime, yesterday)) return 'أمس، $time';
-  return '${dateTime.day} ${_arabicMonths[dateTime.month - 1]} ${dateTime.year}، $time';
+  if (_isSameDate(dateTime, yesterday)) return 'أمس، {0}'.trArgs([time]);
+  return '{0} {1} {2}، {3}'.trArgs([dateTime.day, _arabicMonths[dateTime.month - 1], dateTime.year, time]);
 }
 
 bool _isSameDate(DateTime a, DateTime b) {
@@ -47,9 +49,9 @@ String relativeTimeAr(DateTime dateTime, {DateTime? now}) {
     dateTime,
     now: now,
     minutesAgo: (minutes) =>
-        'منذ ${arabicCountedNoun(minutes, singular: 'دقيقة', dual: 'دقيقتين', plural: 'دقائق')}',
+        'منذ {0}'.trArgs([arabicCountedNoun(minutes, singular: 'دقيقة', dual: 'دقيقتين', plural: 'دقائق')]),
     hoursAgo: (hours) =>
-        'منذ ${arabicCountedNoun(hours, singular: 'ساعة', dual: 'ساعتين', plural: 'ساعات')}',
+        'منذ {0}'.trArgs([arabicCountedNoun(hours, singular: 'ساعة', dual: 'ساعتين', plural: 'ساعات')]),
   );
 }
 
@@ -61,8 +63,8 @@ String compactRelativeTimeAr(DateTime dateTime, {DateTime? now}) {
   return _relativeTime(
     dateTime,
     now: now,
-    minutesAgo: (minutes) => 'منذ $minutes د',
-    hoursAgo: (hours) => 'منذ $hours س',
+    minutesAgo: (minutes) => 'منذ {0} د'.trArgs([minutes]),
+    hoursAgo: (hours) => 'منذ {0} س'.trArgs([hours]),
   );
 }
 
@@ -75,12 +77,12 @@ String _relativeTime(
   now ??= DateTime.now();
   if (_isSameDate(dateTime, now)) {
     final diff = now.difference(dateTime);
-    if (diff.inMinutes < 1) return 'الآن';
+    if (diff.inMinutes < 1) return 'الآن'.tr;
     if (diff.inMinutes < 60) return minutesAgo(diff.inMinutes);
     return hoursAgo(diff.inHours);
   }
   final yesterday = DateTime(now.year, now.month, now.day - 1);
-  if (_isSameDate(dateTime, yesterday)) return 'أمس';
+  if (_isSameDate(dateTime, yesterday)) return 'أمس'.tr;
   return smartDate(dateTime, now: now);
 }
 

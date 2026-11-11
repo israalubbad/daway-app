@@ -6,6 +6,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/dashed_border_box.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The dashed "upload your medicines file" card a pharmacy with no medicines
 /// yet sees at the top of its home: an upload icon, a title, a line about the
 /// Excel file, and the "اختيار ملف" button that [onPickFile] answers.
@@ -46,12 +48,12 @@ class AddMedicinesFileCard extends StatelessWidget {
             ),
             SizedBox(height: 13.h),
             Text(
-              'رفع ملف المنتجات',
+              'رفع ملف المنتجات'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.pharmacyUploadTitle,
             ),
             Text(
-              'ارفع ملف Excel يحتوي على منتجات الصيدلية.',
+              'ارفع ملف Excel يحتوي على منتجات الصيدلية.'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.pharmacyUploadSubtitle,
             ),
@@ -73,7 +75,7 @@ class AddMedicinesFileCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'اختيار ملف',
+                  'اختيار ملف'.tr,
                   style: AppTextStyles.pharmacyUploadButton,
                 ),
               ),

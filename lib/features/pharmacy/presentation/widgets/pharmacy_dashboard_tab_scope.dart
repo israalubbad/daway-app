@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../core/widgets/app_snackbar.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The shell's tabs, in the order [PharmacyDashboardShellScreen] builds
+
 /// them — named so call sites (e.g. the side menu) never hand a raw tab
 /// index around, which would silently drift out of sync with the shell's
 /// list if either side were reordered.
@@ -42,7 +44,7 @@ class PharmacyDashboardTabScope extends InheritedWidget {
     if (scope != null) {
       scope.switchToTab(tab);
     } else {
-      AppSnackbar.show(context, 'قريباً');
+      AppSnackbar.show(context, 'قريباً'.tr);
     }
   }
 

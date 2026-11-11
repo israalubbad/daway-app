@@ -4,8 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/medicine.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The row of stock filters above the product list: "الكل" with the number of
+
 /// products, then one chip per stock status. Each chip is as wide as its label,
 /// and the row scrolls sideways if they do not all fit.
 class ProductFilterChips extends StatelessWidget {
@@ -24,10 +26,10 @@ class ProductFilterChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final chips = [
-      (MedicineStatusFilter.all, 'الكل($totalCount)'),
-      (MedicineStatusFilter.available, 'متوفر'),
-      (MedicineStatusFilter.low, 'مخزون منخفض'),
-      (MedicineStatusFilter.outOfStock, 'نافد'),
+      (MedicineStatusFilter.all, 'الكل({0})'.trArgs([totalCount])),
+      (MedicineStatusFilter.available, 'متوفر'.tr),
+      (MedicineStatusFilter.low, 'مخزون منخفض'.tr),
+      (MedicineStatusFilter.outOfStock, 'نافد'.tr),
     ];
 
     return SingleChildScrollView(

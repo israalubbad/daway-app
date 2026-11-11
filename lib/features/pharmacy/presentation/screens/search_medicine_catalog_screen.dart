@@ -11,6 +11,8 @@ import '../cubit/add_medicine_state.dart';
 import '../widgets/pharmacy_form_field.dart';
 import '../widgets/pharmacy_products_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The second page of "إضافة منتج جديد": search the catalog by name, and tap a
 /// result to fill the form with it (the page then closes).
 ///
@@ -58,13 +60,13 @@ class _SearchMedicineCatalogScreenState extends State<SearchMedicineCatalogScree
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PharmacyProductsHeader(
-                title: 'إضافة منتج جديد',
-                subtitle: 'أضف بيانات الدواء او المنتج',
+                title: 'إضافة منتج جديد'.tr,
+                subtitle: 'أضف بيانات الدواء او المنتج'.tr,
                 onBack: () => Navigator.of(context).pop(),
               ),
               SizedBox(height: 24.h),
               PharmacyFormField(
-                label: 'اسم الدواء/ المنتج',
+                label: 'اسم الدواء/ المنتج'.tr,
                 controller: _queryController,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (_) => _search(),
@@ -74,7 +76,7 @@ class _SearchMedicineCatalogScreenState extends State<SearchMedicineCatalogScree
                 buildWhen: (previous, current) =>
                     previous.formData.isSearching != current.formData.isSearching,
                 builder: (context, state) => AppCustomButton(
-                  text: 'بحث عن الدواء/المنتج',
+                  text: 'بحث عن الدواء/المنتج'.tr,
                   isLoading: state.formData.isSearching,
                   textStyle: AppTextStyles.pharmacyPageSubtitle,
                   onPressed: _search,
@@ -114,7 +116,7 @@ class _Results extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.only(top: 16.h),
             child: Text(
-              'لا توجد نتائج. يمكنك إضافته كمنتج جديد.',
+              'لا توجد نتائج. يمكنك إضافته كمنتج جديد.'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.cardDescription,
             ),
@@ -185,7 +187,7 @@ class _SourceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = type == 'moh' ? 'وزارة الصحة' : 'القائمة العامة';
+    final label = type == 'moh' ? 'وزارة الصحة'.tr : 'القائمة العامة'.tr;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(

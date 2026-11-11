@@ -11,6 +11,8 @@ import '../../domain/entities/medicine_reminder.dart';
 import '../cubit/reminders_cubit.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "إضافة تذكير للدواء" — a full screen (redesigned 2026-09-28 from a
 /// bottom sheet), reused for editing too: [existing] pre-fills the fields
 /// and swaps the header/delete affordance in, same dual-purpose the sheet
@@ -89,11 +91,11 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PatientSubScreenHeader(
-                title: isEditing ? 'تعديل التذكير' : 'إضافة تذكير للدواء',
-                description: 'أضف الادوية لتذكيرك فيها بالوقت المناسب',
+                title: isEditing ? 'تعديل التذكير'.tr : 'إضافة تذكير للدواء'.tr,
+                description: 'أضف الادوية لتذكيرك فيها بالوقت المناسب'.tr,
               ),
               SizedBox(height: 24.h),
-              Text('اسم الدواء', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+              Text('اسم الدواء'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
               SizedBox(height: 8.h),
               AppTextField(
                 controller: _nameController,
@@ -102,7 +104,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'مواعيد التذكير',
+                'مواعيد التذكير'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.profileFieldLabel,
               ),
@@ -133,7 +135,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'وقت التذكير',
+                'وقت التذكير'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.profileFieldLabel,
               ),
@@ -171,7 +173,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   child: Text(
-                    'حذف',
+                    'حذف'.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,
@@ -181,7 +183,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                 ),
                 SizedBox(height: 16.h),
               ],
-              AppCustomButton(text: 'التالي', onPressed: _save),
+              AppCustomButton(text: 'التالي'.tr, onPressed: _save),
               SizedBox(height: 24.h),
             ],
           ),

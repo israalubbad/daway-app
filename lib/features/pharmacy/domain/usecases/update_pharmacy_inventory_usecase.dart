@@ -13,7 +13,7 @@ class UpdatePharmacyInventoryUseCase {
   Future<ApiResult<void>> call(List<InventoryItemUpdate> items) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(
+      return ApiError(
         ApiFailure(message: sessionExpiredMessage),
       );
     }

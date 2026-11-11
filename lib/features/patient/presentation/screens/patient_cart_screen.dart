@@ -18,6 +18,8 @@ import '../widgets/patient_sub_screen_header.dart';
 import '../widgets/single_pharmacy_dialogs.dart';
 import 'checkout_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "السلة" — reads/updates the real `/patient/cart` backend. Adding items
 /// still happens elsewhere (currently nowhere: see MedicineDetailScreen's
 /// doc comment on why "أضف الى السلة" is "قريباً" for now).
@@ -81,9 +83,9 @@ class _CartView extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: const PatientSubScreenHeader(
-                    title: 'السلة',
-                    description: 'راجع منتجاتك وتأكد من تفاصيل طلبك قبل الدفع.',
+                  child: PatientSubScreenHeader(
+                    title: 'السلة'.tr,
+                    description: 'راجع منتجاتك وتأكد من تفاصيل طلبك قبل الدفع.'.tr,
                   ),
                 ),
                 Expanded(
@@ -105,7 +107,7 @@ class _CartView extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
                     child: AppCustomButton(
-                      text: 'إتمام الطلب',
+                      text: 'إتمام الطلب'.tr,
                       onPressed: () => _checkout(context, state),
                     ),
                   ),
@@ -159,7 +161,7 @@ class _CartList extends StatelessWidget {
           ],
           SizedBox(height: 8.h),
           Text(
-            'الاجمالي للمنتجات : ${formatPrice(state.total)} \$',
+            'الاجمالي للمنتجات : {0} \$'.trArgs([formatPrice(state.total)]),
             textAlign: TextAlign.right,
             style: AppTextStyles.profileFieldLabel,
           ),
@@ -174,7 +176,7 @@ class _CartList extends StatelessWidget {
                 }
               },
               child: Text(
-                'تفريغ السلة',
+                'تفريغ السلة'.tr,
                 style: TextStyle(color: AppColors.logoutRed),
               ),
             ),
@@ -227,10 +229,10 @@ class _EmptyCart extends StatelessWidget {
               color: AppColors.grey,
             ),
             SizedBox(height: 24.h),
-            Text('سلتك فاضية', style: AppTextStyles.emptyStateTitle),
+            Text('سلتك فاضية'.tr, style: AppTextStyles.emptyStateTitle),
             SizedBox(height: 16.h),
             Text(
-              'أضف المنتجات اللي بدك إياها وابدأ طلبك بسهولة',
+              'أضف المنتجات اللي بدك إياها وابدأ طلبك بسهولة'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.emptyStateSubtitle,
             ),
@@ -246,7 +248,7 @@ class _EmptyCart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
-                  'تصفح الأقسام',
+                  'تصفح الأقسام'.tr,
                   style: AppTextStyles.emptyStateAction,
                 ),
               ),

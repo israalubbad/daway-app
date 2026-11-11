@@ -8,8 +8,10 @@ import '../cubit/patient_auth_cubit.dart';
 import '../cubit/patient_auth_state.dart';
 import '../widgets/patient_phone_form.dart';
 import 'otp_verification_screen.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class PatientAuthScreen extends StatelessWidget {
+
   const PatientAuthScreen({super.key});
 
   @override
@@ -39,14 +41,14 @@ class PatientAuthScreen extends StatelessWidget {
                 SizedBox(height: 32.h),
 
                 Text(
-                  'مرحباً بعودتك!',
+                  'مرحباً بعودتك!'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
 
                 Text(
-                  'سجّل دخولك برقم هاتفك للوصول إلى حسابك ومتابعة طلباتك بسهولة.',
+                  'سجّل دخولك برقم هاتفك للوصول إلى حسابك ومتابعة طلباتك بسهولة.'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenSubtitle,
                 ),

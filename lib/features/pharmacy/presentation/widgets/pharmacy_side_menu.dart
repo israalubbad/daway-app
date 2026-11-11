@@ -11,6 +11,8 @@ import '../../../../core/widgets/logout_confirmation_sheet.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import 'pharmacy_dashboard_tab_scope.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Drawer shown from every tab inside [PharmacyDashboardShellScreen] — each
 /// tab owns its own instance rather than the shell owning one shared Drawer,
 /// so tapping a tab item here switches the shell's selected tab via
@@ -58,57 +60,57 @@ class PharmacySideMenu extends StatelessWidget {
             SizedBox(height: 16.h),
             _MenuItem(
               icon: Icons.home_outlined,
-              label: 'الرئيسية',
+              label: 'الرئيسية'.tr,
               onTap: () => _switchToTab(context, PharmacyDashboardTab.home),
             ),
             _MenuItem(
               icon: Icons.medication_outlined,
-              label: 'الأدوية',
+              label: 'الأدوية'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.medicines),
             ),
             _MenuItem(
               icon: Icons.inventory_2_outlined,
-              label: 'المخزون',
+              label: 'المخزون'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.inventory),
             ),
             _MenuItem(
               icon: Icons.chat_bubble_outline,
-              label: 'الاستفسارات',
+              label: 'الاستفسارات'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.inquiries),
             ),
             _MenuItem(
               icon: Icons.sync_alt,
-              label: 'البدائل',
+              label: 'البدائل'.tr,
               onTap: () => _openAlternatives(context),
             ),
             _MenuItem(
               icon: Icons.star_outline_rounded,
-              label: 'التقييمات والمراجعات',
+              label: 'التقييمات والمراجعات'.tr,
               onTap: () => _openRatings(context),
             ),
             _MenuItem(
               icon: Icons.account_balance_wallet_outlined,
-              label: 'المحاسبة',
+              label: 'المحاسبة'.tr,
               onTap: () => _openAccounting(context),
             ),
             _MenuItem(
               icon: Icons.settings_outlined,
-              label: 'الإعدادات',
+              label: 'الإعدادات'.tr,
               onTap: () => _switchToTab(context, PharmacyDashboardTab.settings),
             ),
             _MenuItem(
               icon: Icons.support_agent_outlined,
-              label: 'المساعدة والدعم',
+              label: 'المساعدة والدعم'.tr,
               onTap: () => _openSupport(context),
             ),
             const Spacer(),
             Divider(color: AppColors.borderGrey, height: 1),
             _MenuItem(
               icon: Icons.logout,
-              label: 'تسجيل الخروج',
+              label: 'تسجيل الخروج'.tr,
               iconColor: AppColors.error,
               labelColor: AppColors.error,
               onTap: () => LogoutConfirmationSheet.show(

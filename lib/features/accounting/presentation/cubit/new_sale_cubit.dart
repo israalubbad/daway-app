@@ -7,6 +7,8 @@ import '../../domain/entities/sale_invoice.dart';
 import '../../domain/usecases/accounting_usecases.dart';
 import 'new_sale_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class NewSaleCubit extends Cubit<NewSaleState> {
   final SearchSaleItemsUseCase _searchItems;
   final FindSaleItemByBarcodeUseCase _findByBarcode;
@@ -47,14 +49,14 @@ class NewSaleCubit extends Cubit<NewSaleState> {
           emit(state.copyWith(clearRecognized: true, barcodeMessage: _outOfStock));
         }
       case Success():
-        emit(state.copyWith(clearRecognized: true, barcodeMessage: 'لم يتم العثور على دواء بهذا الباركود'));
+        emit(state.copyWith(clearRecognized: true, barcodeMessage: 'لم يتم العثور على دواء بهذا الباركود'.tr));
       case ApiError(:final failure):
         emit(state.copyWith(clearRecognized: true, barcodeMessage: failure.message));
     }
   }
 
 
-  static const _outOfStock = 'هذا الدواء غير متوفر في المخزون';
+  static String get _outOfStock => 'هذا الدواء غير متوفر في المخزون'.tr;
 
   /// Puts [item] in the cart; one already there gets one more unit, up to its
   /// stock. A medicine with none in stock is refused (and false returned): the

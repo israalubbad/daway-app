@@ -18,6 +18,8 @@ import 'pharmacy_orders_screen.dart';
 import 'pharmacy_products_screen.dart';
 import 'pharmacy_settings_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Bottom-nav shell for the logged-in pharmacy area. Each tab keeps its own
 /// Scaffold/AppBar/Drawer (see [PharmacySideMenu]'s doc comment) — this
 /// shell only owns which tab is selected, a piece of purely local UI state.
@@ -113,8 +115,8 @@ class _PharmacyDashboardShellScreenState
       PharmacyDashboardTab.medicines: switch (_productsCubit) {
         final cubit? => BlocProvider.value(
           value: cubit,
-          child: const PharmacyProductsScreen(
-            title: 'المنتجات',
+          child: PharmacyProductsScreen(
+            title: 'المنتجات'.tr,
             showBackButton: false,
           ),
         ),

@@ -4,8 +4,10 @@ import 'package:flutter_svg/svg.dart';
 
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
-
+
+import '../../core/localization/translations.dart';
 /// Section title + "عرض الكل" chip, shared by the patient home's sections and
+
 /// the pharmacy home's orders section.
 ///
 /// By default the title, the chip's label and its chevron have the look of the
@@ -14,7 +16,8 @@ import '../theming/app_text_styles.dart';
 class SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback onActionTap;
-  final String actionLabel;
+  /// Defaults to "عرض الكل", looked up when built so it follows the language.
+  final String? actionLabel;
   final TextStyle? titleStyle;
   final TextStyle? actionStyle;
   final Color? chevronColor;
@@ -24,7 +27,7 @@ class SectionHeader extends StatelessWidget {
     super.key,
     required this.title,
     required this.onActionTap,
-    this.actionLabel = 'عرض الكل',
+    this.actionLabel,
     this.titleStyle,
     this.actionStyle,
     this.chevronColor,
@@ -59,7 +62,7 @@ class SectionHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(actionLabel, style: actionStyle ?? AppTextStyles.homeSectionChip),
+                Text(actionLabel ?? 'عرض الكل'.tr, style: actionStyle ?? AppTextStyles.homeSectionChip),
                 SizedBox(width: 4.w),
                 SvgPicture.asset(
                   'assets/icons/arrow_icon.svg',

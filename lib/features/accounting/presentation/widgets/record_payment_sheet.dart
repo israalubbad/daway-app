@@ -12,6 +12,8 @@ import '../cubit/sales_cubit.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "تسجيل دفعة" on an invoice: how much was paid now, and how. Starts at what
 /// is still owed. Pops with true once the payment is saved.
 class RecordPaymentSheet extends StatefulWidget {
@@ -83,20 +85,20 @@ class _RecordPaymentSheetState extends State<RecordPaymentSheet> {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text('تسجيل دفعة', style: AccountingStyles.sectionTitle)),
+                  Expanded(child: Text('تسجيل دفعة'.tr, style: AccountingStyles.sectionTitle)),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded),
-                    tooltip: 'إغلاق',
+                    tooltip: 'إغلاق'.tr,
                   ),
                 ],
               ),
               Text(
-                'الفاتورة ${widget.invoice.number} · المتبقي ${formatMoney(widget.invoice.remaining)}',
+                'الفاتورة {0} · المتبقي {1}'.trArgs([widget.invoice.number, formatMoney(widget.invoice.remaining)]),
                 style: AccountingStyles.muted,
               ),
               SizedBox(height: 12.h),
-              Text('المبلغ', style: AccountingStyles.label),
+              Text('المبلغ'.tr, style: AccountingStyles.label),
               SizedBox(height: 6.h),
               TextField(
                 controller: _amountController,
@@ -120,7 +122,7 @@ class _RecordPaymentSheetState extends State<RecordPaymentSheet> {
                 ),
               ),
               SizedBox(height: 12.h),
-              Text('طريقة الدفع', style: AccountingStyles.label),
+              Text('طريقة الدفع'.tr, style: AccountingStyles.label),
               SizedBox(height: 6.h),
               Wrap(
                 spacing: 8.w,
@@ -138,7 +140,7 @@ class _RecordPaymentSheetState extends State<RecordPaymentSheet> {
                 Text(_error!, style: AccountingStyles.label.copyWith(color: AppColors.logoutRed)),
               ],
               SizedBox(height: 16.h),
-              AppCustomButton(text: 'تسجيل', isLoading: _isSaving, onPressed: _save),
+              AppCustomButton(text: 'تسجيل'.tr, isLoading: _isSaving, onPressed: _save),
             ],
           ),
         ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/barcode_camera_view.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// A full-screen camera that reads one product barcode and hands it back.
 /// Opened from the new-invoice screen's scan button; pops with the code, or
 /// with nothing when the user goes back.
@@ -38,7 +40,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         formats: productBarcodeFormats,
         onCode: _onCode,
         onBack: () => Navigator.of(context).pop(),
-        hint: 'وجّه الكاميرا نحو الباركود',
+        hint: 'وجّه الكاميرا نحو الباركود'.tr,
       ),
     );
   }

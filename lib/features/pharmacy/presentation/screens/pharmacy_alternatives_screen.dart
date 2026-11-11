@@ -13,8 +13,10 @@ import '../cubit/pharmacy_alternatives_state.dart';
 import '../helpers/medicine_text_display.dart';
 import '../widgets/alternative_candidate_card.dart';
 import '../widgets/medicine_status_badge.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class PharmacyAlternativesScreen extends StatelessWidget {
+
   const PharmacyAlternativesScreen({super.key});
 
   Future<void> _toggleCandidate(
@@ -39,7 +41,7 @@ class PharmacyAlternativesScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         centerTitle: true,
         title: Text(
-          'البدائل',
+          'البدائل'.tr,
           style: AppTextStyles.screenTitle.copyWith(
             color: AppColors.mainTeal,
             fontSize: 20.sp,
@@ -75,7 +77,7 @@ class PharmacyAlternativesScreen extends StatelessWidget {
         _BaseMedicineBanner(medicine: state.baseMedicine),
         SizedBox(height: 20.h),
         Text(
-          'بدائل بنفس المادة الفعالة',
+          'بدائل بنفس المادة الفعالة'.tr,
           style: AppTextStyles.cardTitle.copyWith(fontSize: 16.sp),
           textAlign: TextAlign.right,
         ),
@@ -84,7 +86,7 @@ class PharmacyAlternativesScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 24.h),
             child: Text(
-              'لا توجد أدوية أخرى بنفس المادة الفعالة في مخزونك',
+              'لا توجد أدوية أخرى بنفس المادة الفعالة في مخزونك'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.cardDescription,
             ),
@@ -117,9 +119,9 @@ class _BaseMedicineBanner extends StatelessWidget {
   const _BaseMedicineBanner({required this.medicine});
 
   String get _statusLabel => switch (medicine.status) {
-    MedicineStatus.outOfStock => 'غير متوفر حالياً',
-    MedicineStatus.low => 'مخزون منخفض',
-    MedicineStatus.available => 'متوفر',
+    MedicineStatus.outOfStock => 'غير متوفر حالياً'.tr,
+    MedicineStatus.low => 'مخزون منخفض'.tr,
+    MedicineStatus.available => 'متوفر'.tr,
   };
 
   IconData get _statusIcon => switch (medicine.status) {
@@ -181,7 +183,7 @@ class _BaseMedicineBanner extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'الكمية المتوفرة:',
+                'الكمية المتوفرة:'.tr,
                 style: TextStyle(fontSize: 13.sp, color: AppColors.grey),
               ),
               Text(

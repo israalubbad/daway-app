@@ -10,6 +10,8 @@ import '../cubit/cash_cubit.dart';
 import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "تسجيل حركة صندوق": deposit or withdrawal, amount and reason. The movement
 /// cannot be taken back, so saving first asks to confirm the amount.
 class AddCashMovementSheet extends StatefulWidget {
@@ -61,21 +63,21 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          'تأكيد ${_isDeposit ? 'إيداع' : 'سحب'} ${formatMoney(_amount)}؟',
+          'تأكيد {0} {1}؟'.trArgs([_isDeposit ? 'إيداع' : 'سحب', formatMoney(_amount)]),
           style: AccountingStyles.cardTitle,
         ),
         content: Text(
-          'سيتم تسجيل الحركة في دفتر الصندوق فوراً ولا يمكن التراجع عنها.',
+          'سيتم تسجيل الحركة في دفتر الصندوق فوراً ولا يمكن التراجع عنها.'.tr,
           style: AccountingStyles.body,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text('إلغاء'.tr),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('تأكيد'),
+            child: Text('تأكيد'.tr),
           ),
         ],
       ),
@@ -103,7 +105,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
     Navigator.of(context).pop();
     messenger
       ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('تم تسجيل الحركة')));
+      ..showSnackBar(SnackBar(content: Text('تم تسجيل الحركة'.tr)));
   }
 
   @override
@@ -119,26 +121,26 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text('تسجيل حركة صندوق', style: AccountingStyles.sectionTitle)),
+                  Expanded(child: Text('تسجيل حركة صندوق'.tr, style: AccountingStyles.sectionTitle)),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded),
-                    tooltip: 'إغلاق',
+                    tooltip: 'إغلاق'.tr,
                   ),
                 ],
               ),
               SizedBox(height: 8.h),
-              Text('النوع', style: AccountingStyles.label),
+              Text('النوع'.tr, style: AccountingStyles.label),
               SizedBox(height: 6.h),
               Row(
                 children: [
-                  Expanded(child: _TypeButton(label: 'إيداع', selected: _isDeposit, onTap: () => setState(() => _isDeposit = true))),
+                  Expanded(child: _TypeButton(label: 'إيداع'.tr, selected: _isDeposit, onTap: () => setState(() => _isDeposit = true))),
                   SizedBox(width: 8.w),
-                  Expanded(child: _TypeButton(label: 'سحب', selected: !_isDeposit, onTap: () => setState(() => _isDeposit = false))),
+                  Expanded(child: _TypeButton(label: 'سحب'.tr, selected: !_isDeposit, onTap: () => setState(() => _isDeposit = false))),
                 ],
               ),
               SizedBox(height: 12.h),
-              Text('المبلغ', style: AccountingStyles.label),
+              Text('المبلغ'.tr, style: AccountingStyles.label),
               SizedBox(height: 6.h),
               TextField(
                 controller: _amountController,
@@ -153,18 +155,18 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                 Padding(
                   padding: EdgeInsets.only(top: 6.h),
                   child: Text(
-                    'المبلغ أكبر من الرصيد الحالي (${formatMoney(widget.balance)})',
+                    'المبلغ أكبر من الرصيد الحالي ({0})'.trArgs([formatMoney(widget.balance)]),
                     style: AccountingStyles.label.copyWith(color: AppColors.statLowStock),
                   ),
                 ),
               SizedBox(height: 12.h),
-              Text('سبب الحركة', style: AccountingStyles.label),
+              Text('سبب الحركة'.tr, style: AccountingStyles.label),
               SizedBox(height: 6.h),
               TextField(
                 controller: _reasonController,
                 maxLines: 3,
                 onChanged: (_) => setState(() => _error = null),
-                decoration: _decoration(hint: 'اذكر سبب الحركة (إلزامي)'),
+                decoration: _decoration(hint: 'اذكر سبب الحركة (إلزامي)'.tr),
               ),
               SizedBox(height: 12.h),
               Container(
@@ -179,7 +181,7 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
-                        'سيتم تسجيل الحركة في دفتر الصندوق فوراً ولا يمكن التراجع عنها.',
+                        'سيتم تسجيل الحركة في دفتر الصندوق فوراً ولا يمكن التراجع عنها.'.tr,
                         style: AccountingStyles.label,
                       ),
                     ),
@@ -192,18 +194,18 @@ class _AddCashMovementSheetState extends State<AddCashMovementSheet> {
               ],
               SizedBox(height: 16.h),
               AppCustomButton(
-                text: 'تسجيل',
+                text: 'تسجيل'.tr,
                 isLoading: _isSaving,
                 backgroundColor: _canSave ? AppColors.mainTeal : AppColors.borderGrey,
                 // Said under the fields: a snackbar would sit behind this sheet.
                 onPressed: _canSave
                     ? _save
-                    : () => setState(() => _error = 'أدخل المبلغ وسبب الحركة'),
+                    : () => setState(() => _error = 'أدخل المبلغ وسبب الحركة'.tr),
               ),
               SizedBox(height: 8.h),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('إلغاء', style: AccountingStyles.body.copyWith(color: AppColors.mainTeal)),
+                child: Text('إلغاء'.tr, style: AccountingStyles.body.copyWith(color: AppColors.mainTeal)),
               ),
             ],
           ),

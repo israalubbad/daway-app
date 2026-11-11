@@ -10,8 +10,10 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import '../screens/patient_settings_screen.dart';
 import 'patient_dashboard_tab_scope.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Drawer shown from every tab inside [PatientDashboardShellScreen] — each
+
 /// tab owns its own instance rather than the shell owning one shared Drawer,
 /// so tapping a tab item here switches the shell's selected tab via
 /// [PatientDashboardTabScope] instead of pushing a new route ("الإعدادات"
@@ -27,7 +29,7 @@ class PatientSideMenu extends StatelessWidget {
     if (scope != null) {
       scope.switchToTab(tab);
     } else {
-      AppSnackbar.show(context, 'قريباً');
+      AppSnackbar.show(context, 'قريباً'.tr);
     }
   }
 
@@ -57,32 +59,32 @@ class PatientSideMenu extends StatelessWidget {
             SizedBox(height: 16.h),
             _MenuItem(
               icon: Icons.home_outlined,
-              label: 'الرئيسية',
+              label: 'الرئيسية'.tr,
               onTap: () => _switchToTab(context, PatientDashboardTab.home),
             ),
             _MenuItem(
               icon: Icons.search,
-              label: 'البحث',
+              label: 'البحث'.tr,
               onTap: () => _switchToTab(context, PatientDashboardTab.search),
             ),
             _MenuItem(
               icon: Icons.chat_bubble_outline,
-              label: 'المراسلات',
+              label: 'المراسلات'.tr,
               onTap: () => _switchToTab(context, PatientDashboardTab.messages),
             ),
             _MenuItem(
               icon: Icons.person_outline,
-              label: 'الملف الشخصي',
+              label: 'الملف الشخصي'.tr,
               onTap: () => _switchToTab(context, PatientDashboardTab.profile),
             ),
             _MenuItem(
               icon: Icons.settings_outlined,
-              label: 'الإعدادات',
+              label: 'الإعدادات'.tr,
               onTap: () => _openSettings(context),
             ),
             _MenuItem(
               icon: Icons.support_agent_outlined,
-              label: 'المساعدة والدعم',
+              label: 'المساعدة والدعم'.tr,
               onTap: () => _openSupport(context),
             ),
           ],

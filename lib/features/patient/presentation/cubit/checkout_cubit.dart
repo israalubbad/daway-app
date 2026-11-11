@@ -14,9 +14,11 @@ import '../../domain/usecases/get_patient_addresses_usecase.dart';
 import '../../domain/usecases/get_patient_profile_usecase.dart';
 import 'checkout_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// What the patient is told when the server refused the order because the
 /// price it quoted has moved.
-const quoteChangedMessage = 'تغيّر السعر، راجع الإجمالي الجديد ثم أكّد الطلب';
+String get quoteChangedMessage => 'تغيّر السعر، راجع الإجمالي الجديد ثم أكّد الطلب'.tr;
 
 /// Drives "أكمل طلبك": picks the delivery address, validates the coupon, shows
 /// the server's price for the cart delivered there (`POST
@@ -137,7 +139,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         return failure.message;
       case Success(:final data):
         final created = await _createAddressUseCase(
-          label: 'عنوان التوصيل',
+          label: 'عنوان التوصيل'.tr,
           recipientName: data.name,
           phone: data.phone,
           address: location.address,
@@ -170,7 +172,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     final current = state;
     if (current is! CheckoutReady || current.isApplyingCoupon) return null;
     final trimmed = code.trim();
-    if (trimmed.isEmpty) return 'اكتب كود الخصم أولاً';
+    if (trimmed.isEmpty) return 'اكتب كود الخصم أولاً'.tr;
 
     emit(current.copyWith(isApplyingCoupon: true));
     final result = await _validateCouponUseCase(

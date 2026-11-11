@@ -17,6 +17,8 @@ import '../widgets/home_pharmacies_section.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/patient_dashboard_tab_scope.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PatientHomeScreen extends StatelessWidget {
   const PatientHomeScreen({super.key});
 
@@ -36,7 +38,7 @@ class PatientHomeScreen extends StatelessWidget {
 class _PatientHomeView extends StatelessWidget {
   const _PatientHomeView();
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً'.tr);
 
   void _goToSearchTab(BuildContext context) {
     PatientDashboardTabScope.maybeOf(context)?.switchToTab(PatientDashboardTab.search);

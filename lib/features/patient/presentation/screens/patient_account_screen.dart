@@ -20,6 +20,7 @@ import 'patient_orders_screen.dart';
 import 'patient_profile_screen.dart';
 import 'patient_settings_screen.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Account hub tab — a menu of account-related destinations. "معلومات
 /// الحساب" pushes the real [PatientProfileScreen], "عناويني" pushes
 /// [PatientAddressesScreen], "طلباتي" pushes [PatientOrdersScreen],
@@ -84,6 +85,7 @@ class PatientAccountScreen extends StatelessWidget {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,41 +96,41 @@ class PatientAccountScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 32.h),
-              Text('أهلاً في حسابك', textAlign: TextAlign.right, style: AppTextStyles.authScreenTitle),
+              Text('أهلاً في حسابك'.tr, textAlign: TextAlign.right, style: AppTextStyles.authScreenTitle),
               SizedBox(height: 8.h),
               Text(
-                'من هنا بتقدر تدير كل تفاصيل حسابك.',
+                'من هنا بتقدر تدير كل تفاصيل حسابك.'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.authScreenSubtitle,
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/user_icon.svg'),
-                label: 'معلومات الحساب',
+                label: 'معلومات الحساب'.tr,
                 onTap: () => _openProfile(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/order_icon.svg'),
-                label: 'طلباتي',
+                label: 'طلباتي'.tr,
                 onTap: () => _openOrders(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/bookmark_icon.svg'),
-                label: 'الادوية المحفوظة',
+                label: 'الادوية المحفوظة'.tr,
                 onTap: () => _openFavorites(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/place_icon.svg'),
-                label: 'عناويني',
+                label: 'عناويني'.tr,
                 onTap: () => _openAddresses(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: Icon(Icons.monitor_heart_outlined, color: AppColors.mainTeal, size: 22.sp),
-                label: 'الملف الصحي',
+                label: 'الملف الصحي'.tr,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const PatientHealthProfileScreen()),
                 ),
@@ -136,25 +138,25 @@ class PatientAccountScreen extends StatelessWidget {
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: Icon(Icons.alarm_rounded, color: AppColors.mainTeal, size: 22.sp),
-                label: 'تذكيرات الأدوية',
+                label: 'تذكيرات الأدوية'.tr,
                 onTap: () => Navigator.of(context).pushNamed(Routes.medicineRemindersScreen),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: Icon(Icons.notifications_outlined, color: AppColors.mainTeal, size: 22.sp),
-                label: 'الاشعارات',
+                label: 'الاشعارات'.tr,
                 onTap: () => _openNotifications(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/headphones_icon.svg'),
-                label: 'الدعم الفني',
+                label: 'الدعم الفني'.tr,
                 onTap: () => openSupportChat(context),
               ),
               SizedBox(height: 24.h),
               AccountRowCard(
                 leading: const AccountRowIcon('assets/icons/settings_icon.svg'),
-                label: 'الإعدادات',
+                label: 'الإعدادات'.tr,
                 onTap: () => _openSettings(context),
               ),
               SizedBox(height: 24.h),

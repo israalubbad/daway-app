@@ -8,8 +8,10 @@ import '../../domain/entities/chat_message.dart';
 import '../../domain/repositories/inquiry_thread_resolver.dart';
 import '../../domain/usecases/chat_usecases.dart';
 import 'chat_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// One conversation, for patient and pharmacy alike. A conversation can span
+
 /// several inquiries (the backend keeps one per medicine), so the thread is
 /// the messages of all of them merged by time; new messages go to one target
 /// inquiry.
@@ -157,7 +159,7 @@ class ChatCubit extends Cubit<ChatState> {
       // question); it needs one to exist.
       if (_targetId == null) {
         emit(current.copyWith(isSending: false));
-        return 'ابدأ المحادثة بكتابة رسالة أولاً';
+        return 'ابدأ المحادثة بكتابة رسالة أولاً'.tr;
       }
       final uploaded = await _uploadImageUseCase(imagePath);
       if (isClosed) return null;
@@ -176,7 +178,7 @@ class ChatCubit extends Cubit<ChatState> {
       // becomes the inquiry's opening question).
       if (trimmed == null || trimmed.isEmpty || !_canStartThread) {
         emit(current.copyWith(isSending: false));
-        return 'ابدأ المحادثة بكتابة رسالة أولاً';
+        return 'ابدأ المحادثة بكتابة رسالة أولاً'.tr;
       }
       final started = await _resolver!.startInquiry(
         pharmacyId: pharmacyId!,

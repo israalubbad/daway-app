@@ -4,18 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
+import '../../../localization/domain/entities/app_language.dart';
 
-/// A language the picker offers: its name in its own language, and a small
-/// line under it in the other one.
-enum AppLanguage {
-  arabic('العربية', 'Arabic'),
-  english('English', 'الإنجليزية');
-
-  final String nativeName;
-  final String subtitle;
-
-  const AppLanguage(this.nativeName, this.subtitle);
-}
+export '../../../localization/domain/entities/app_language.dart';
 
 /// "اختر اللغة": lists the [AppLanguage]s with [selected] highlighted;
 /// tapping one closes the sheet with it as the result.

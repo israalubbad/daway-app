@@ -7,6 +7,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_fonts.dart';
 
+import '../../core/localization/translations.dart';
+
 /// The product barcode kinds: EAN-13, EAN-8, UPC-A, UPC-E, GTIN-14, Code 128.
 const productBarcodeFormats = [
   BarcodeFormat.ean13,
@@ -119,7 +121,7 @@ class _BarcodeCameraViewState extends State<BarcodeCameraView> with WidgetsBindi
                 children: [
                   _RoundButton(
                     icon: Icons.arrow_forward_ios_rounded,
-                    label: 'رجوع',
+                    label: 'رجوع'.tr,
                     onTap: widget.onBack,
                   ),
                   const Spacer(),
@@ -129,7 +131,7 @@ class _BarcodeCameraViewState extends State<BarcodeCameraView> with WidgetsBindi
                       final on = state.torchState == TorchState.on;
                       return _RoundButton(
                         icon: on ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-                        label: on ? 'إطفاء الفلاش' : 'تشغيل الفلاش',
+                        label: on ? 'إطفاء الفلاش'.tr : 'تشغيل الفلاش'.tr,
                         onTap: _controller.toggleTorch,
                       );
                     },
@@ -212,8 +214,8 @@ class _CameraError extends StatelessWidget {
             SizedBox(height: 12.h),
             Text(
               denied
-                  ? 'اسمح للتطبيق باستخدام الكاميرا من إعدادات الهاتف لمسح الباركود'
-                  : 'تعذر تشغيل الكاميرا',
+                  ? 'اسمح للتطبيق باستخدام الكاميرا من إعدادات الهاتف لمسح الباركود'.tr
+                  : 'تعذر تشغيل الكاميرا'.tr,
               textAlign: TextAlign.center,
               style: AppFonts.tajawal(
                 TextStyle(fontSize: 14.sp, color: Colors.white),

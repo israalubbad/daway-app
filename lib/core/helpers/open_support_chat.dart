@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_constants.dart';
 import '../widgets/app_snackbar.dart';
 
+import '../../core/localization/translations.dart';
+
 /// Opens a WhatsApp chat with the support number; if WhatsApp cannot be
 /// opened, falls back to the phone dialer with the same number, and says so
 /// when neither works.
@@ -28,5 +30,5 @@ Future<void> openSupportChat(BuildContext context) async {
       // Fall through to the next way of reaching support.
     }
   }
-  AppSnackbar.showOn(messenger, 'تعذر فتح واتساب أو الاتصال');
+  AppSnackbar.showOn(messenger, 'تعذر فتح واتساب أو الاتصال'.tr);
 }

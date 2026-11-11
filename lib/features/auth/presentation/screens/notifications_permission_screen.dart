@@ -5,6 +5,8 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../widgets/notifications_permission_view.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Final step of the sign-up flow, reached once OTP verification succeeded
 /// (the account already exists at this point) — best-effort OS notification
 /// permission request, then straight to the home screen.
@@ -27,7 +29,7 @@ class NotificationsPermissionScreen extends StatelessWidget {
       child: Scaffold(
         body: SafeArea(
           child: NotificationsPermissionView(
-            subtitle: 'فعّل الإشعارات لتصلك تحديثات طلباتك وتنبيهات الأدوية المهمة.',
+            subtitle: 'فعّل الإشعارات لتصلك تحديثات طلباتك وتنبيهات الأدوية المهمة.'.tr,
             buttonColor: AppColors.mainTeal,
             onAllow: () => _finish(context, requestPermission: true),
             onSkip: () => _finish(context, requestPermission: false),

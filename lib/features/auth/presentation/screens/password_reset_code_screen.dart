@@ -14,8 +14,10 @@ import '../widgets/auth_flow_header.dart';
 import '../widgets/password_reset_notice_listener.dart';
 import '../widgets/resend_code_link.dart';
 import 'reset_password_screen.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The second screen of resetting a password: the code sent to the phone.
+
 ///
 /// Expects the [PasswordResetCubit] of [ForgotPasswordScreen] above it. Going
 /// back from here takes the flow back to the phone step.
@@ -25,7 +27,7 @@ class PasswordResetCodeScreen extends StatelessWidget {
   // The number is one left-to-right unit in the right-to-left line: isolated,
   // so its "+" stays in front of it.
   static String _subtitle(String phone) =>
-      'أدخل رمز التحقق المرسل إلى رقم هاتفك\nللمتابعة \u2066${maskLocalPhone(phone)}\u2069';
+      'أدخل رمز التحقق المرسل إلى رقم هاتفك\nللمتابعة \u2066{0}\u2069'.trArgs([maskLocalPhone(phone)]);
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,7 @@ class PasswordResetCodeScreen extends StatelessWidget {
                     BlocSelector<PasswordResetCubit, PasswordResetState, String>(
                       selector: (state) => state.phone,
                       builder: (context, phone) => AuthFlowHeader(
-                        title: 'أدخل رمز التحقق',
+                        title: 'أدخل رمز التحقق'.tr,
                         subtitle: _subtitle(phone),
                       ),
                     ),
@@ -129,7 +131,7 @@ class _CodeFormState extends State<_CodeForm> {
           selector: (state) => state.isBusy,
           builder: (context, isBusy) {
             return AppCustomButton(
-              text: 'تحقق',
+              text: 'تحقق'.tr,
               textStyle: AppTextStyles.authFlowButton,
               backgroundColor: AppColors.mainTeal,
               isLoading: isBusy,

@@ -5,8 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The two big cards under the pharmacy home's header: the number of
+
 /// products (which opens the products tab) and the month's sales.
 class PharmacySummaryCards extends StatelessWidget {
   final int totalProducts;
@@ -33,7 +35,7 @@ class PharmacySummaryCards extends StatelessWidget {
         children: [
           Expanded(
             child: _SummaryCard(
-              title: 'إجمالي\nالمنتجات',
+              title: 'إجمالي\nالمنتجات'.tr,
               onTap: onProductsTap,
               value: Text('$totalProducts', style: AppTextStyles.pharmacySummaryValue),
               trailing: const _ArrowIcon(),
@@ -42,7 +44,7 @@ class PharmacySummaryCards extends StatelessWidget {
           SizedBox(width: 8.w),
           Expanded(
             child: _SummaryCard(
-              title: 'إجمالي المبيعات\nالشهرية',
+              title: 'إجمالي المبيعات\nالشهرية'.tr,
               value: _SalesValue(amount: monthlySales),
             ),
           ),

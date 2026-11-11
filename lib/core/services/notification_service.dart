@@ -5,6 +5,8 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 
 import '../../features/patient/domain/entities/medicine_reminder.dart';
 
+import '../../core/localization/translations.dart';
+
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
@@ -13,10 +15,10 @@ class NotificationService {
   /// default_notification_channel_id, so pushes that arrive while the app is
   /// in the background use it too.
   static const pushChannelId = 'push_default';
-  static const _pushChannel = AndroidNotificationChannel(
+  static AndroidNotificationChannel get _pushChannel => AndroidNotificationChannel(
     pushChannelId,
-    'الإشعارات',
-    description: 'إشعارات من دواي',
+    'الإشعارات'.tr,
+    description: 'إشعارات من دواي'.tr,
     importance: Importance.high,
   );
 
@@ -93,14 +95,14 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         id,
-        'تذكير دواء',
-        'حان موعد ${reminder.name}',
+        'تذكير دواء'.tr,
+        'حان موعد {0}'.trArgs([reminder.name]),
         scheduledDate,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             'medicine_reminders',
-            'تذكيرات الأدوية',
-            channelDescription: 'تنبيهات مواعيد الأدوية',
+            'تذكيرات الأدوية'.tr,
+            channelDescription: 'تنبيهات مواعيد الأدوية'.tr,
             importance: Importance.high,
             priority: Priority.high,
           ),

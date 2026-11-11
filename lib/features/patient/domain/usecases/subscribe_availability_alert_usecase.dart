@@ -12,7 +12,7 @@ class SubscribeAvailabilityAlertUseCase {
   Future<ApiResult<void>> call(int medicineId) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(
+      return ApiError(
         ApiFailure(message: sessionExpiredMessage),
       );
     }

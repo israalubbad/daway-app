@@ -11,6 +11,8 @@ import '../../domain/usecases/add_pharmacy_medicine_usecase.dart';
 import '../../domain/usecases/search_medicine_catalog_usecase.dart';
 import 'add_medicine_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Backs both pages of "إضافة منتج جديد": the form, and the search page that
 /// fills it from the catalog.
 class AddMedicineCubit extends Cubit<AddMedicineState> {
@@ -109,7 +111,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
         suggestions: const [],
         isSearching: false,
         hasSearched: false,
-        searchError: 'اكتب حرفين على الأقل للبحث',
+        searchError: 'اكتب حرفين على الأقل للبحث'.tr,
       )));
       return;
     }

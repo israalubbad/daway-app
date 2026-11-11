@@ -7,8 +7,10 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/header_icon_button.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../cubit/pharmacy_profile_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Greeting, the pharmacy's address and the notifications button — the top
+
 /// block of [PharmacyHomeScreen]. Only the name and the address depend on
 /// [PharmacyProfileCubit] (each through its own selector, so an edit of one
 /// does not rebuild the other); the notifications button stays outside.
@@ -42,7 +44,7 @@ class PharmacyHomeHeader extends StatelessWidget {
                       TextSpan(
                         style: AppTextStyles.homeGreetingRegular,
                         children: [
-                          const TextSpan(text: 'أهلا بك '),
+                          TextSpan(text: 'أهلا بك '.tr),
                           TextSpan(text: name, style: AppTextStyles.pharmacyGreetingName),
                         ],
                       ),

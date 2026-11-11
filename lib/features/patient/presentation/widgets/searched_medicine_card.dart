@@ -6,6 +6,8 @@ import '../../domain/entities/searched_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 import 'medicine_grid_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// A medicine card for the search results grid — unlike
 /// [CategoryMedicineCard], `GET /medicines/search` does return a real image
 /// and a live "متوفر في N صيدليات" count, so this shows both instead of a
@@ -36,9 +38,9 @@ class SearchedMedicineCard extends StatelessWidget {
       title: medicine.tradeName,
       subtitle: hasPharmacies
           ? pharmaciesAvailabilityLabel(medicine.availablePharmaciesCount)
-          : 'غير متوفر حالياً',
+          : 'غير متوفر حالياً'.tr,
       subtitleColor: hasPharmacies ? AppColors.success : AppColors.grey,
-      detailsLabel: 'عرض التفاصيل',
+      detailsLabel: 'عرض التفاصيل'.tr,
       onDetailsTap: onDetailsTap,
     );
   }

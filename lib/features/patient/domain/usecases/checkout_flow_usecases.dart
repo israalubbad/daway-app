@@ -4,9 +4,7 @@ import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/checkout_flow.dart';
 import '../repositories/checkout_flow_repository.dart';
 
-const _sessionExpired = ApiFailure(
-  message: sessionExpiredMessage,
-);
+ApiFailure get _sessionExpired => ApiFailure(message: sessionExpiredMessage);
 
 class ValidateCouponUseCase {
   final CheckoutFlowRepository _repository;
@@ -20,7 +18,7 @@ class ValidateCouponUseCase {
     required double orderTotal,
   }) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
     return _repository.validateCoupon(
       token: session.token,
       code: code.trim(),
@@ -37,7 +35,7 @@ class GetOrderPaymentUseCase {
 
   Future<ApiResult<OrderPayment>> call(int orderId) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
     return _repository.getPayment(token: session.token, orderId: orderId);
   }
 }
@@ -55,7 +53,7 @@ class SubmitPaymentReceiptUseCase {
     required String receiptPath,
   }) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
     return _repository.submitReceipt(
       token: session.token,
       orderId: orderId,
@@ -77,7 +75,7 @@ class ReportPaymentProblemUseCase {
     required String message,
   }) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
     return _repository.reportProblem(
       token: session.token,
       orderId: orderId,
@@ -94,7 +92,7 @@ class GetOrderTrackingUseCase {
 
   Future<ApiResult<OrderTracking>> call(int orderId) async {
     final session = await _sessionRepository.getSession();
-    if (session == null) return const ApiError(_sessionExpired);
+    if (session == null) return ApiError(_sessionExpired);
     return _repository.getTracking(token: session.token, orderId: orderId);
   }
 }

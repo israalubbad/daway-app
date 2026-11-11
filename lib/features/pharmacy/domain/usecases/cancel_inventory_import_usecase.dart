@@ -12,7 +12,7 @@ class CancelInventoryImportUseCase {
   Future<ApiResult<void>> call(String importId) async {
     final session = await _sessionRepository.getSession();
     if (session == null) {
-      return const ApiError(
+      return ApiError(
         ApiFailure(message: sessionExpiredMessage),
       );
     }

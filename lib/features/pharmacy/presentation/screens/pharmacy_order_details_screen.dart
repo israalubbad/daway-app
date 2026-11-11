@@ -13,6 +13,8 @@ import '../../domain/entities/pharmacy_order.dart';
 import '../widgets/pharmacy_products_header.dart';
 import '../widgets/product_status_badge.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Fetches the full record of an order (medicines, quantities, patient); null
 /// when it cannot be had, and the screen keeps what the list gave it.
 typedef PharmacyOrderLoader = Future<PharmacyOrder?> Function(PharmacyOrder order);
@@ -79,8 +81,8 @@ class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PharmacyProductsHeader(
-                title: 'تفاصيل الطلب',
-                subtitle: 'راجع تفاصيل طلب العميل',
+                title: 'تفاصيل الطلب'.tr,
+                subtitle: 'راجع تفاصيل طلب العميل'.tr,
                 onBack: () => Navigator.of(context).pop(),
               ),
               SizedBox(height: 24.h),
@@ -180,7 +182,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           if (order.patientName case final patient?) ...[
             SizedBox(height: 8.h),
-            Text('العميل: $patient', style: AppTextStyles.pharmacyOrderNumber),
+            Text('العميل: {0}'.trArgs([patient]), style: AppTextStyles.pharmacyOrderNumber),
           ],
           SizedBox(height: 16.h),
           Container(
@@ -197,10 +199,10 @@ class _SummaryCard extends StatelessWidget {
                   glyph: '💊',
                   label: arabicCountedNoun(
                     order.itemsCount,
-                    singular: 'دواء',
-                    dual: 'دواءان',
-                    plural: 'أدوية',
-                    one: 'دواء واحد',
+                    singular: 'دواء'.tr,
+                    dual: 'دواءان'.tr,
+                    plural: 'أدوية'.tr,
+                    one: 'دواء واحد'.tr,
                   ),
                 ),
                 const _CellDivider(),
@@ -310,8 +312,8 @@ class _ItemCard extends StatelessWidget {
                 SizedBox(height: 4.h),
                 Text(
                   item.unitPrice == null
-                      ? 'الكمية: ${item.quantity}'
-                      : 'الكمية: ${item.quantity} × ${formatPrice(item.unitPrice!)} ₪',
+                      ? 'الكمية: {0}'.trArgs([item.quantity])
+                      : 'الكمية: {0} × {1} ₪'.trArgs([item.quantity, formatPrice(item.unitPrice!)]),
                   style: AppTextStyles.settingsMutedText,
                 ),
                 SizedBox(height: 8.h),
@@ -344,7 +346,7 @@ class _DeliveryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _CardTitle(icon: 'assets/icons/map_pin_icon.svg', title: 'عنوان التوصيل'),
+          _CardTitle(icon: 'assets/icons/map_pin_icon.svg', title: 'عنوان التوصيل'.tr),
           SizedBox(height: 16.h),
           Text(area, style: AppTextStyles.settingsMutedText),
           if (street != null && street!.isNotEmpty) ...[
@@ -365,8 +367,8 @@ class _PaymentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, textColor, tint) = payment.isPaid
-        ? ('مدفوع', AppColors.productAvailableText, AppColors.productAvailableTint)
-        : ('غير مدفوع', AppColors.statLowStock, AppColors.productLowStockTint);
+        ? ('مدفوع'.tr, AppColors.productAvailableText, AppColors.productAvailableTint)
+        : ('غير مدفوع'.tr, AppColors.statLowStock, AppColors.productLowStockTint);
 
     return _Card(
       child: Column(
@@ -374,7 +376,7 @@ class _PaymentCard extends StatelessWidget {
         children: [
           _CardTitle(
             icon: 'assets/icons/credit_card_icon.svg',
-            title: 'طريقة الدفع',
+            title: 'طريقة الدفع'.tr,
             trailing: Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
               decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(4.r)),

@@ -8,6 +8,8 @@ import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 import 'accounting_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// One figure of the overview's grid: a tinted icon, its title and the amount.
 class KpiCard extends StatelessWidget {
   final String title;
@@ -61,12 +63,12 @@ class KpiGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cards = [
-      KpiCard(title: 'مبيعات اليوم', amount: overview.todaySales, icon: Icons.trending_up_rounded, color: AppColors.mainTeal),
-      KpiCard(title: 'مشتريات اليوم', amount: overview.todayPurchases, icon: Icons.shopping_bag_outlined, color: AppColors.mainTeal),
-      KpiCard(title: 'مصروفات اليوم', amount: overview.todayExpenses, icon: Icons.payments_outlined, color: AppColors.warning),
-      KpiCard(title: 'ربح اليوم', amount: overview.todayProfit, icon: Icons.savings_outlined, color: AppColors.statAvailable),
-      KpiCard(title: 'رصيد الصندوق', amount: overview.cashBalance, icon: Icons.account_balance_wallet_outlined, color: AppColors.logoutRed),
-      KpiCard(title: 'الديون المستحقة', amount: overview.outstandingDebts, icon: Icons.request_quote_outlined, color: AppColors.logoutRed),
+      KpiCard(title: 'مبيعات اليوم'.tr, amount: overview.todaySales, icon: Icons.trending_up_rounded, color: AppColors.mainTeal),
+      KpiCard(title: 'مشتريات اليوم'.tr, amount: overview.todayPurchases, icon: Icons.shopping_bag_outlined, color: AppColors.mainTeal),
+      KpiCard(title: 'مصروفات اليوم'.tr, amount: overview.todayExpenses, icon: Icons.payments_outlined, color: AppColors.warning),
+      KpiCard(title: 'ربح اليوم'.tr, amount: overview.todayProfit, icon: Icons.savings_outlined, color: AppColors.statAvailable),
+      KpiCard(title: 'رصيد الصندوق'.tr, amount: overview.cashBalance, icon: Icons.account_balance_wallet_outlined, color: AppColors.logoutRed),
+      KpiCard(title: 'الديون المستحقة'.tr, amount: overview.outstandingDebts, icon: Icons.request_quote_outlined, color: AppColors.logoutRed),
     ];
     return Column(
       children: [

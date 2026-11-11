@@ -11,8 +11,10 @@ import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
 import '../widgets/patient_profile_avatar.dart';
 import '../widgets/patient_sub_screen_header.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// "معلومات الحساب": the name and birth date are inputs you simply tap and
+
 /// change (no "edit" mode to enter first), the phone number is shown locked,
 /// and "حفظ التعديلات" only lights up once something has changed.
 class PatientProfileScreen extends StatefulWidget {
@@ -76,9 +78,9 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PatientSubScreenHeader(
-            title: 'معلومات الحساب',
-            description: 'اضغط على أي حقل لتغييره، ثم احفظ التعديلات.',
+          PatientSubScreenHeader(
+            title: 'معلومات الحساب'.tr,
+            description: 'اضغط على أي حقل لتغييره، ثم احفظ التعديلات.'.tr,
           ),
           SizedBox(height: 32.h),
           Center(
@@ -93,7 +95,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ),
           ),
           SizedBox(height: 32.h),
-          Text('الاسم', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('الاسم'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.edit_outlined,
@@ -109,19 +111,19 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             Padding(
               padding: EdgeInsets.only(top: 6.h),
               child: Text(
-                'الاسم مطلوب',
+                'الاسم مطلوب'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.authFieldError,
               ),
             ),
           SizedBox(height: 24.h),
-          Text('تاريخ الميلاد', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('تاريخ الميلاد'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.calendar_today_outlined,
             onTap: () => _pickBirthDate(context, state.birthDate),
             child: Text(
-              state.birthDate ?? 'اختر تاريخ ميلادك',
+              state.birthDate ?? 'اختر تاريخ ميلادك'.tr,
               textAlign: TextAlign.right,
               style: AppTextStyles.profileFieldValue.copyWith(
                 color: state.birthDate == null ? AppColors.grey : null,
@@ -129,7 +131,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          Text('رقم الهاتف', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+          Text('رقم الهاتف'.tr, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
           SizedBox(height: 8.h),
           _FieldBox(
             icon: Icons.lock_outline,
@@ -143,14 +145,14 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
           Padding(
             padding: EdgeInsets.only(top: 6.h),
             child: Text(
-              'رقم الهاتف مرتبط بحسابك ولا يمكن تغييره من هنا.',
+              'رقم الهاتف مرتبط بحسابك ولا يمكن تغييره من هنا.'.tr,
               textAlign: TextAlign.right,
               style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
             ),
           ),
           SizedBox(height: 40.h),
           AppCustomButton(
-            text: 'حفظ التعديلات',
+            text: 'حفظ التعديلات'.tr,
             isLoading: state.isSaving,
             backgroundColor: canSave ? AppColors.mainTeal : AppColors.borderGrey,
             onPressed: canSave ? cubit.save : () {},
@@ -240,7 +242,7 @@ class _NameInputState extends State<_NameInput> {
         isDense: true,
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,
-        hintText: 'اكتب اسمك',
+        hintText: 'اكتب اسمك'.tr,
         hintStyle: AppTextStyles.profileFieldValue.copyWith(color: AppColors.grey),
       ),
     );

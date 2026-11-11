@@ -18,6 +18,8 @@ import '../helpers/notifications_navigation.dart';
 import '../widgets/medicine_status_badge.dart';
 import '../widgets/pharmacy_side_menu.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PharmacyInventoryScreen extends StatefulWidget {
   const PharmacyInventoryScreen({super.key});
 
@@ -50,7 +52,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
         scrolledUnderElevation: 0,
         centerTitle: true,
         title: Text(
-          'إدارة المخزون',
+          'إدارة المخزون'.tr,
           style: AppTextStyles.screenTitle.copyWith(color: AppColors.mainTeal, fontSize: 20.sp),
         ),
         actions: [
@@ -105,7 +107,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
                     child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
                 : const Icon(Icons.save_outlined),
-            label: const Text('حفظ التحديثات'),
+            label: Text('حفظ التحديثات'.tr),
           );
         },
       ),
@@ -122,7 +124,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'أضف أو عدّل كميات الأدوية المتوفرة في الصيدلية',
+                'أضف أو عدّل كميات الأدوية المتوفرة في الصيدلية'.tr,
                 style: AppTextStyles.cardDescription,
                 textAlign: TextAlign.right,
               ),
@@ -138,7 +140,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
               SizedBox(height: 16.h),
               AppTextField(
                 controller: _searchController,
-                hintText: 'ابحث عن دواء...',
+                hintText: 'ابحث عن دواء...'.tr,
                 prefixIcon: Icon(Icons.search, color: AppColors.grey),
                 onChanged: (value) => context.read<PharmacyInventoryCubit>().queryChanged(value),
               ),
@@ -148,7 +150,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
                 child: Row(
                   children: [
                     AppFilterChip(
-                      label: 'الكل',
+                      label: 'الكل'.tr,
                       selected: state.filter == MedicineStatusFilter.all,
                       onTap: () => context
                           .read<PharmacyInventoryCubit>()
@@ -156,7 +158,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
                     ),
                     SizedBox(width: 8.w),
                     AppFilterChip(
-                      label: 'متوفر',
+                      label: 'متوفر'.tr,
                       color: AppColors.success,
                       selected: state.filter == MedicineStatusFilter.available,
                       onTap: () => context
@@ -165,7 +167,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
                     ),
                     SizedBox(width: 8.w),
                     AppFilterChip(
-                      label: 'منخفض',
+                      label: 'منخفض'.tr,
                       color: AppColors.warning,
                       selected: state.filter == MedicineStatusFilter.low,
                       onTap: () => context
@@ -174,7 +176,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
                     ),
                     SizedBox(width: 8.w),
                     AppFilterChip(
-                      label: 'نافد',
+                      label: 'نافد'.tr,
                       color: AppColors.error,
                       selected: state.filter == MedicineStatusFilter.outOfStock,
                       onTap: () => context
@@ -190,7 +192,7 @@ class _PharmacyInventoryScreenState extends State<PharmacyInventoryScreen> {
         Expanded(
           child: filtered.isEmpty
               ? Center(
-                  child: Text('لا توجد أدوية مطابقة', style: AppTextStyles.cardDescription),
+                  child: Text('لا توجد أدوية مطابقة'.tr, style: AppTextStyles.cardDescription),
                 )
               : ListView.separated(
                   padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 88.h),
@@ -236,15 +238,15 @@ class _InventoryStatsCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _StatTile(label: 'متوفر', value: tally.available, color: AppColors.success),
+            child: _StatTile(label: 'متوفر'.tr, value: tally.available, color: AppColors.success),
           ),
           const _StatDivider(),
           Expanded(
-            child: _StatTile(label: 'منخفض', value: tally.low, color: AppColors.warning),
+            child: _StatTile(label: 'منخفض'.tr, value: tally.low, color: AppColors.warning),
           ),
           const _StatDivider(),
           Expanded(
-            child: _StatTile(label: 'نافد', value: tally.outOfStock, color: AppColors.error),
+            child: _StatTile(label: 'نافد'.tr, value: tally.outOfStock, color: AppColors.error),
           ),
         ],
       ),
@@ -278,7 +280,7 @@ class _StatTile extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(label, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: color)),
-        Text('دواء', style: TextStyle(fontSize: 11.sp, color: AppColors.grey)),
+        Text('دواء'.tr, style: TextStyle(fontSize: 11.sp, color: AppColors.grey)),
       ],
     );
   }

@@ -7,6 +7,8 @@ import '../helpers/accounting_format.dart';
 import '../helpers/accounting_styles.dart';
 import 'accounting_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 enum InvoiceAction { view, refund, recordPayment, share }
 
 /// One sales invoice: number and status, who and when, the three amounts, the
@@ -42,16 +44,16 @@ class InvoiceCard extends StatelessWidget {
             ],
           ),
           Text(
-            '${invoice.customerName ?? 'زائر نقدي'} · ${invoice.itemsCount} صنف · ${formatDateTime(invoice.date)}',
+            '{0} · {1} صنف · {2}'.trArgs([invoice.customerName ?? 'زائر نقدي', invoice.itemsCount, formatDateTime(invoice.date)]),
             style: AccountingStyles.muted,
           ),
           SizedBox(height: 10.h),
           Row(
             children: [
-              _Figure(label: 'الإجمالي', amount: invoice.total),
-              _Figure(label: 'المدفوع', amount: invoice.paid),
+              _Figure(label: 'الإجمالي'.tr, amount: invoice.total),
+              _Figure(label: 'المدفوع'.tr, amount: invoice.paid),
               _Figure(
-                label: 'المتبقي',
+                label: 'المتبقي'.tr,
                 amount: remaining,
                 color: remaining > 0 ? AppColors.logoutRed : null,
               ),
@@ -63,7 +65,7 @@ class InvoiceCard extends StatelessWidget {
               AccountingChip(paymentMethodLabel(invoice.method)),
               const Spacer(),
               Text(
-                invoice.discount > 0 ? 'خصم ${formatMoney(invoice.discount)}' : 'خصم –',
+                invoice.discount > 0 ? 'خصم {0}'.trArgs([formatMoney(invoice.discount)]) : 'خصم –'.tr,
                 textDirection: TextDirection.rtl,
                 style: AccountingStyles.muted,
               ),
@@ -108,25 +110,25 @@ class _Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<InvoiceAction>(
-      tooltip: 'إجراءات',
+      tooltip: 'إجراءات'.tr,
       icon: Icon(Icons.more_vert_rounded, size: 20.r, color: AppColors.authInputBorder),
       padding: EdgeInsets.zero,
       onSelected: onAction,
       itemBuilder: (_) => [
-        const PopupMenuItem(value: InvoiceAction.view, child: Text('عرض')),
+        PopupMenuItem(value: InvoiceAction.view, child: Text('عرض'.tr)),
         // A cancelled or refunded invoice takes no returns or payments.
         PopupMenuItem(
           value: InvoiceAction.refund,
           enabled: !invoice.isClosed,
-          child: const Text('إرجاع'),
+          child: Text('إرجاع'.tr),
         ),
         // A fully paid invoice has nothing left to pay.
         PopupMenuItem(
           value: InvoiceAction.recordPayment,
           enabled: !invoice.isClosed && invoice.remaining > 0,
-          child: const Text('تسجيل دفعة'),
+          child: Text('تسجيل دفعة'.tr),
         ),
-        const PopupMenuItem(value: InvoiceAction.share, child: Text('مشاركة PDF')),
+        PopupMenuItem(value: InvoiceAction.share, child: Text('مشاركة PDF'.tr)),
       ],
     );
   }

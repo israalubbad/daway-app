@@ -4,6 +4,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/localization/data/repositories/language_repository_impl.dart';
+import '../../features/localization/domain/repositories/language_repository.dart';
+import '../../features/localization/domain/usecases/get_app_language_usecase.dart';
+import '../../features/localization/domain/usecases/save_app_language_usecase.dart';
+import '../../features/localization/presentation/cubit/language_cubit.dart';
 import '../../features/auth/data/datasources/account_closure_remote_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/account_closure_repository_impl.dart';
@@ -311,6 +316,12 @@ Future<void> setupGetIt() async {
   // ---------------- Local Storage ----------------
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
   getIt.registerLazySingleton(() => SecureStorageService(getIt()));
+
+  // ---------------- Language ----------------
+  getIt.registerLazySingleton<LanguageRepository>(() => const LanguageRepositoryImpl());
+  getIt.registerLazySingleton(() => GetAppLanguageUseCase(getIt()));
+  getIt.registerLazySingleton(() => SaveAppLanguageUseCase(getIt()));
+  getIt.registerLazySingleton(() => LanguageCubit(getIt(), getIt()));
 
   // ---------------- Auth ----------------
   getIt.registerLazySingleton(() => AuthRemoteDataSource(getIt()));

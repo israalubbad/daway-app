@@ -8,8 +8,10 @@ import '../cubit/home_location_cubit.dart';
 import '../../../../core/widgets/header_icon_button.dart';
 import '../cubit/patient_profile_cubit.dart';
 import '../cubit/patient_profile_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Greeting + cart/notification actions + the patient's saved location —
+
 /// the top block of [PatientHomeScreen]. Only the greeting/location text
 /// depends on [PatientProfileCubit], so that's the only part rebuilt while
 /// the profile loads — the cart/notification buttons stay outside the
@@ -45,7 +47,7 @@ class HomeHeader extends StatelessWidget {
                     TextSpan(
                       style: AppTextStyles.homeGreetingRegular,
                       children: [
-                        const TextSpan(text: 'أهلا بك '),
+                        TextSpan(text: 'أهلا بك '.tr),
                         TextSpan(text: name, style: AppTextStyles.homeGreetingName),
                       ],
                     ),
@@ -82,7 +84,7 @@ class HomeHeader extends StatelessWidget {
                       final label = (saved != null && saved.isNotEmpty) ? saved : deviceAddress;
                       return Flexible(
                         child: Text(
-                          (label == null || label.isEmpty) ? 'حدد موقعك' : label,
+                          (label == null || label.isEmpty) ? 'حدد موقعك'.tr : label,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.homeLocationText,

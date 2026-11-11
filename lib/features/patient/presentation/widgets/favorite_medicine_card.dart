@@ -9,6 +9,8 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/favorite_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// A saved medicine in "الأدوية المحفوظة". The enriched favorites response
 /// has no dosage/strength field (unlike the design's "500 مجم" chip), so
 /// that chip isn't modeled here — add it back once the backend returns one.
@@ -112,7 +114,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                   child: Text(
                     hasPharmacies
                         ? pharmaciesAvailabilityLabel(medicine.pharmaciesCount)
-                        : 'غير متوفر حالياً',
+                        : 'غير متوفر حالياً'.tr,
                     textAlign: TextAlign.right,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -120,7 +122,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                   ),
                 ),
                 if (medicine.minPrice != null) ...[
-                  Text('يبدأ من ', style: AppTextStyles.favoriteCardPriceLabel),
+                  Text('يبدأ من '.tr, style: AppTextStyles.favoriteCardPriceLabel),
                   Text(
                     '${formatPrice(medicine.minPrice!)} ₪',
                     style: AppTextStyles.favoriteCardPrice,
@@ -144,7 +146,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'تفاصيل الدواء',
+                    'تفاصيل الدواء'.tr,
                     style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700),
                   ),
                 ],

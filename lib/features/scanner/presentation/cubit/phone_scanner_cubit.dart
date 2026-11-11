@@ -6,6 +6,8 @@ import '../../domain/entities/scan_pairing.dart';
 import '../../domain/usecases/scan_session_usecases.dart';
 import 'phone_scanner_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The phone as the web sales screen's barcode scanner: reads the QR code on
 /// that screen to join its scan session, then sends every barcode the camera
 /// reads to it.
@@ -50,7 +52,7 @@ class PhoneScannerCubit extends Cubit<PhoneScannerState> {
             phase: PhoneScannerPhase.scanning,
             isBusy: false,
             isError: false,
-            message: 'تم الاقتران، وجّه الكاميرا نحو الباركود',
+            message: 'تم الاقتران، وجّه الكاميرا نحو الباركود'.tr,
           ),
         );
       case ApiError(:final failure):
@@ -74,7 +76,7 @@ class PhoneScannerCubit extends Cubit<PhoneScannerState> {
             isError: false,
             lastBarcode: barcode,
             sentCount: state.sentCount + 1,
-            message: 'تم إرسال الباركود',
+            message: 'تم إرسال الباركود'.tr,
           ),
         );
       case ApiError(:final failure):
@@ -86,7 +88,7 @@ class PhoneScannerCubit extends Cubit<PhoneScannerState> {
             phase: over ? PhoneScannerPhase.ended : state.phase,
             isBusy: false,
             isError: true,
-            message: over ? 'انتهت جلسة المسح، ابدأ جلسة جديدة من الموقع' : failure.message,
+            message: over ? 'انتهت جلسة المسح، ابدأ جلسة جديدة من الموقع'.tr : failure.message,
           ),
         );
     }
@@ -104,8 +106,8 @@ class PhoneScannerCubit extends Cubit<PhoneScannerState> {
 
   String _pairingMessage(Failure failure) {
     return switch (_statusOf(failure)) {
-      409 => 'هناك جهاز آخر مقترن بهذه الجلسة، وافق على الاستبدال من شاشة الموقع',
-      410 || 404 => 'انتهت جلسة المسح، أنشئ رمزاً جديداً من الموقع',
+      409 => 'هناك جهاز آخر مقترن بهذه الجلسة، وافق على الاستبدال من شاشة الموقع'.tr,
+      410 || 404 => 'انتهت جلسة المسح، أنشئ رمزاً جديداً من الموقع'.tr,
       _ => failure.message,
     };
   }

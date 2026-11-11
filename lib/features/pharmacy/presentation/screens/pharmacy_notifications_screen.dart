@@ -15,6 +15,8 @@ import '../cubit/notifications_state.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
 import '../widgets/pharmacy_notification_item.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "الإشعارات", laid out like the patient's: a back chip, the title, filter
 /// tabs with counts, then one row per notification.
 ///
@@ -60,9 +62,9 @@ class PharmacyNotificationsScreen extends StatelessWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: const PatientSubScreenHeader(
-                      title: 'الإشعارات',
-                      description: 'تابع مخزونك واستفسارات عملائك',
+                    child: PatientSubScreenHeader(
+                      title: 'الإشعارات'.tr,
+                      description: 'تابع مخزونك واستفسارات عملائك'.tr,
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -105,19 +107,19 @@ class PharmacyNotificationsScreen extends StatelessWidget {
           tabs: [
             FilterTabItem(
               value: NotificationFilter.all,
-              label: 'الكل (${count(NotificationFilter.all)})',
+              label: 'الكل ({0})'.trArgs([count(NotificationFilter.all)]),
             ),
             FilterTabItem(
               value: NotificationFilter.unread,
-              label: 'غير مقروءة (${count(NotificationFilter.unread)})',
+              label: 'غير مقروءة ({0})'.trArgs([count(NotificationFilter.unread)]),
             ),
             FilterTabItem(
               value: NotificationFilter.inventory,
-              label: 'المخزون (${count(NotificationFilter.inventory)})',
+              label: 'المخزون ({0})'.trArgs([count(NotificationFilter.inventory)]),
             ),
             FilterTabItem(
               value: NotificationFilter.inquiries,
-              label: 'الاستفسارات (${count(NotificationFilter.inquiries)})',
+              label: 'الاستفسارات ({0})'.trArgs([count(NotificationFilter.inquiries)]),
             ),
           ],
         ),
@@ -129,7 +131,7 @@ class PharmacyNotificationsScreen extends StatelessWidget {
               child: TextButton(
                 onPressed: state.markingAllAsRead ? null : () => _handleMarkAllAsRead(context),
                 child: Text(
-                  'تحديد الكل كمقروء',
+                  'تحديد الكل كمقروء'.tr,
                   style: AppFonts.tajawal(
                     TextStyle(fontSize: 13.sp, color: AppColors.mainTeal),
                     FontWeight.w500,
@@ -142,9 +144,9 @@ class PharmacyNotificationsScreen extends StatelessWidget {
         if (visible.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: const EmptyStateView(
+            child: EmptyStateView(
               imageAsset: 'assets/images/empty_notifications.png',
-              title: 'لا توجد إشعارات',
+              title: 'لا توجد إشعارات'.tr,
               topSpacing: 64,
             ),
           )

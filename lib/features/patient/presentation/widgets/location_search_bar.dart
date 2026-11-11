@@ -6,8 +6,10 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../cubit/location_picker_cubit.dart';
 import '../cubit/location_picker_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Free-text address search bar floated over the top of the map. Reuses
+
 /// [AppTextField] (with a Material wrapper for the floating shadow) rather
 /// than hand-rolling a second input style.
 class LocationSearchBar extends StatelessWidget {
@@ -23,7 +25,7 @@ class LocationSearchBar extends StatelessWidget {
       color: Colors.white,
       child: AppTextField(
         controller: controller,
-        hintText: 'ابحث عن عنوان...',
+        hintText: 'ابحث عن عنوان...'.tr,
         textInputAction: TextInputAction.search,
         onSubmitted: (value) => context.read<LocationPickerCubit>().search(value),
         prefixIcon: BlocBuilder<LocationPickerCubit, LocationPickerState>(

@@ -4,8 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
-
+
+import '../../core/localization/translations.dart';
 /// A labelled outlined field of the auth flows: the label above (right-aligned
+
 /// in the right-to-left page), then a 56px field with an 8px corner and a grey
 /// border that turns blue when focused and red when [hasError].
 ///
@@ -109,7 +111,7 @@ class _AuthPasswordFieldState extends State<AuthPasswordField> {
       textInputAction: widget.textInputAction,
       hasError: widget.hasError,
       suffixIcon: IconButton(
-        tooltip: _obscure ? 'إظهار كلمة المرور' : 'إخفاء كلمة المرور',
+        tooltip: _obscure ? 'إظهار كلمة المرور'.tr : 'إخفاء كلمة المرور'.tr,
         icon: Icon(
           _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
           color: AppColors.grey,

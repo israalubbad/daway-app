@@ -1,24 +1,26 @@
 import '../../domain/entities/notification.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The backend's `message` is already a full sentence, so only the bold title
 /// line, the category chip and the icon are derived from the type.
 String notificationTitleFor(NotificationType type) {
   return switch (type) {
-    NotificationType.outOfStock => 'دواء نافد من المخزون',
-    NotificationType.lowStock => 'مخزون منخفض',
-    NotificationType.newInquiry => 'استفسار جديد',
-    NotificationType.newRating => 'تقييم جديد',
-    NotificationType.other => 'إشعار',
+    NotificationType.outOfStock => 'دواء نافد من المخزون'.tr,
+    NotificationType.lowStock => 'مخزون منخفض'.tr,
+    NotificationType.newInquiry => 'استفسار جديد'.tr,
+    NotificationType.newRating => 'تقييم جديد'.tr,
+    NotificationType.other => 'إشعار'.tr,
   };
 }
 
 /// The small category chip on a notification.
 String notificationCategoryFor(NotificationType type) {
   return switch (type) {
-    NotificationType.outOfStock || NotificationType.lowStock => 'المخزون',
-    NotificationType.newInquiry => 'الاستفسارات',
-    NotificationType.newRating => 'التقييمات',
-    NotificationType.other => 'عام',
+    NotificationType.outOfStock || NotificationType.lowStock => 'المخزون'.tr,
+    NotificationType.newInquiry => 'الاستفسارات'.tr,
+    NotificationType.newRating => 'التقييمات'.tr,
+    NotificationType.other => 'عام'.tr,
   };
 }
 

@@ -11,6 +11,8 @@ import '../../../../core/widgets/barcode_camera_view.dart';
 import '../cubit/phone_scanner_cubit.dart';
 import '../cubit/phone_scanner_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "المسح بالهاتف": the phone as the web sales screen's barcode scanner. First
 /// the camera reads the QR code in the web screen's "وصل هاتفك" window to join
 /// its scan session; then every barcode it reads is sent to that screen.
@@ -45,7 +47,7 @@ class _PhoneScannerView extends StatelessWidget {
               formats: const [BarcodeFormat.qrCode],
               onCode: cubit.qrDetected,
               onBack: back,
-              hint: 'امسح رمز QR الظاهر في نافذة «وصل هاتفك» على شاشة البيع في الموقع',
+              hint: 'امسح رمز QR الظاهر في نافذة «وصل هاتفك» على شاشة البيع في الموقع'.tr,
               footer: _StatusLine(state: state),
             ),
             PhoneScannerPhase.scanning => BarcodeCameraView(
@@ -53,11 +55,11 @@ class _PhoneScannerView extends StatelessWidget {
               formats: productBarcodeFormats,
               onCode: cubit.barcodeDetected,
               onBack: back,
-              hint: 'وجّه الكاميرا نحو باركود الدواء، وسيصل إلى شاشة البيع',
+              hint: 'وجّه الكاميرا نحو باركود الدواء، وسيصل إلى شاشة البيع'.tr,
               footer: _StatusLine(state: state, showCount: true),
             ),
             PhoneScannerPhase.ended => _EndedView(
-              message: state.message ?? 'انتهت جلسة المسح',
+              message: state.message ?? 'انتهت جلسة المسح'.tr,
               onRestart: cubit.restart,
               onBack: back,
             ),
@@ -137,10 +139,10 @@ class _EndedView extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h),
-            AppCustomButton(text: 'اقتران جديد', onPressed: onRestart),
+            AppCustomButton(text: 'اقتران جديد'.tr, onPressed: onRestart),
             SizedBox(height: 12.h),
             AppCustomButton(
-              text: 'رجوع',
+              text: 'رجوع'.tr,
               backgroundColor: Colors.transparent,
               borderColor: Colors.white54,
               textColor: Colors.white,

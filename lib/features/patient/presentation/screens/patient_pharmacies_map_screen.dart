@@ -18,8 +18,10 @@ import '../../domain/entities/nearby_pharmacy.dart';
 import '../cubit/nearby_pharmacies_cubit.dart';
 import '../cubit/nearby_pharmacies_state.dart';
 import '../helpers/pharmacy_marker.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// "اكتشف الصيدليات القريبة منك" from the home screen — a live map (see
+
 /// LocationPickerScreen for the same google_maps_flutter setup) with a
 /// marker per pharmacy; tapping one (or the map) opens/closes its detail
 /// sheet.
@@ -75,12 +77,12 @@ class _PharmaciesMapViewState extends State<_PharmaciesMapView> {
 
   Future<void> _call(BuildContext context, String? phoneNumber) async {
     if (phoneNumber == null || phoneNumber.isEmpty) {
-      AppSnackbar.show(context, 'رقم الهاتف غير متوفر');
+      AppSnackbar.show(context, 'رقم الهاتف غير متوفر'.tr);
       return;
     }
     final uri = Uri(scheme: 'tel', path: phoneNumber);
     if (!await launchUrl(uri)) {
-      if (context.mounted) AppSnackbar.show(context, 'تعذر فتح تطبيق الاتصال');
+      if (context.mounted) AppSnackbar.show(context, 'تعذر فتح تطبيق الاتصال'.tr);
     }
   }
 
@@ -89,7 +91,7 @@ class _PharmaciesMapViewState extends State<_PharmaciesMapView> {
       'https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}',
     );
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      if (context.mounted) AppSnackbar.show(context, 'تعذر فتح تطبيق الخرائط');
+      if (context.mounted) AppSnackbar.show(context, 'تعذر فتح تطبيق الخرائط'.tr);
     }
   }
 
@@ -240,7 +242,7 @@ class _MapContentState extends State<_MapContent> {
                       iconSize: 24,
                       backgroundColor: Colors.white,
                       iconColor: AppColors.mainTeal,
-                      semanticLabel: 'رجوع',
+                      semanticLabel: 'رجوع'.tr,
                       onTap: () => Navigator.of(context).maybePop(),
                     ),
                     SizedBox(width: 12.w),
@@ -251,7 +253,7 @@ class _MapContentState extends State<_MapContent> {
                         color: Colors.white,
                         child: AppTextField(
                           controller: widget.searchController,
-                          hintText: 'ابحث عن صيدلية',
+                          hintText: 'ابحث عن صيدلية'.tr,
                           textInputAction: TextInputAction.search,
                           onChanged: cubit.searchChanged,
                           icon: Icon(Icons.search, color: AppColors.grey),
@@ -269,7 +271,7 @@ class _MapContentState extends State<_MapContent> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                       child: Text(
-                        'لا توجد صيدليات مطابقة لبحثك',
+                        'لا توجد صيدليات مطابقة لبحثك'.tr,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.emptyStateTitle,
                       ),
@@ -364,7 +366,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
                 SizedBox(width: 12.w),
                 _Badge(
                   width: 86,
-                  label: 'يبعد عنك ${distanceKm.toStringAsFixed(1)} كم',
+                  label: 'يبعد عنك {0} كم'.trArgs([distanceKm.toStringAsFixed(1)]),
                   background: AppColors.permissionIconBg,
                   border: AppColors.iconBlueBorder,
                   textColor: AppColors.mainTeal,
@@ -373,7 +375,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
               SizedBox(width: 8.w),
               _Badge(
                 width: 60,
-                label: pharmacy.isOpenNow ? 'مفتوح الان' : 'مغلق الان',
+                label: pharmacy.isOpenNow ? 'مفتوح الان'.tr : 'مغلق الان'.tr,
                 background: pharmacy.isOpenNow ? AppColors.pharmacyOpenBg : AppColors.logoutRedTint,
                 textColor: pharmacy.isOpenNow ? AppColors.pharmacyOpenText : AppColors.logoutRed,
               ),
@@ -393,7 +395,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
             Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: 'مواعيد العمل  ', style: AppTextStyles.pharmacySheetHoursLabel),
+                  TextSpan(text: 'مواعيد العمل  '.tr, style: AppTextStyles.pharmacySheetHoursLabel),
                   TextSpan(text: workingHoursLabel, style: AppTextStyles.pharmacySheetHoursValue),
                 ],
               ),
@@ -405,7 +407,7 @@ class _PharmacyDetailSheet extends StatelessWidget {
               Expanded(
                 child: _OutlineActionButton(
                   icon: Icons.call_outlined,
-                  label: 'اتصال',
+                  label: 'اتصال'.tr,
                   onTap: onCallTap,
                 ),
               ),
@@ -413,18 +415,18 @@ class _PharmacyDetailSheet extends StatelessWidget {
               Expanded(
                 child: _OutlineActionButton(
                   icon: Icons.chat_bubble_outline,
-                  label: 'مراسلة',
+                  label: 'مراسلة'.tr,
                   onTap: onMessageTap,
                 ),
               ),
             ],
           ),
           SizedBox(height: 24.h),
-          AppCustomButton(text: 'عرض الاتجاهات', onPressed: onDirectionsTap),
+          AppCustomButton(text: 'عرض الاتجاهات'.tr, onPressed: onDirectionsTap),
           SizedBox(height: 12.h),
           _OutlineActionButton(
             icon: Icons.star_outline_rounded,
-            label: 'قيّم الصيدلية',
+            label: 'قيّم الصيدلية'.tr,
             onTap: onRateTap,
           ),
         ],

@@ -8,15 +8,17 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/category_subcategory.dart';
 import '../cubit/category_medicines_cubit.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Arabic section titles for the subcategory `group_key`s the backend sends
+
 /// today (see the Categories API doc comment on [CategorySubcategory]).
 /// Unknown group keys fall back to the key itself so a new one doesn't
 /// silently disappear from the screen.
-const Map<String, String> _groupTitles = {
-  'symptoms': 'الأعراض',
-  'vitamins': 'الفيتامينات',
-  'supplements': 'المكملات',
+Map<String, String> get _groupTitles => {
+  'symptoms': 'الأعراض'.tr,
+  'vitamins': 'الفيتامينات'.tr,
+  'supplements': 'المكملات'.tr,
 };
 
 class CategoryFilterResult {
@@ -155,10 +157,10 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
                 ),
               ),
               SizedBox(height: 16.h),
-              Text('تصفية النتائج', textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+              Text('تصفية النتائج'.tr, textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
               SizedBox(height: 8.h),
               Text(
-                'حدد خياراتك للوصول إلى المنتجات المناسبة لك.',
+                'حدد خياراتك للوصول إلى المنتجات المناسبة لك.'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
@@ -193,7 +195,7 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
                       ],
                       if (widget.dosageForms.isNotEmpty)
                         _FilterSection(
-                          title: 'شكل الدواء',
+                          title: 'شكل الدواء'.tr,
                           children: [
                             for (final form in widget.dosageForms)
                               _FilterChip(
@@ -212,7 +214,7 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
               ),
               SizedBox(height: 24.h),
               AppCustomButton(
-                text: _isCounting ? 'عرض النتائج...' : 'عرض النتائج ($_resultCount)',
+                text: _isCounting ? 'عرض النتائج...'.tr : 'عرض النتائج ({0})'.trArgs([_resultCount]),
                 onPressed: () => Navigator.of(context).pop(
                   CategoryFilterResult(subcategorySlug: _subcategorySlug, dosageForm: _dosageForm),
                 ),

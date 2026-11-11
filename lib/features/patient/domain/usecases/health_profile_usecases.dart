@@ -4,9 +4,8 @@ import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/patient_health_profile.dart';
 import '../repositories/health_profile_repository.dart';
 
-const _sessionExpired = ApiError<PatientHealthProfile>(
-  ApiFailure(message: sessionExpiredMessage),
-);
+ApiError<PatientHealthProfile> get _sessionExpired =>
+    ApiError<PatientHealthProfile>(ApiFailure(message: sessionExpiredMessage));
 
 class GetHealthProfileUseCase {
   final HealthProfileRepository _repository;

@@ -10,8 +10,10 @@ import '../../../../core/widgets/profile_load_error.dart';
 import '../../domain/entities/chat_conversation.dart';
 import '../cubit/conversations_cubit.dart';
 import '../cubit/conversations_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The "الاستشارات / الاستفسارات" list, identical for patient and pharmacy:
+
 /// a title, a search box, and one row per conversation (avatar box and name
 /// on the right, unread count on the left). Needs a [ConversationsCubit] above it.
 class ConversationsView extends StatefulWidget {
@@ -79,7 +81,7 @@ class _ConversationsViewState extends State<ConversationsView> {
             SizedBox(height: 24.h),
             AppTextField(
               controller: _searchController,
-              hintText: 'البحث',
+              hintText: 'البحث'.tr,
               fillColor: Colors.white,
               prefixIcon: Icon(Icons.search, color: AppColors.mainTeal),
               onChanged: context.read<ConversationsCubit>().searchChanged,
@@ -98,7 +100,7 @@ class _ConversationsViewState extends State<ConversationsView> {
                         child: Text(
                           state.conversations.isEmpty
                               ? widget.emptyText
-                              : 'لا توجد نتائج مطابقة لبحثك',
+                              : 'لا توجد نتائج مطابقة لبحثك'.tr,
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 14.sp, color: AppColors.grey, height: 1.6),
                         ),

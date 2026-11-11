@@ -5,8 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import 'pharmacy_dashboard_tab_scope.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The 5-item bottom navigation bar of [PharmacyDashboardShellScreen]: an icon
+
 /// and a label per tab, and a bar above the selected one. Built as a plain
 /// widget (like the patient's) rather than [BottomNavigationBar] since its
 /// icons keep their own sizes and the selected home icon keeps its own two
@@ -26,13 +28,13 @@ class PharmacyBottomNavBar extends StatelessWidget {
     required this.onTabSelected,
   });
 
-  static const _items = [
-    _NavEntry(PharmacyDashboardTab.home, 'الرئيسية', 'assets/icons/home_fill_icon.svg', 24,
+  static List<_NavEntry> get _items => [
+    _NavEntry(PharmacyDashboardTab.home, 'الرئيسية'.tr, 'assets/icons/home_fill_icon.svg', 24,
         keepsColorsWhenSelected: true),
-    _NavEntry(PharmacyDashboardTab.medicines, 'المنتجات', 'assets/icons/Search_icon.svg', 24),
-    _NavEntry(PharmacyDashboardTab.orders, 'الطلبات', 'assets/icons/Search_icon.svg', 24),
-    _NavEntry(PharmacyDashboardTab.inquiries, 'المراسلات', 'assets/icons/massage_icon.svg', 24),
-    _NavEntry(PharmacyDashboardTab.settings, 'الإعدادات', 'assets/icons/settings_icon.svg', 24),
+    _NavEntry(PharmacyDashboardTab.medicines, 'المنتجات'.tr, 'assets/icons/Search_icon.svg', 24),
+    _NavEntry(PharmacyDashboardTab.orders, 'الطلبات'.tr, 'assets/icons/Search_icon.svg', 24),
+    _NavEntry(PharmacyDashboardTab.inquiries, 'المراسلات'.tr, 'assets/icons/massage_icon.svg', 24),
+    _NavEntry(PharmacyDashboardTab.settings, 'الإعدادات'.tr, 'assets/icons/settings_icon.svg', 24),
   ];
 
   /// The item marked while [selectedTab] shows.

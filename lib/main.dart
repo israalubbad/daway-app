@@ -15,6 +15,7 @@ import 'core/services/notification_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/theming/app_fonts.dart';
 import 'features/auth/domain/usecases/get_session_usecase.dart';
+import 'features/localization/presentation/cubit/language_cubit.dart';
 
 // Runs in its own isolate when a push arrives with the app in the background
 // or killed, so it has to be top-level and initialise Firebase itself.
@@ -40,6 +41,7 @@ void main() async {
 
   await dotenv.load(fileName: '.env');
   await setupGetIt();
+  await getIt<LanguageCubit>().load();
   await NotificationService.init();
   await getIt<PushNotificationService>().init();
 

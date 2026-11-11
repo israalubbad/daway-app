@@ -9,6 +9,8 @@ import '../cubit/pharmacy_auth_cubit.dart';
 import '../cubit/pharmacy_auth_state.dart';
 import '../widgets/pharmacy_login_form.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PharmacyAuthScreen extends StatelessWidget {
   const PharmacyAuthScreen({super.key});
 
@@ -31,13 +33,13 @@ class PharmacyAuthScreen extends StatelessWidget {
                 const Center(child: AppLogo()),
                 SizedBox(height: 32.h),
                 Text(
-                  'مرحباً بعودتك!',
+                  'مرحباً بعودتك!'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'سجّل دخولك ببيانات صيدليتك للوصول إلى حسابك ومتابعة طلباتك بسهولة.',
+                  'سجّل دخولك ببيانات صيدليتك للوصول إلى حسابك ومتابعة طلباتك بسهولة.'.tr,
                   textAlign: TextAlign.right,
                   style: AppTextStyles.authScreenSubtitle,
                 ),

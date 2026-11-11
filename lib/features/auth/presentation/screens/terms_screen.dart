@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../widgets/legal_content_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const LegalContentScreen(
-      title: 'الشروط والأحكام',
+    return LegalContentScreen(
+      title: 'الشروط والأحكام'.tr,
       body: _termsBody,
     );
   }

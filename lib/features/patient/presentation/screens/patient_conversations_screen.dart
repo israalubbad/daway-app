@@ -5,6 +5,8 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../chat/presentation/cubit/conversations_cubit.dart';
 import '../../../chat/presentation/widgets/conversations_view.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "المراسلات" tab: the patient's conversations with pharmacies. Has no
 /// Scaffold of its own, like the other dashboard tabs (the shell supplies the
 /// bottom nav).
@@ -15,11 +17,11 @@ class PatientConversationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<ConversationsCubit>(instanceName: 'patient'),
-      child: const ConversationsView(
-        title: 'الاستشارات',
-        description: 'راجع استفساراتك للصيدليات وردودها.',
+      child: ConversationsView(
+        title: 'الاستشارات'.tr,
+        description: 'راجع استفساراتك للصيدليات وردودها.'.tr,
         emptyText:
-            'لا توجد مراسلات بعد.\nافتح صفحة أي دواء واضغط «اسأل الصيدلية قبل الشراء».',
+            'لا توجد مراسلات بعد.\nافتح صفحة أي دواء واضغط «اسأل الصيدلية قبل الشراء».'.tr,
       ),
     );
   }

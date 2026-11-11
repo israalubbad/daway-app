@@ -11,8 +11,10 @@ import '../cubit/pharmacy_sign_up_cubit.dart';
 import '../cubit/pharmacy_sign_up_state.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/terms_screen.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// Pharmacy name / phone / address / password fields shown on
+
 /// [PharmacySignUpScreen].
 class PharmacySignUpForm extends StatefulWidget {
   const PharmacySignUpForm({super.key});
@@ -85,20 +87,20 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('اسم الصيدلية', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('اسم الصيدلية'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _nameController,
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'اسم الصيدلية مطلوب' : null,
+                (value == null || value.trim().isEmpty) ? 'اسم الصيدلية مطلوب'.tr : null,
             decoration: _fieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
 
-          Text('رقم الجوال', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('رقم الجوال'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _phoneController,
@@ -107,9 +109,9 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
             inputFormatters: [DigitsOnlyFormatter()],
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'رقم الجوال مطلوب';
+              if (value == null || value.trim().isEmpty) return 'رقم الجوال مطلوب'.tr;
               if (!Validators.isValidLocalPhone(value)) {
-                return 'يرجى إدخال رقم جوال صحيح مكوّن من 10 أرقام';
+                return 'يرجى إدخال رقم جوال صحيح مكوّن من 10 أرقام'.tr;
               }
               return null;
             },
@@ -118,20 +120,20 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('العنوان', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('العنوان'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _addressController,
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'العنوان مطلوب' : null,
+                (value == null || value.trim().isEmpty) ? 'العنوان مطلوب'.tr : null,
             decoration: _fieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
 
-          Text('كلمة المرور', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('كلمة المرور'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _passwordController,
@@ -139,9 +141,9 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) {
-              if (value == null || value.isEmpty) return 'كلمة المرور مطلوبة';
+              if (value == null || value.isEmpty) return 'كلمة المرور مطلوبة'.tr;
               if (!Validators.isValidPassword(value)) {
-                return 'كلمة المرور يجب أن تكون ${Validators.minPasswordLength} أحرف على الأقل';
+                return 'كلمة المرور يجب أن تكون {0} أحرف على الأقل'.trArgs([Validators.minPasswordLength]);
               }
               return null;
             },
@@ -178,7 +180,7 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
             buildWhen: (previous, current) => previous.isRegistering != current.isRegistering,
             builder: (context, state) {
               return AppCustomButton(
-                text: 'التالي',
+                text: 'التالي'.tr,
                 backgroundColor: AppColors.mainTeal,
                 isLoading: state.isRegistering,
                 onPressed: () => _submit(context),
@@ -192,18 +194,18 @@ class _PharmacySignUpFormState extends State<PharmacySignUpForm> {
             TextSpan(
               style: AppTextStyles.authConsentText,
               children: [
-                const TextSpan(text: 'بالضغط على '),
-                TextSpan(text: 'التالي', style: AppTextStyles.authConsentLink),
-                const TextSpan(text: ' أنت توافق على '),
+                TextSpan(text: 'بالضغط على '.tr),
+                TextSpan(text: 'التالي'.tr, style: AppTextStyles.authConsentLink),
+                TextSpan(text: ' أنت توافق على '.tr),
                 _consentLink(
-                  'الشروط والأحكام',
+                  'الشروط والأحكام'.tr,
                   () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TermsScreen()),
                   ),
                 ),
-                const TextSpan(text: ' و '),
+                TextSpan(text: ' و '.tr),
                 _consentLink(
-                  'سياسة الخصوصية',
+                  'سياسة الخصوصية'.tr,
                   () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
                   ),

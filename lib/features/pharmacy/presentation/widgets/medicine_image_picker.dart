@@ -8,6 +8,8 @@ import '../../../../core/helpers/image_source_picker.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The dashed "أضف صورة" box for the medicine's (optional) photo, on the "add
 /// medicine" screen: a camera in a round chip over the label, replaced by the
 /// photo once one is picked. Picking goes through [pickImageFromSourceSheet].
@@ -55,7 +57,7 @@ class MedicineImagePicker extends StatelessWidget {
           child: Icon(Icons.photo_camera_outlined, size: 24.sp, color: AppColors.mainTeal),
         ),
         SizedBox(height: 8.h),
-        Text('أضف صورة', style: AppTextStyles.footerText.copyWith(color: AppColors.mainTeal)),
+        Text('أضف صورة'.tr, style: AppTextStyles.footerText.copyWith(color: AppColors.mainTeal)),
       ],
     );
   }
@@ -66,7 +68,7 @@ class MedicineImagePicker extends StatelessWidget {
       children: [
         Semantics(
           button: true,
-          label: 'أضف صورة',
+          label: 'أضف صورة'.tr,
           child: GestureDetector(
             onTap: () => _pickImage(context),
             child: ClipRRect(

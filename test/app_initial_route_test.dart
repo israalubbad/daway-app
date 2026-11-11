@@ -10,6 +10,7 @@ import 'package:daway_app/features/onboarding/domain/usecases/set_onboarding_see
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'features/localization/language_test_fakes.dart';
 import 'helpers/arabic_test_app.dart';
 
 class _Onboarding implements OnboardingRepository {
@@ -22,6 +23,7 @@ class _Onboarding implements OnboardingRepository {
 
 void main() {
   setUp(() {
+    registerLanguageCubit(getIt);
     getIt.registerFactory(
       () => AccountTypeCubit(
         GetOnboardingSeenUseCase(_Onboarding()),

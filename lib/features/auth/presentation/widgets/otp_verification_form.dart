@@ -10,6 +10,8 @@ import '../cubit/patient_auth_cubit.dart';
 import '../cubit/patient_auth_state.dart';
 import 'resend_otp_link.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class OtpVerificationForm extends StatefulWidget {
   const OtpVerificationForm({super.key});
 
@@ -41,7 +43,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                'رمز التحقق (مؤقت): $code',
+                'رمز التحقق (مؤقت): {0}'.trArgs([code]),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16.sp,
@@ -83,7 +85,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
           buildWhen: (previous, current) => previous.isVerifying != current.isVerifying,
           builder: (context, state) {
             return AppCustomButton(
-              text: 'تحقق',
+              text: 'تحقق'.tr,
               backgroundColor: AppColors.mainTeal,
               isLoading: state.isVerifying,
               onPressed: () => context.read<PatientAuthCubit>().verifyOtp(_otp),

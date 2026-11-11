@@ -8,8 +8,10 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/order.dart';
 import 'order_status_badge.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// One order in "طلباتي" — pharmacy name/status, an item/price/location
+
 /// summary strip, and a "عرض الطلب" action with the order's relative time.
 class OrderCard extends StatelessWidget {
   final Order order;
@@ -74,10 +76,10 @@ class OrderCard extends StatelessWidget {
                     icon: Icons.medication_outlined,
                     label: arabicCountedNoun(
                       order.itemsCount,
-                      singular: 'دواء',
-                      dual: 'دواءان',
-                      plural: 'أدوية',
-                      one: 'دواء واحد',
+                      singular: 'دواء'.tr,
+                      dual: 'دواءان'.tr,
+                      plural: 'أدوية'.tr,
+                      one: 'دواء واحد'.tr,
                     ),
                   ),
                 ),
@@ -113,7 +115,7 @@ class OrderCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
                   ),
                   child: Text(
-                    'عرض الطلب',
+                    'عرض الطلب'.tr,
                     style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700),
                   ),
                 ),

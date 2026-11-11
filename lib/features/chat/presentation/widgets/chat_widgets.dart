@@ -7,6 +7,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../domain/entities/chat_message.dart';
 
+import '../../../../core/localization/translations.dart';
+
 // Pieces of the conversation UI shared by the pharmacy inquiry chat and the
 // assistant (chatbot) chat, so both look the same.
 
@@ -100,8 +102,8 @@ class _DayChip extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff == 0) return 'اليوم';
-    if (diff == 1) return 'أمس';
+    if (diff == 0) return 'اليوم'.tr;
+    if (diff == 1) return 'أمس'.tr;
     return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
   }
 
@@ -203,7 +205,7 @@ class ChatBubble extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            mine ? 'أنت: $time' : time,
+            mine ? 'أنت: {0}'.trArgs([time]) : time,
             style: TextStyle(fontSize: 11.sp, color: AppColors.grey),
           ),
         ],

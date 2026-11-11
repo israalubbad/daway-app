@@ -6,6 +6,8 @@ import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../cubit/account_closure_cubit.dart';
 import '../cubit/account_closure_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The patient's "delete my account" confirmation. It stays open while the
 /// request runs and shows why it failed; on success the screen underneath
 /// ends the session and replaces every route, which takes this sheet with it.
@@ -25,10 +27,9 @@ class DeleteAccountSheet extends StatelessWidget {
     return BlocBuilder<AccountClosureCubit, AccountClosureState>(
       bloc: cubit,
       builder: (context, state) => AccountClosureSheet(
-        title: 'حذف الحساب نهائياً؟',
-        message: 'سيتم حذف حسابك وبياناتك ولا يمكن التراجع عن ذلك. '
-            'لن تتمكن من الدخول بهذا الرقم مرة أخرى.',
-        confirmLabel: 'حذف حسابي',
+        title: 'حذف الحساب نهائياً؟'.tr,
+        message: 'سيتم حذف حسابك وبياناتك ولا يمكن التراجع عن ذلك. لن تتمكن من الدخول بهذا الرقم مرة أخرى.'.tr,
+        confirmLabel: 'حذف حسابي'.tr,
         isSubmitting: state is AccountClosureSubmitting,
         errorMessage: state is AccountClosureIdle ? state.errorMessage : null,
         onConfirm: (reason) => cubit.deleteAccount(reason: reason),

@@ -5,8 +5,10 @@ import '../../domain/entities/order.dart';
 import '../../domain/usecases/cancel_order_usecase.dart';
 import '../../domain/usecases/get_orders_usecase.dart';
 import 'orders_state.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class OrdersCubit extends Cubit<OrdersState> {
+
   final GetOrdersUseCase _getOrdersUseCase;
   final CancelOrderUseCase _cancelOrderUseCase;
 
@@ -31,7 +33,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   /// user-facing error message.
   Future<String?> cancel(Order order) async {
     final orderId = int.tryParse(order.orderNumber);
-    if (orderId == null) return 'تعذر تحديد رقم الطلب';
+    if (orderId == null) return 'تعذر تحديد رقم الطلب'.tr;
 
     final result = await _cancelOrderUseCase(orderId);
     if (isClosed) return null;

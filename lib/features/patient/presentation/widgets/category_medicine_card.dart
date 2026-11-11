@@ -6,6 +6,8 @@ import '../../domain/entities/category_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 import 'medicine_grid_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// A medicine card for a category's results grid: the medicine's image when
 /// there is one (a stand-in icon otherwise), its name, and how many pharmacies
 /// stock it (or its generic name / dosage form when that isn't known).
@@ -47,11 +49,11 @@ class CategoryMedicineCard extends StatelessWidget {
           ? secondaryLine
           : (pharmaciesCount > 0
               ? pharmaciesAvailabilityLabel(pharmaciesCount)
-              : 'غير متوفر حالياً'),
+              : 'غير متوفر حالياً'.tr),
       subtitleColor: pharmaciesCount == null
           ? null
           : (pharmaciesCount > 0 ? AppColors.success : AppColors.grey),
-      detailsLabel: 'عرض تفاصيل',
+      detailsLabel: 'عرض تفاصيل'.tr,
       onDetailsTap: onDetailsTap,
     );
   }

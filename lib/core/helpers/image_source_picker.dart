@@ -5,8 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../theming/app_colors.dart';
-
+
+import '../../core/localization/translations.dart';
 /// Shows a camera/gallery bottom sheet and returns the picked file, or null
+
 /// if the user cancelled or picking failed (a snackbar is shown in that
 /// case). Shared by every screen that lets the user pick a single image
 /// (profile/logo avatars, medicine photos, ...).
@@ -23,12 +25,12 @@ Future<File?> pickImageFromSourceSheet(BuildContext context) async {
           SizedBox(height: 8.h),
           ListTile(
             leading: Icon(Icons.photo_camera_outlined, color: AppColors.mainTeal),
-            title: const Text('التقاط صورة'),
+            title: Text('التقاط صورة'.tr),
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.camera),
           ),
           ListTile(
             leading: Icon(Icons.photo_library_outlined, color: AppColors.mainTeal),
-            title: const Text('اختيار من المعرض'),
+            title: Text('اختيار من المعرض'.tr),
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.gallery),
           ),
           SizedBox(height: 8.h),
@@ -45,7 +47,7 @@ Future<File?> pickImageFromSourceSheet(BuildContext context) async {
   } catch (_) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الكاميرا، تحقق من صلاحيات التطبيق')),
+        SnackBar(content: Text('تعذر فتح الكاميرا، تحقق من صلاحيات التطبيق'.tr)),
       );
     }
     return null;

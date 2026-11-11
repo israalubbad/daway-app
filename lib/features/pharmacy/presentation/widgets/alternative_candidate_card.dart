@@ -9,6 +9,8 @@ import '../../domain/entities/medicine.dart';
 import '../helpers/medicine_text_display.dart';
 import 'medicine_status_badge.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Shared by both the selected and unselected candidate-action buttons, so
 /// a padding/radius tweak only has to change in one place.
 ButtonStyle get _buttonShape => ButtonStyle(
@@ -93,7 +95,7 @@ class AlternativeCandidateCard extends StatelessWidget {
                         SizedBox(width: 4.w),
                         Flexible(
                           child: Text(
-                            'السعر ${candidate.price.toStringAsFixed(2)} ${AppConstants.currencySuffix}',
+                            'السعر {0} {1}'.trArgs([candidate.price.toStringAsFixed(2), AppConstants.currencySuffix]),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -140,7 +142,7 @@ class AlternativeCandidateCard extends StatelessWidget {
                             ),
                           ),
                           icon: const Icon(Icons.check, size: 16),
-                          label: const Text('تم اختياره'),
+                          label: Text('تم اختياره'.tr),
                         )
                       : OutlinedButton(
                           onPressed: onTap,
@@ -150,7 +152,7 @@ class AlternativeCandidateCard extends StatelessWidget {
                               side: BorderSide(color: AppColors.mainTeal),
                             ),
                           ),
-                          child: const Text('اختيار البديل'),
+                          child: Text('اختيار البديل'.tr),
                         ),
                 ),
               const Spacer(),

@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Read-only search field on [PatientHomeScreen] — tapping it hands off to
 /// the real search tab instead of typing inline.
 class HomeSearchBar extends StatelessWidget {
@@ -37,7 +39,7 @@ class HomeSearchBar extends StatelessWidget {
             SizedBox(width: 10.w),
             Expanded(
               child: Text(
-                'ابحث عن دواء او صيدلية',
+                'ابحث عن دواء او صيدلية'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.homeSearchHint,
               ),

@@ -16,6 +16,8 @@ import '../widgets/accounting_empty_state.dart';
 import '../widgets/accounting_filter_sheets.dart';
 import '../widgets/add_cash_movement_sheet.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "الصندوق": the cash balance (with a warning when it is low), the cash
 /// book's movements, and the button that records one by hand.
 ///
@@ -49,8 +51,8 @@ class AccountingCashScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 24.h),
                 children: [
                   PharmacyProductsHeader(
-                    title: 'الصندوق',
-                    subtitle: 'كل حركة نقدية داخل الصيدلية، والرصيد يُجمع ولا يُكتب يدوياً',
+                    title: 'الصندوق'.tr,
+                    subtitle: 'كل حركة نقدية داخل الصيدلية، والرصيد يُجمع ولا يُكتب يدوياً'.tr,
                     onBack: onBack,
                   ),
                   SizedBox(height: 16.h),
@@ -86,7 +88,7 @@ class AccountingCashScreen extends StatelessWidget {
     final visible = state.visible;
     return [
       AppCustomButton(
-        text: 'تسجيل حركة صندوق',
+        text: 'تسجيل حركة صندوق'.tr,
         height: 48.h,
         onPressed: () => AddCashMovementSheet.show(
           context,
@@ -99,7 +101,7 @@ class AccountingCashScreen extends StatelessWidget {
       SizedBox(height: 24.h),
       Row(
         children: [
-          Expanded(child: Text('الحركات', style: AccountingStyles.sectionTitle)),
+          Expanded(child: Text('الحركات'.tr, style: AccountingStyles.sectionTitle)),
           Badge(
             isLabelVisible: state.activeFilters > 0,
             label: Text('${state.activeFilters}'),
@@ -107,7 +109,7 @@ class AccountingCashScreen extends StatelessWidget {
             child: IconButton(
               onPressed: () => _openFilters(context, state),
               icon: const Icon(Icons.tune_rounded, color: AppColors.mainTeal),
-              tooltip: 'فلاتر',
+              tooltip: 'فلاتر'.tr,
             ),
           ),
         ],
@@ -116,9 +118,9 @@ class AccountingCashScreen extends StatelessWidget {
       if (visible.isEmpty)
         AccountingEmptyState(
           icon: Icons.account_balance_wallet_outlined,
-          title: 'لا توجد حركات صندوق',
-          hint: 'ستظهر هنا كل الحركات النقدية: مبيعات، مصروفات، دفعات، وتسويات.',
-          actionLabel: 'فاتورة جديدة',
+          title: 'لا توجد حركات صندوق'.tr,
+          hint: 'ستظهر هنا كل الحركات النقدية: مبيعات، مصروفات، دفعات، وتسويات.'.tr,
+          actionLabel: 'فاتورة جديدة'.tr,
           onAction: onNewSale,
         )
       else
@@ -142,7 +144,7 @@ class _BalanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('الرصيد الحالي', style: AccountingStyles.label),
+          Text('الرصيد الحالي'.tr, style: AccountingStyles.label),
           SizedBox(height: 4.h),
           MoneyText(ledger.balance, style: AccountingStyles.bigAmount),
           if (ledger.isLow) ...[
@@ -158,7 +160,7 @@ class _BalanceCard extends StatelessWidget {
                   Icon(Icons.warning_amber_rounded, size: 18.r, color: AppColors.logoutRed),
                   SizedBox(width: 8.w),
                   Text(
-                    'رصيد الصندوق منخفض',
+                    'رصيد الصندوق منخفض'.tr,
                     style: AccountingStyles.label.copyWith(color: AppColors.logoutRed),
                   ),
                 ],

@@ -24,6 +24,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
 import '../../../auth/account_closure_test_fakes.dart';
+import '../../../localization/language_test_fakes.dart';
 
 const _located = PharmacyProfile(
   pharmacyId: 'PH-1234',
@@ -127,6 +128,7 @@ void main() {
   );
 
   setUp(() {
+    registerLanguageCubit(getIt);
     logoutCubit = _FakeLogoutCubit();
     closureRepository = FakeAccountClosureRepository();
     closureSession = FakeClosureSessionRepository();

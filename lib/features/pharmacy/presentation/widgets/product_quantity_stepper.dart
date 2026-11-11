@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-
+
+import '../../../../core/localization/translations.dart';
 /// The quantity on a product card with its two buttons: "−" first, then the
+
 /// number, then the filled "+" — the row reads plus, number, minus from the
 /// left, as in the design.
 ///
@@ -37,7 +39,7 @@ class ProductQuantityStepper extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _StepButton(label: 'إنقاص الكمية', isPlus: false, onTap: onDecrement),
+          _StepButton(label: 'إنقاص الكمية'.tr, isPlus: false, onTap: onDecrement),
           SizedBox(width: 3.w),
           ConstrainedBox(
             constraints: BoxConstraints(minWidth: 32.w),
@@ -53,7 +55,7 @@ class ProductQuantityStepper extends StatelessWidget {
             ),
           ),
           SizedBox(width: 3.w),
-          _StepButton(label: 'زيادة الكمية', isPlus: true, onTap: onIncrement),
+          _StepButton(label: 'زيادة الكمية'.tr, isPlus: true, onTap: onIncrement),
         ],
       ),
     );

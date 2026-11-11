@@ -15,6 +15,8 @@ import '../widgets/accounting_card.dart';
 import '../widgets/sale_summary_sheet.dart';
 import 'barcode_scanner_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "فاتورة بيع جديدة": scan or search medicines into the cart, then complete the
 /// sale from the summary sheet. Pops with true once a sale was saved, so the
 /// screen that opened it can refresh.
@@ -76,7 +78,7 @@ class _NewSaleViewState extends State<_NewSaleView> {
     final cubit = context.read<NewSaleCubit>();
     final saved = await SaleSummarySheet.show(context, cubit);
     if (saved != true || !context.mounted) return;
-    AppSnackbar.show(context, 'تم إتمام البيع');
+    AppSnackbar.show(context, 'تم إتمام البيع'.tr);
     Navigator.of(context).pop(true);
   }
 
@@ -94,8 +96,8 @@ class _NewSaleViewState extends State<_NewSaleView> {
                     padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 16.h),
                     children: [
                       PharmacyProductsHeader(
-                        title: 'فاتورة بيع جديدة',
-                        subtitle: 'امسح الباركود أو ابحث عن الدواء ثم أضفه للسلة',
+                        title: 'فاتورة بيع جديدة'.tr,
+                        subtitle: 'امسح الباركود أو ابحث عن الدواء ثم أضفه للسلة'.tr,
                         onBack: () => Navigator.of(context).pop(),
                       ),
                       SizedBox(height: 16.h),
@@ -168,8 +170,8 @@ class _ScanCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('شاشة البيع', style: AccountingStyles.sectionTitle),
-          Text('ابدأ بمسح الباركود أو البحث بالاسم', style: AccountingStyles.muted),
+          Text('شاشة البيع'.tr, style: AccountingStyles.sectionTitle),
+          Text('ابدأ بمسح الباركود أو البحث بالاسم'.tr, style: AccountingStyles.muted),
           SizedBox(height: 12.h),
           Row(
             children: [
@@ -180,7 +182,7 @@ class _ScanCard extends StatelessWidget {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => onBarcodeSubmitted(),
                   style: AccountingStyles.body.copyWith(fontFamily: 'monospace'),
-                  decoration: _decoration('امسح الباركود أو اكتبه…'),
+                  decoration: _decoration('امسح الباركود أو اكتبه…'.tr),
                 ),
               ),
               SizedBox(width: 8.w),
@@ -200,7 +202,7 @@ class _ScanCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 6.h),
-          Text('يدعم EAN-13 · EAN-8 · UPC-A · GTIN-14', style: AccountingStyles.muted),
+          Text('يدعم EAN-13 · EAN-8 · UPC-A · GTIN-14'.tr, style: AccountingStyles.muted),
           if (state.recognized != null) ...[
             SizedBox(height: 8.h),
             Align(
@@ -228,24 +230,24 @@ class _ScanCard extends StatelessWidget {
               const Expanded(child: Divider()),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12.w),
-                child: Text('أو', style: AccountingStyles.muted),
+                child: Text('أو'.tr, style: AccountingStyles.muted),
               ),
               const Expanded(child: Divider()),
             ],
           ),
           SizedBox(height: 12.h),
-          Text('ابحث عن دواء', style: AccountingStyles.label),
+          Text('ابحث عن دواء'.tr, style: AccountingStyles.label),
           SizedBox(height: 6.h),
           TextField(
             controller: searchController,
             onChanged: onQueryChanged,
             decoration: _decoration(
-              'اكتب اسم الدواء أو المادة الفعالة…',
+              'اكتب اسم الدواء أو المادة الفعالة…'.tr,
               suffix: Icon(Icons.search, size: 20.r, color: AppColors.authInputBorder),
             ),
           ),
           SizedBox(height: 4.h),
-          Text('اكتب حرفين على الأقل للبحث', style: AccountingStyles.muted),
+          Text('اكتب حرفين على الأقل للبحث'.tr, style: AccountingStyles.muted),
           if (state.isSearching)
             Padding(
               padding: EdgeInsets.only(top: 12.h),
@@ -254,7 +256,7 @@ class _ScanCard extends StatelessWidget {
           else if (state.query.trim().length >= 2 && state.results.isEmpty)
             Padding(
               padding: EdgeInsets.only(top: 12.h),
-              child: Text('لا توجد نتائج', style: AccountingStyles.muted),
+              child: Text('لا توجد نتائج'.tr, style: AccountingStyles.muted),
             )
           else
             for (final item in state.results)
@@ -269,7 +271,7 @@ class _ScanCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(item.name, style: AccountingStyles.cardTitle),
-                            Text('المتوفر: ${item.stock}', style: AccountingStyles.muted),
+                            Text('المتوفر: {0}'.trArgs([item.stock]), style: AccountingStyles.muted),
                           ],
                         ),
                       ),
@@ -306,7 +308,7 @@ class _Recognized extends StatelessWidget {
           SizedBox(width: 4.w),
           Flexible(
             child: Text(
-              'تم التعرف على الدواء: $name',
+              'تم التعرف على الدواء: {0}'.trArgs([name]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AccountingStyles.label.copyWith(color: AppColors.productAvailableText),
@@ -333,7 +335,7 @@ class _CartCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text('أصناف السلة', style: AccountingStyles.sectionTitle)),
+              Expanded(child: Text('أصناف السلة'.tr, style: AccountingStyles.sectionTitle)),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                 decoration: BoxDecoration(
@@ -352,8 +354,8 @@ class _CartCard extends StatelessWidget {
                 children: [
                   Icon(Icons.shopping_cart_outlined, size: 36.r, color: AppColors.authInputBorder),
                   SizedBox(height: 8.h),
-                  Text('السلة فارغة', style: AccountingStyles.cardTitle),
-                  Text('امسح باركود أو ابحث عن دواء لإضافته', style: AccountingStyles.muted),
+                  Text('السلة فارغة'.tr, style: AccountingStyles.cardTitle),
+                  Text('امسح باركود أو ابحث عن دواء لإضافته'.tr, style: AccountingStyles.muted),
                 ],
               ),
             )
@@ -411,18 +413,18 @@ class _CartLineTile extends StatelessWidget {
             ],
           ),
         ),
-        stepButton(Icons.remove, () => cubit.quantityChanged(line.item.id, line.quantity - 1), 'تقليل الكمية'),
+        stepButton(Icons.remove, () => cubit.quantityChanged(line.item.id, line.quantity - 1), 'تقليل الكمية'.tr),
         SizedBox(
           width: 32.w,
           child: Text('${line.quantity}', textAlign: TextAlign.center, style: AccountingStyles.cardTitle),
         ),
-        stepButton(Icons.add, () => cubit.quantityChanged(line.item.id, line.quantity + 1), 'زيادة الكمية'),
+        stepButton(Icons.add, () => cubit.quantityChanged(line.item.id, line.quantity + 1), 'زيادة الكمية'.tr),
         SizedBox(width: 8.w),
         SizedBox(width: 64.w, child: MoneyText(line.total, style: AccountingStyles.cardTitle)),
         IconButton(
           onPressed: () => cubit.removeItem(line.item.id),
           icon: Icon(Icons.delete_outline_rounded, size: 20.r, color: AppColors.logoutRed),
-          tooltip: 'حذف',
+          tooltip: 'حذف'.tr,
         ),
       ],
     );
@@ -451,14 +453,14 @@ class _CheckoutBar extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الإجمالي', style: AccountingStyles.muted),
+                Text('الإجمالي'.tr, style: AccountingStyles.muted),
                 MoneyText(state.total, style: AccountingStyles.amount),
               ],
             ),
             SizedBox(width: 16.w),
             Expanded(
               child: AppCustomButton(
-                text: 'إتمام البيع',
+                text: 'إتمام البيع'.tr,
                 height: 48.h,
                 backgroundColor: state.canSubmit ? AppColors.mainTeal : AppColors.borderGrey,
                 onPressed: state.canSubmit ? onCheckout : () {},

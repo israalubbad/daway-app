@@ -11,8 +11,10 @@ import '../../domain/entities/medicine_reminder.dart';
 import '../cubit/reminders_cubit.dart';
 import '../cubit/reminders_state.dart';
 import 'add_medicine_reminder_screen.dart';
-
+
+import '../../../../core/localization/translations.dart';
 class MedicineRemindersScreen extends StatelessWidget {
+
   const MedicineRemindersScreen({super.key});
 
   @override
@@ -63,13 +65,13 @@ class _MedicineRemindersView extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               Text(
-                'تذكيرات الأدوية',
+                'تذكيرات الأدوية'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.allCategoriesTitle,
               ),
               SizedBox(height: 8.h),
               Text(
-                'أضف الادوية لتذكيرك فيها بالوقت المناسب',
+                'أضف الادوية لتذكيرك فيها بالوقت المناسب'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
@@ -110,8 +112,8 @@ class _RemindersList extends StatelessWidget {
         children: [
           EmptyStateView(
             imageAsset: 'assets/images/empty_reminder.png',
-            title: 'لم تقم باضافة اي تذكير لادويتك',
-            actionLabel: 'أضف تذكير',
+            title: 'لم تقم باضافة اي تذكير لادويتك'.tr,
+            actionLabel: 'أضف تذكير'.tr,
             onActionTap: () => _showAddDialog(context),
             // This screen's own header is ~19 shorter than the shared
             // sub-screen header (and adds a 22 gap), so this lands the
@@ -210,7 +212,7 @@ class _ReminderCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'تعديل',
+                        'تعديل'.tr,
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
@@ -300,7 +302,7 @@ class _AddReminderButton extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'اضافة تذكير جديد',
+                'اضافة تذكير جديد'.tr,
                 textAlign: TextAlign.right,
                 style: AppTextStyles.addressCardTitle,
               ),
