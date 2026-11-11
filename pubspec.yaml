@@ -68,6 +68,10 @@ dependencies:
   pdf: ^3.12.0
   share_plus: ^13.3.1
   cached_network_image: ^4.0.6
+  # Both already come with cached_network_image: named here because the image
+  # cache limits and the API-answer cache use them directly.
+  flutter_cache_manager: ^3.4.1
+  path_provider: ^2.1.5
 
 
 dev_dependencies:

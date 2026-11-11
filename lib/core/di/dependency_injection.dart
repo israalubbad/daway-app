@@ -2,10 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../features/auth/data/datasources/account_closure_remote_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/account_closure_repository_impl.dart';
+import '../../features/auth/data/repositories/cache_clearing_session_repository.dart';
+import '../networking/response_cache_store.dart';
 import '../../features/auth/domain/repositories/account_closure_repository.dart';
 import '../../features/auth/domain/usecases/close_patient_account_usecase.dart';
 import '../../features/auth/domain/usecases/get_pharmacy_closure_request_usecase.dart';
@@ -292,9 +295,15 @@ final getIt = GetIt.instance;
 
 Future<void> setupGetIt() async {
   // ---------------- Networking ----------------
+  // Small on-disk copy of the catalogue and the user's lists, for speed and for
+  // when the connection drops; emptied when the session ends.
+  getIt.registerLazySingleton<ResponseCacheStore>(
+    () => FileResponseCacheStore(getTemporaryDirectory),
+  );
   getIt.registerLazySingleton(
     () => DioFactory.getDio(
       onSessionExpired: () => getIt<SessionExpiryHandler>().handle(),
+      cacheStore: getIt<ResponseCacheStore>(),
     ),
   );
   getIt.registerLazySingleton(() => SessionExpiryHandler(getIt()));
@@ -323,9 +332,12 @@ Future<void> setupGetIt() async {
     () => PushNotificationService(getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<SessionRepository>(
-    () => DeviceTokenSyncingSessionRepository(
-      SessionRepositoryImpl(getIt()),
-      getIt(),
+    () => CacheClearingSessionRepository(
+      DeviceTokenSyncingSessionRepository(
+        SessionRepositoryImpl(getIt()),
+        getIt(),
+        getIt(),
+      ),
       getIt(),
     ),
   );
