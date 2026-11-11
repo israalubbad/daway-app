@@ -195,10 +195,11 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('lands on the settings tab', (tester) async {
+  testWidgets('lands on the home tab, not on the settings', (tester) async {
     await pumpShell(tester);
 
-    expect(find.text(_settingsDescription), findsOneWidget);
+    expect(find.textContaining('أهلا بك'), findsOneWidget);
+    expect(find.text(_settingsDescription), findsNothing);
   });
 
   testWidgets('each nav item shows its own screen', (tester) async {
@@ -239,10 +240,11 @@ void main() {
       await pumpShell(tester);
       final semantics = tester.ensureSemantics();
 
+      await tapNavItem(tester, 'المنتجات');
       await tapNavItem(tester, 'الرئيسية');
       expect(dashboardCubit.refreshes, 1);
 
-      await tapNavItem(tester, 'المنتجات');
+      await tapNavItem(tester, 'الإعدادات');
       await tapNavItem(tester, 'الرئيسية');
       expect(dashboardCubit.refreshes, 2);
 
@@ -252,6 +254,7 @@ void main() {
     testWidgets('is not repeated by tapping الرئيسية while already on it', (tester) async {
       await pumpShell(tester);
       final semantics = tester.ensureSemantics();
+      await tapNavItem(tester, 'المنتجات');
       await tapNavItem(tester, 'الرئيسية');
 
       await tapNavItem(tester, 'الرئيسية');
@@ -306,7 +309,7 @@ void main() {
   group('the products page', () {
     // What the home card does: ask the shell for the page.
     Future<void> openProductsPage(WidgetTester tester) async {
-      // The shell lands on الإعدادات, so the home tab is offstage.
+      // The shell lands on الرئيسية, so the home tab is on show.
       final scope = PharmacyDashboardTabScope.maybeOf(
         tester.element(find.byType(PharmacyHomeScreen, skipOffstage: false)),
       )!;

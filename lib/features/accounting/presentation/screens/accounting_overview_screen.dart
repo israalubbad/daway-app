@@ -95,7 +95,7 @@ class AccountingOverviewScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Icon(Icons.chevron_left_rounded, size: 22.r, color: AppColors.mainTeal),
+                        Icon(Icons.chevron_right_rounded, size: 22.r, color: AppColors.mainTeal),
                       ],
                     ),
                   ),

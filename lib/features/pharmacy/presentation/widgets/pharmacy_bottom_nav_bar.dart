@@ -31,7 +31,7 @@ class PharmacyBottomNavBar extends StatelessWidget {
   static List<_NavEntry> get _items => [
     _NavEntry(PharmacyDashboardTab.home, 'الرئيسية'.tr, 'assets/icons/home_fill_icon.svg', 24,
         keepsColorsWhenSelected: true),
-    _NavEntry(PharmacyDashboardTab.medicines, 'المنتجات'.tr, 'assets/icons/Search_icon.svg', 24),
+    _NavEntry(PharmacyDashboardTab.medicines, 'المنتجات'.tr, 'assets/icons/products_icon.svg', 24),
     _NavEntry(PharmacyDashboardTab.orders, 'الطلبات'.tr, 'assets/icons/Search_icon.svg', 24),
     _NavEntry(PharmacyDashboardTab.inquiries, 'المراسلات'.tr, 'assets/icons/massage_icon.svg', 24),
     _NavEntry(PharmacyDashboardTab.settings, 'الإعدادات'.tr, 'assets/icons/settings_icon.svg', 24),
