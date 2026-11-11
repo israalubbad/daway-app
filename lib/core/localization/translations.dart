@@ -21,6 +21,14 @@ abstract final class Translations {
   static void use(String code) => _code = code == englishCode ? englishCode : arabicCode;
 }
 
+/// A name the backend sends in both languages: the English one when English is on
+/// and there is one, the Arabic otherwise (so a missing English name never leaves
+/// a blank).
+String localizedName(String arabic, String? english) {
+  final en = english?.trim();
+  return Translations.isEnglish && en != null && en.isNotEmpty ? en : arabic;
+}
+
 extension TranslateText on String {
   /// This text in the current language.
   String get tr => Translations.isEnglish ? (enStrings[this] ?? this) : this;

@@ -169,7 +169,7 @@ class _AllCategoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              category.nameAr,
+              category.name,
               textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

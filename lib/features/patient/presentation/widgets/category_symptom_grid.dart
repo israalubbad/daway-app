@@ -61,7 +61,7 @@ class _SymptomCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              symptom.nameAr,
+              symptom.name,
               textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

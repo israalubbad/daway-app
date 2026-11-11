@@ -296,7 +296,7 @@ class _CategoryField extends StatelessWidget {
       value: formData.categoryId,
       items: [
         for (final category in formData.categories)
-          DropdownMenuItem(value: category.id, child: Text(category.nameAr)),
+          DropdownMenuItem(value: category.id, child: Text(category.name)),
       ],
       onChanged: formData.isLoadingCategories
           ? null

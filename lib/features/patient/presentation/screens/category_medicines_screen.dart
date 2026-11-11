@@ -9,6 +9,7 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/category_medicine.dart';
@@ -121,6 +122,9 @@ class _CategoryMedicinesViewState extends State<_CategoryMedicinesView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 32.h),
+              // The screen is pushed over the home, so it needs a way back.
+              AppBackButton(onTap: () => Navigator.of(context).pop()),
+              SizedBox(height: 20.h),
               _Header(category: widget.category),
               SizedBox(height: 20.h),
               BlocBuilder<CategoryMedicinesCubit, CategoryMedicinesState>(
@@ -189,10 +193,10 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(category.nameAr, textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
+        Text(category.name, textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
         SizedBox(height: 8.h),
         Text(
-          'تصفح كل خيارات {0} المتوفرة لدينا.'.trArgs([category.nameAr]),
+          'تصفح كل خيارات {0} المتوفرة لدينا.'.trArgs([category.name]),
           textAlign: TextAlign.start,
           style: AppTextStyles.allCategoriesSubtitle,
         ),

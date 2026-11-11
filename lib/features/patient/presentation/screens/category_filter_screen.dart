@@ -176,7 +176,7 @@ class _CategoryFilterScreenState extends State<CategoryFilterScreen> {
                           children: [
                             for (final subcategory in entry.value)
                               _FilterChip(
-                                label: subcategory.nameAr,
+                                label: subcategory.name,
                                 selected: _subcategorySlug == subcategory.slug,
                                 onTap: () {
                                   setState(() {
