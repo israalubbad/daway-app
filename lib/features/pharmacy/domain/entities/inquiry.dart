@@ -42,8 +42,6 @@ class Inquiry {
     this.lastMessage,
   });
 }
-enum InquiryStatusFilter { all, newInquiry, answered, closed }
-
 /// The full response shape of `GET /pharmacy/inquiries`: the page of
 /// inquiries plus the backend's own status counts (`counts.new/answered/
 /// closed`) — kept separate from a client-side tally of [inquiries] since
