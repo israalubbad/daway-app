@@ -53,7 +53,7 @@ class AccountingEntryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_left_rounded, size: 24.r, color: AppColors.mainTeal),
+              Icon(Icons.chevron_right_rounded, size: 24.r, color: AppColors.mainTeal),
             ],
           ),
         ),

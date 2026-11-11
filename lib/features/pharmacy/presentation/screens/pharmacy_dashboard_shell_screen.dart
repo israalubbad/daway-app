@@ -37,7 +37,7 @@ class PharmacyDashboardShellScreen extends StatefulWidget {
 
 class _PharmacyDashboardShellScreenState
     extends State<PharmacyDashboardShellScreen> {
-  PharmacyDashboardTab _selectedTab = PharmacyDashboardTab.settings;
+  PharmacyDashboardTab _selectedTab = PharmacyDashboardTab.home;
 
   // Owned here rather than by the home tab's own provider, so that coming back
   // to الرئيسية can refresh it (see [_selectTab]).
