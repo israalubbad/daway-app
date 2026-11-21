@@ -94,14 +94,6 @@ Release signing: copy `android/key.properties.example` to `android/key.propertie
 
 **Localization.** Texts are written in Arabic with `.tr` (`'نص {0}'.trArgs([x])`); the English tables are in `lib/core/localization/en/`, keyed by the Arabic text. A test fails if a `.tr` text has no English. No `const` around `.tr`, and never `.tr` on text sent to the backend. Use `start`/`end` (not `left`/`right`) and `MirrorWhenLtr` for arrows.
 
-**Code rules**
-- Smallest change that solves the problem; fix causes, not symptoms.
-- Use the shared tools: `withSessionToken` (use cases), `guardApi` (repositories), `authFieldDecoration()`, `networkImage()`.
-- `const` where possible; no controllers in `build()`; `setState` only for local UI state.
-- Tests for domain and data; a bug fix comes with a test that reproduces it; one behavior per test.
-
-**Security.** No secrets in code or git; backup and cleartext are disabled; reminders are in secure storage. Open items: restrict the Maps key and the Cloudinary preset, rate-limit `/otp/send` and `/login/pharmacy`.
-
 **Git.** Branches `feature/`, `fix/`, `refactor/`, `docs/` off `develop`. CI (`.github/workflows/dart.yml`) runs `flutter analyze` and `flutter test` on pushes and PRs to `develop`.
 
 Repository: <https://github.com/daway-app/daway-mobile>
