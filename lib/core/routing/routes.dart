@@ -32,4 +32,5 @@ class Routes {
   static const String logoutFarewellScreen = '/logoutFarewellScreen';
   static const String rateExperienceScreen = '/rateExperienceScreen';
   static const String chatScreen = '/chatScreen';
+  static const String assistantScreen = '/assistantScreen';
 }

@@ -51,4 +51,5 @@ abstract class ApiConstants {
   static const String patientInquiries = '/patient/inquiries';
   static const String patientAvailabilityAlerts = '/patient/availability-alerts';
   static const String patientHealthProfile = '/patient/health-profile';
+  static const String patientAssistantChat = '/patient/assistant/chat';
 }

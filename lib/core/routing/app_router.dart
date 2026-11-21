@@ -1,3 +1,4 @@
+import 'package:daway_app/features/assistant/presentation/screens/assistant_screen.dart';
 import 'package:daway_app/features/auth/presentation/screens/account_type_screen.dart';
 import 'package:daway_app/features/auth/presentation/screens/logout_farewell_screen.dart';
 import 'package:daway_app/features/auth/presentation/screens/forgot_password_screen.dart';
@@ -236,6 +237,11 @@ class AppRouter {
             pharmacyId: args['pharmacyId'] as int,
             pharmacyName: args['pharmacyName'] as String,
           ),
+        );
+
+      case Routes.assistantScreen:
+        return MaterialPageRoute(
+          builder: (_) => const AssistantScreen(),
         );
 
       case Routes.chatScreen:
