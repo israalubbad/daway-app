@@ -1,8 +1,10 @@
+import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_flow.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
@@ -114,6 +116,16 @@ class FakeOrdersRepository implements OrdersRepository {
   int? lastAddressId;
   String? lastCouponCode;
 
+  /// What the quote call answers. By default delivery pricing is off (the
+  /// server answers 422), so a flow that does not care about the quote runs
+  /// without one.
+  ApiResult<CheckoutQuote> quoteResult =
+      const ApiError(ApiFailure(message: 'pricing off', statusCode: 422));
+  int quoteCallCount = 0;
+  String? lastQuoteCouponCode;
+  CheckoutQuote? lastQuote;
+  String? lastIdempotencyKey;
+
   @override
   Future<ApiResult<List<Order>>> getOrders({required String token}) async => const Success([]);
 
@@ -122,12 +134,27 @@ class FakeOrdersRepository implements OrdersRepository {
       const Success(null);
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    quoteCallCount++;
+    lastQuoteCouponCode = couponCode;
+    return quoteResult;
+  }
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
+    lastQuote = quote;
+    lastIdempotencyKey = idempotencyKey;
     lastAddressId = addressId;
     lastCouponCode = couponCode;
     return checkoutResult;

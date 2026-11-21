@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/profile_load_error.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import '../../../auth/presentation/cubit/logout_state.dart';
@@ -13,7 +12,9 @@ import '../cubit/pharmacy_dashboard_cubit.dart';
 import '../cubit/pharmacy_dashboard_state.dart';
 import 'pharmacy_order_details_screen.dart';
 import '../helpers/notifications_navigation.dart';
+import '../widgets/accounting_entry_card.dart';
 import '../widgets/add_medicines_file_card.dart';
+import '../helpers/stock_import_navigation.dart';
 import '../widgets/pharmacy_dashboard_tab_scope.dart';
 import '../widgets/pharmacy_home_header.dart';
 import '../widgets/pharmacy_orders_section.dart';
@@ -27,13 +28,18 @@ import '../widgets/pharmacy_summary_cards.dart';
 /// Expects a [PharmacyDashboardCubit], a [PharmacyProfileCubit] (for the
 /// header) and a [LogoutCubit] above it.
 class PharmacyHomeScreen extends StatelessWidget {
-  /// The pharmacy's newest orders. There is no orders API yet, so the shell
-  /// opens the screen with none and the section stays hidden; this is what
-  /// lets the populated state be built and tested now, and have real orders
-  /// handed in once an API exists.
+  /// The pharmacy's newest orders, handed in by the shell from its orders
+  /// cubit; the section stays hidden while there are none.
   final List<PharmacyOrder> orders;
 
-  const PharmacyHomeScreen({super.key, this.orders = const []});
+  /// Takes a decision made from an order's details screen.
+  final PharmacyOrderLoader? onLoadDetails;
+
+  const PharmacyHomeScreen({
+    super.key,
+    this.orders = const [],
+    this.onLoadDetails,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +81,7 @@ class PharmacyHomeScreen extends StatelessWidget {
                       PharmacyDashboardLoaded(:final stats) => _HomeContent(
                         stats: stats,
                         orders: orders,
+                        onLoadDetails: onLoadDetails,
                       ),
                     };
                   },
@@ -91,10 +98,19 @@ class PharmacyHomeScreen extends StatelessWidget {
 class _HomeContent extends StatelessWidget {
   final PharmacyDashboardStats stats;
   final List<PharmacyOrder> orders;
+  final PharmacyOrderLoader? onLoadDetails;
 
-  const _HomeContent({required this.stats, required this.orders});
+  const _HomeContent({
+    required this.stats,
+    required this.orders,
+    this.onLoadDetails,
+  });
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  Future<void> _openStockImport(BuildContext context) async {
+    if (await openStockImport(context) && context.mounted) {
+      context.read<PharmacyDashboardCubit>().refresh();
+    }
+  }
 
   void _goToTab(BuildContext context, PharmacyDashboardTab tab) {
     PharmacyDashboardTabScope.switchToTabOrShowComingSoon(context, tab);
@@ -106,14 +122,12 @@ class _HomeContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!stats.hasMedicines) ...[
-          // Importing a file has no endpoint yet.
-          AddMedicinesFileCard(onPickFile: () => _comingSoon(context)),
+          AddMedicinesFileCard(onPickFile: () => _openStockImport(context)),
           SizedBox(height: 16.h),
         ],
         PharmacySummaryCards(
           totalProducts: stats.totalMedicines,
-          // The mobile API has no monthly-sales figure yet.
-          monthlySales: null,
+          monthlySales: stats.monthlySales,
           onProductsTap: () => _goToTab(context, PharmacyDashboardTab.products),
         ),
         SizedBox(height: 8.h),
@@ -125,12 +139,21 @@ class _HomeContent extends StatelessWidget {
           onRatingsTap: () =>
               Navigator.of(context).pushNamed(Routes.pharmacyRatingsScreen),
         ),
+        SizedBox(height: 16.h),
+        AccountingEntryCard(
+          onTap: () => Navigator.of(context).pushNamed(Routes.accountingScreen),
+        ),
         if (orders.isNotEmpty) ...[
           SizedBox(height: 40.h),
           PharmacyOrdersSection(
             orders: orders,
             onViewAllTap: () => _goToTab(context, PharmacyDashboardTab.orders),
-            onOrderTap: (order) => PharmacyOrderDetailsScreen.open(context, order),
+            onOrderTap: (order) =>
+                PharmacyOrderDetailsScreen.open(
+                  context,
+                  order,
+                  onLoadDetails: onLoadDetails,
+                ),
           ),
         ],
       ],

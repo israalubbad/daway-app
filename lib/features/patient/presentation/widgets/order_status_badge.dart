@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/order.dart';
 
+import '../../../../core/localization/translations.dart';
+
 (String, Color) _labelAndColor(OrderStatus status) => switch (status) {
-      OrderStatus.pending => ('قيد الانتظار', AppColors.orderInProgressColor),
-      OrderStatus.confirmed => ('تم التأكيد', AppColors.orderInProgressColor),
-      OrderStatus.preparing => ('قيد التحضير', AppColors.orderInProgressColor),
-      OrderStatus.outForDelivery => ('في الطريق', AppColors.orderInProgressColor),
-      OrderStatus.delivered => ('تم التوصيل', AppColors.orderCompletedColor),
-      OrderStatus.cancelled => ('ملغي', AppColors.orderCancelledColor),
+      OrderStatus.pending => ('قيد الانتظار'.tr, AppColors.orderInProgressColor),
+      OrderStatus.confirmed => ('تم التأكيد'.tr, AppColors.orderInProgressColor),
+      OrderStatus.preparing => ('قيد التحضير'.tr, AppColors.orderInProgressColor),
+      OrderStatus.outForDelivery => ('في الطريق'.tr, AppColors.orderInProgressColor),
+      OrderStatus.delivered => ('تم التوصيل'.tr, AppColors.orderCompletedColor),
+      OrderStatus.cancelled => ('ملغي'.tr, AppColors.orderCancelledColor),
     };
 
 /// The small colored pill on an order card showing its status.

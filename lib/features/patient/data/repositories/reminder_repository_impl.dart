@@ -10,17 +10,15 @@ class ReminderRepositoryImpl implements ReminderRepository {
   const ReminderRepositoryImpl(this._localDataSource);
 
   @override
-  Future<ApiResult<List<MedicineReminder>>> getReminders() async {
-    try {
+  Future<ApiResult<List<MedicineReminder>>> getReminders() {
+    return guardApi(() async {
       return Success(await _localDataSource.getReminders());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> saveReminder(MedicineReminder reminder) async {
-    try {
+  Future<ApiResult<void>> saveReminder(MedicineReminder reminder) {
+    return guardApi(() async {
       final reminders = await _localDataSource.getReminders();
       final index = reminders.indexWhere((r) => r.id == reminder.id);
       if (index >= 0) {
@@ -30,20 +28,16 @@ class ReminderRepositoryImpl implements ReminderRepository {
       }
       await _localDataSource.saveReminders(reminders);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> deleteReminder(String id) async {
-    try {
+  Future<ApiResult<void>> deleteReminder(String id) {
+    return guardApi(() async {
       final reminders = await _localDataSource.getReminders();
       reminders.removeWhere((r) => r.id == id);
       await _localDataSource.saveReminders(reminders);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

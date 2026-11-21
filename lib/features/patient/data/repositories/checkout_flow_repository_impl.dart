@@ -16,8 +16,8 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
     required String token,
     required String code,
     required double orderTotal,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.validateCoupon(
         token: token,
         code: code,
@@ -30,17 +30,15 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
         );
       }
       return Success(discount);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<OrderPayment>> getPayment({
     required String token,
     required int orderId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getPayment(
         token: token,
         orderId: orderId,
@@ -60,9 +58,7 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
         payment = payment.withBanks(banks);
       }
       return Success(payment);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -72,8 +68,8 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
     required int bankId,
     required double amount,
     required String receiptPath,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.submitReceipt(
         token: token,
         orderId: orderId,
@@ -82,9 +78,7 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
         receiptPath: receiptPath,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -92,33 +86,29 @@ class CheckoutFlowRepositoryImpl implements CheckoutFlowRepository {
     required String token,
     required int orderId,
     required String message,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.reportProblem(
         token: token,
         orderId: orderId,
         message: message,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<OrderTracking>> getTracking({
     required String token,
     required int orderId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getTracking(
         token: token,
         orderId: orderId,
       );
       return Success(parseTracking(_data(response.data)));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   static Map<String, dynamic> _data(Object? body) {

@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 
 import '../theming/app_colors.dart';
 
+import '../../core/localization/translations.dart';
+
 /// Small pill button labelled "تعديل" — used on the account-info and
 /// addresses screens to enter edit mode for a field or a saved address.
 class EditChip extends StatelessWidget {
@@ -32,7 +34,7 @@ class EditChip extends StatelessWidget {
             ),
             SizedBox(width: 4.w),
             Text(
-              'تعديل',
+              'تعديل'.tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 color: AppColors.mainTeal,

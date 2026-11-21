@@ -10,7 +10,9 @@ import '../../domain/usecases/get_patient_profile_usecase.dart';
 import '../../domain/usecases/update_patient_address_usecase.dart';
 import 'patient_addresses_state.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Drives "عناويني". The screen has no name/phone fields of its own (see
+
 /// PatientAddressesScreen's doc comment) — new addresses borrow the
 /// patient's own profile name/phone, and edits keep whatever the address
 /// already had, only replacing the picked location.
@@ -44,9 +46,9 @@ class PatientAddressesCubit extends Cubit<PatientAddressesState> {
   }
 
   static String _labelFor(int index) => switch (index) {
-        0 => 'المنزل',
-        1 => 'العمل',
-        _ => 'عنوان ${index + 1}',
+        0 => 'المنزل'.tr,
+        1 => 'العمل'.tr,
+        _ => 'عنوان {0}'.trArgs([index + 1]),
       };
 
   /// Returns null on success (and reloads the list), or a user-facing error

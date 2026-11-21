@@ -60,6 +60,12 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
     emit(current.copyWith(name: value, clearSaveError: true));
   }
 
+  void phoneChanged(String value) {
+    final current = state;
+    if (current is! PharmacyProfileLoaded) return;
+    emit(current.copyWith(phone: value, clearSaveError: true));
+  }
+
   void locationSelected(PickedLocation location) {
     final current = state;
     if (current is! PharmacyProfileLoaded) return;
@@ -69,16 +75,6 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
       address: location.address,
       clearSaveError: true,
     ));
-  }
-
-  void workingHoursChanged(WeekDay day, {String? open, String? close}) {
-    final current = state;
-    if (current is! PharmacyProfileLoaded) return;
-    final updated = [
-      for (final entry in current.workingHours)
-        if (entry.day == day) WorkingHoursEntry(day: day, open: open, close: close) else entry,
-    ];
-    emit(current.copyWith(workingHours: updated, clearSaveError: true));
   }
 
   /// Replaces every day's hours at once — what the working-hours dialog
@@ -133,7 +129,7 @@ class PharmacyProfileCubit extends Cubit<PharmacyProfileState> {
     final updated = PharmacyProfile(
       pharmacyId: current.profile.pharmacyId,
       name: current.name.trim(),
-      phone: current.profile.phone,
+      phone: current.phone.trim(),
       logoUrl: current.logoUrl,
       latitude: current.latitude,
       longitude: current.longitude,

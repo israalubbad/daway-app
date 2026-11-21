@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/networking/auth_options.dart';
 
 import '../../../../core/constants/api_constants.dart';
 
@@ -7,8 +8,6 @@ class CheckoutFlowRemoteDataSource {
 
   const CheckoutFlowRemoteDataSource(this._dio);
 
-  Options _auth(String token) =>
-      Options(headers: {'Authorization': 'Bearer $token'});
 
   String _order(int orderId) => '${ApiConstants.patientOrders}/$orderId';
 
@@ -20,7 +19,7 @@ class CheckoutFlowRemoteDataSource {
     return _dio.post(
       ApiConstants.patientCouponsValidate,
       data: {'code': code, 'order_total': orderTotal},
-      options: _auth(token),
+      options: authOptions(token),
     );
   }
 
@@ -28,11 +27,11 @@ class CheckoutFlowRemoteDataSource {
     required String token,
     required int orderId,
   }) {
-    return _dio.get('${_order(orderId)}/payment', options: _auth(token));
+    return _dio.get('${_order(orderId)}/payment', options: authOptions(token));
   }
 
   Future<Response<dynamic>> getPaymentBanks({required String token}) {
-    return _dio.get(ApiConstants.patientPaymentBanks, options: _auth(token));
+    return _dio.get(ApiConstants.patientPaymentBanks, options: authOptions(token));
   }
 
   Future<Response<dynamic>> submitReceipt({
@@ -50,7 +49,7 @@ class CheckoutFlowRemoteDataSource {
     return _dio.post(
       '${_order(orderId)}/payment/receipt',
       data: form,
-      options: _auth(token),
+      options: authOptions(token),
     );
   }
 
@@ -62,7 +61,7 @@ class CheckoutFlowRemoteDataSource {
     return _dio.post(
       '${_order(orderId)}/payment/problem',
       data: {'category': 'other', 'message': message},
-      options: _auth(token),
+      options: authOptions(token),
     );
   }
 
@@ -70,6 +69,6 @@ class CheckoutFlowRemoteDataSource {
     required String token,
     required int orderId,
   }) {
-    return _dio.get('${_order(orderId)}/tracking', options: _auth(token));
+    return _dio.get('${_order(orderId)}/tracking', options: authOptions(token));
   }
 }

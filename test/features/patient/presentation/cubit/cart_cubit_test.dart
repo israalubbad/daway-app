@@ -1,8 +1,5 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
 import 'package:daway_app/features/patient/domain/repositories/cart_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/clear_cart_usecase.dart';
@@ -12,6 +9,7 @@ import 'package:daway_app/features/patient/domain/usecases/update_cart_item_quan
 import 'package:daway_app/features/patient/presentation/cubit/cart_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/cart_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _item = CartItem(
   id: 7,
@@ -62,22 +60,9 @@ class _FakeCartRepository implements CartRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   late _FakeCartRepository repository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
 
   CartCubit buildCubit() {
     return CartCubit(
@@ -90,7 +75,7 @@ void main() {
 
   setUp(() {
     repository = _FakeCartRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.patient();
   });
 
   test('loads the cart items on construction', () async {

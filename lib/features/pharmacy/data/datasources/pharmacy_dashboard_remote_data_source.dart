@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PharmacyDashboardRemoteDataSource {
@@ -10,7 +11,15 @@ class PharmacyDashboardRemoteDataSource {
   Future<Response<dynamic>> getStats({required String token}) {
     return _dio.get(
       ApiConstants.pharmacyDashboardStats,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
+    );
+  }
+
+  Future<Response<dynamic>> getSalesSummary({required String token}) {
+    return _dio.get(
+      ApiConstants.pharmacySalesSummary,
+      queryParameters: {'range': 'month'},
+      options: authOptions(token),
     );
   }
 
@@ -18,7 +27,7 @@ class PharmacyDashboardRemoteDataSource {
     return _dio.get(
       ApiConstants.pharmacyRatings,
       queryParameters: {'per_page': 100},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -26,7 +35,7 @@ class PharmacyDashboardRemoteDataSource {
     return _dio.get(
       ApiConstants.pharmacyInquiries,
       queryParameters: {'per_page': 3},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

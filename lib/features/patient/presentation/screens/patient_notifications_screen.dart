@@ -13,7 +13,9 @@ import '../helpers/patient_notification_display.dart';
 import '../widgets/notification_item.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
+import '../../../../core/localization/translations.dart';
 /// "الإشعارات" — backed by the real `GET /notifications` endpoint. Expects a
+
 /// [PatientNotificationsCubit] to already be provided above it (see
 /// [PatientAccountScreen]'s `_openNotifications`).
 ///
@@ -43,7 +45,7 @@ class _PatientNotificationsScreenState extends State<PatientNotificationsScreen>
         : all.where((n) => tabFor(n.type) == _selectedTab).toList();
   }
 
-  void _dismiss() => AppSnackbar.show(context, 'قريباً');
+  void _dismiss() => AppSnackbar.show(context, 'قريباً'.tr);
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +57,9 @@ class _PatientNotificationsScreenState extends State<PatientNotificationsScreen>
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: const PatientSubScreenHeader(
-                  title: 'الإشعارات',
-                  description: 'تابع طلباتك وراجع سجل مشترياتك',
+                child: PatientSubScreenHeader(
+                  title: 'الإشعارات'.tr,
+                  description: 'تابع طلباتك وراجع سجل مشترياتك'.tr,
                 ),
               ),
               SizedBox(height: 24.h),
@@ -100,19 +102,19 @@ class _PatientNotificationsScreenState extends State<PatientNotificationsScreen>
           tabs: [
             FilterTabItem(
               value: PatientNotificationTab.all,
-              label: 'الكل (${_countFor(all, PatientNotificationTab.all)})',
+              label: 'الكل ({0})'.trArgs([_countFor(all, PatientNotificationTab.all)]),
             ),
             FilterTabItem(
               value: PatientNotificationTab.orders,
-              label: 'الطلبات (${_countFor(all, PatientNotificationTab.orders)})',
+              label: 'الطلبات ({0})'.trArgs([_countFor(all, PatientNotificationTab.orders)]),
             ),
             FilterTabItem(
               value: PatientNotificationTab.offers,
-              label: 'العروض (${_countFor(all, PatientNotificationTab.offers)})',
+              label: 'العروض ({0})'.trArgs([_countFor(all, PatientNotificationTab.offers)]),
             ),
             FilterTabItem(
               value: PatientNotificationTab.system,
-              label: 'النظام (${_countFor(all, PatientNotificationTab.system)})',
+              label: 'النظام ({0})'.trArgs([_countFor(all, PatientNotificationTab.system)]),
             ),
           ],
         ),
@@ -124,7 +126,11 @@ class _PatientNotificationsScreenState extends State<PatientNotificationsScreen>
           )
         else
           for (final notification in visible)
-            NotificationItem(notification: notification, onDismissTap: _dismiss),
+            NotificationItem(
+              notification: notification,
+              onDismissTap: _dismiss,
+              onTap: () => context.read<PatientNotificationsCubit>().markAsRead(notification),
+            ),
       ],
     );
   }
@@ -139,7 +145,7 @@ class _EmptyNotifications extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyStateView(
       imageAsset: 'assets/images/empty_notifications.png',
-      title: 'لا يوجد إشعارات',
+      title: 'لا يوجد إشعارات'.tr,
       topSpacing: topSpacing,
     );
   }

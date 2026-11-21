@@ -20,8 +20,8 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   @override
   Future<ApiResult<NotificationsOverview>> getNotifications({
     required String token,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getNotifications(token: token);
       final body = response.data as Map<String, dynamic>;
       final notificationsJson = extractJsonList(
@@ -59,34 +59,28 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
           unreadCount: unreadCount,
         ),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> markAllAsRead({required String token}) async {
-    try {
+  Future<ApiResult<void>> markAllAsRead({required String token}) {
+    return guardApi(() async {
       await _remoteDataSource.markAllAsRead(token: token);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> markAsRead({
     required String token,
     required int notificationId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.markAsRead(
         token: token,
         notificationId: notificationId,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

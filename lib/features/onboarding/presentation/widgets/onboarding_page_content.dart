@@ -5,13 +5,17 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/onboarding_page.dart';
+import 'artwork/onboarding_artwork_view.dart';
 import 'onboarding_indicator.dart';
 
+import '../../../../core/localization/translations.dart';
 class OnboardingPageContent extends StatelessWidget {
+
   final OnboardingPage page;
   final int pageCount;
   final int currentIndex;
   final bool isLast;
+
   final VoidCallback onActionPressed;
   final VoidCallback onSkipPressed;
 
@@ -40,7 +44,9 @@ class OnboardingPageContent extends StatelessWidget {
                 SizedBox(height: 60.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 37.w),
-                  child: page.illustrationAsset != null
+                  child: page.artwork != null
+                      ? OnboardingArtworkView(artwork: page.artwork!)
+                      : page.illustrationAsset != null
                       ? Image.asset(
                           page.illustrationAsset!,
                           height: 230.h,
@@ -76,7 +82,7 @@ class OnboardingPageContent extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: AppCustomButton(
-            text: isLast ? 'ابدأ الآن' : 'التالي',
+            text: isLast ? 'ابدأ الآن'.tr : 'التالي'.tr,
             onPressed: onActionPressed,
             fontWeight: FontWeight.w500,
           ),
@@ -93,7 +99,7 @@ class OnboardingPageContent extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 14.h),
-              child: Text('تخطي', textAlign: TextAlign.center, style: AppTextStyles.onboardingSkip),
+              child: Text('تخطي'.tr, textAlign: TextAlign.center, style: AppTextStyles.onboardingSkip),
             ),
           ),
           SizedBox(height: 10.h),

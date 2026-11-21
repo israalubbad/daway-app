@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theming/app_colors.dart';
 
+import '../../core/localization/translations.dart';
 /// Tap-to-open field backed by [showDatePicker]. Stores/returns the date as
+
 /// an ISO 'YYYY-MM-DD' string (what the API expects for birth_date), so
 /// callers don't need date-formatting logic of their own.
 class BirthDateField extends StatelessWidget {
@@ -59,12 +61,12 @@ class BirthDateField extends StatelessWidget {
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
-                birthDate ?? 'اختر تاريخ ميلادك',
+                birthDate ?? 'اختر تاريخ ميلادك'.tr,
                 style: TextStyle(
                   fontSize: 16.sp,
                   color: birthDate != null ? AppColors.textDark : AppColors.grey,
                 ),
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
               ),
             ),
           ],

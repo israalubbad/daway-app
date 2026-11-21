@@ -12,6 +12,17 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
 
   const PatientNotificationsRepositoryImpl(this._remoteDataSource);
 
+  @override
+  Future<ApiResult<void>> markAsRead({
+    required String token,
+    required int notificationId,
+  }) {
+    return guardApi(() async {
+      await _remoteDataSource.markAsRead(token: token, notificationId: notificationId);
+      return const Success(null);
+    });
+  }
+
   /// One malformed notification record is skipped rather than failing the
   /// whole list; the rest are shown newest first. But a response whose
   /// records ALL fail to parse is a changed API contract, not an empty inbox,
@@ -19,8 +30,8 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({
     required String token,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       const source = 'GET /notifications';
       final notificationsJson = await fetchAllPages(
         source: source,
@@ -45,8 +56,6 @@ class PatientNotificationsRepositoryImpl implements PatientNotificationsReposito
       }
       sortByDateDescending(notifications, (n) => n.createdAt);
       return Success(notifications);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

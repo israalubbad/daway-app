@@ -7,6 +7,8 @@ import '../../domain/repositories/pharmacies_repository.dart';
 import '../datasources/pharmacies_remote_data_source.dart';
 import '../models/nearby_pharmacy_model.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PharmaciesRepositoryImpl implements PharmaciesRepository {
   final PharmaciesRemoteDataSource _remoteDataSource;
 
@@ -16,8 +18,8 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
   Future<ApiResult<List<NearbyPharmacy>>> getNearbyPharmacies({
     double? userLatitude,
     double? userLongitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getPharmacies();
       final pharmaciesJson = extractJsonList(response.data, source: 'GET /pharmacies');
       var pharmacies = pharmaciesJson
@@ -39,22 +41,18 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
       }
 
       return Success(pharmacies);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<String?>> getWorkingHoursLabel(int pharmacyId) async {
-    try {
+  Future<ApiResult<String?>> getWorkingHoursLabel(int pharmacyId) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getPharmacyDetail(pharmacyId);
       final body = response.data;
       final data = body is Map<String, dynamic> ? body['data'] : null;
       final hours = data is Map<String, dynamic> ? data['hours'] : null;
       return Success(_formatTodaysHours(hours));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   /// Best-effort: every pharmacy seeded on the live backend has an empty
@@ -108,7 +106,7 @@ class PharmaciesRepositoryImpl implements PharmaciesRepository {
     final hour = int.tryParse(parts[0]);
     if (hour == null || hour < 0 || hour > 23) return null;
 
-    final period = hour < 12 ? 'ص' : 'م';
+    final period = hour < 12 ? 'ص'.tr : 'م'.tr;
     final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
     return '$displayHour $period';
   }

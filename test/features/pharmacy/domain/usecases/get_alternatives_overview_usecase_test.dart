@@ -2,7 +2,6 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/alternatives_overview.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -11,6 +10,7 @@ import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_medicin
 import 'package:daway_app/features/pharmacy/domain/usecases/get_alternatives_overview_usecase.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _baseMedicine = Medicine(
   id: 14,
@@ -90,6 +90,7 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -122,33 +123,16 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
   }) async => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePharmacyAlternativesRepository repository;
   late _FakePharmacyMedicineRepository medicineRepository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late GetAlternativesOverviewUseCase useCase;
 
   setUp(() {
     repository = _FakePharmacyAlternativesRepository();
     medicineRepository = _FakePharmacyMedicineRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository();
     useCase = GetAlternativesOverviewUseCase(
       repository,
       GetPharmacyMedicinesUseCase(medicineRepository, sessionRepository),

@@ -1,14 +1,13 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_notification.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_notifications_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_notifications_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/mark_patient_notification_read_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_notifications_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_notifications_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 final _notifications = [
   PatientNotification(
@@ -23,27 +22,18 @@ final _notifications = [
 class _FakeRepository implements PatientNotificationsRepository {
   late ApiResult<List<PatientNotification>> result = Success(_notifications);
 
+  ApiResult<void> markResult = const Success(null);
+  final List<int> markedIds = [];
+
+  @override
+  Future<ApiResult<void>> markAsRead({required String token, required int notificationId}) async {
+    markedIds.add(notificationId);
+    return markResult;
+  }
+
   @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async =>
       result;
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
 }
 
 void main() {
@@ -55,7 +45,8 @@ void main() {
 
   PatientNotificationsCubit buildCubit() {
     final cubit = PatientNotificationsCubit(
-      GetPatientNotificationsUseCase(repository, _FakeSessionRepository()),
+      GetPatientNotificationsUseCase(repository, InMemorySessionRepository.patient()),
+      MarkPatientNotificationReadUseCase(repository, InMemorySessionRepository.patient()),
     );
     addTearDown(cubit.close);
     return cubit;
@@ -90,5 +81,27 @@ void main() {
     await cubit.load();
 
     expect(cubit.state, isA<PatientNotificationsLoaded>());
+  });
+
+  test('markAsRead shows the notification as read and tells the backend', () async {
+    final cubit = buildCubit();
+    await Future<void>.delayed(Duration.zero);
+
+    await cubit.markAsRead(_notifications.first);
+
+    final loaded = cubit.state as PatientNotificationsLoaded;
+    expect(loaded.notifications.single.isRead, isTrue);
+    expect(repository.markedIds, [1]);
+  });
+
+  test('markAsRead puts the notification back as unread when the backend refuses', () async {
+    repository.markResult = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
+    final cubit = buildCubit();
+    await Future<void>.delayed(Duration.zero);
+
+    await cubit.markAsRead(_notifications.first);
+
+    final loaded = cubit.state as PatientNotificationsLoaded;
+    expect(loaded.notifications.single.isRead, isFalse);
   });
 }

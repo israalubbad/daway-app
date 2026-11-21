@@ -11,8 +11,8 @@ class MedicineSearchRepositoryImpl implements MedicineSearchRepository {
   const MedicineSearchRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<SearchedMedicine>>> search(String query) async {
-    try {
+  Future<ApiResult<List<SearchedMedicine>>> search(String query) {
+    return guardApi(() async {
       final response = await _remoteDataSource.search(query);
       const source = 'GET /medicines/search';
       final body = response.data;
@@ -27,8 +27,6 @@ class MedicineSearchRepositoryImpl implements MedicineSearchRepository {
               SearchedMedicineModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(medicines);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

@@ -1,27 +1,21 @@
 import '../../../../core/helpers/arabic_text.dart';
+import '../../../patient/domain/entities/category.dart';
 import '../../domain/entities/medicine_catalog_item.dart';
 
 /// Form data carried across every state so the screen never loses what the
 /// user has already entered while a search, image upload, or submission is
 /// in flight.
 class AddMedicineFormData {
+  /// The English trade name. Filled from [selectedMedicine] when one is picked
+  /// from the search page, typed by hand otherwise.
   final String nameQuery;
-  final List<MedicineCatalogItem> suggestions;
-  final bool isSearching;
-  final String? searchError;
-  final MedicineCatalogItem? selectedMedicine;
 
-  /// True once the pharmacist taps "الدواء غير موجود؟ أضفه يدوياً" — search
-  /// stops, and [nameQuery]/[nameAr]/[activeIngredient] are sent to
-  /// `POST /pharmacy/medicines/by-name` instead of requiring a selection.
-  final bool isManualEntry;
-
-  /// The Arabic trade name, used only in manual entry (optional there).
+  /// The Arabic trade name — optional.
   final String nameAr;
 
-  /// Auto-filled from [selectedMedicine] when a catalog match is picked, but
-  /// freely editable afterwards — also the value sent as `active_ingredient`
-  /// in manual entry.
+  /// Filled from [selectedMedicine] when a catalog match is picked, freely
+  /// editable otherwise — also the value sent as `active_ingredient` when the
+  /// medicine is added by name.
   final String activeIngredient;
   final String quantity;
   final String price;
@@ -31,13 +25,26 @@ class AddMedicineFormData {
   final bool isUploadingImage;
   final String? imageError;
 
+  /// What the search page found for its last query.
+  final List<MedicineCatalogItem> suggestions;
+  final bool isSearching;
+  final String? searchError;
+
+  /// False until the search page has run a query, so "no results" is not shown
+  /// before anything was searched.
+  final bool hasSearched;
+
+  /// A medicine picked from the search page. Null means the medicine is added
+  /// by name (`POST /pharmacy/medicines/by-name`) from the typed fields.
+  final MedicineCatalogItem? selectedMedicine;
+
+  final List<Category> categories;
+  final bool isLoadingCategories;
+  final String? categoriesError;
+  final int? categoryId;
+
   const AddMedicineFormData({
     this.nameQuery = '',
-    this.suggestions = const [],
-    this.isSearching = false,
-    this.searchError,
-    this.selectedMedicine,
-    this.isManualEntry = false,
     this.nameAr = '',
     this.activeIngredient = '',
     this.quantity = '',
@@ -47,32 +54,38 @@ class AddMedicineFormData {
     this.imageUrl,
     this.isUploadingImage = false,
     this.imageError,
+    this.suggestions = const [],
+    this.isSearching = false,
+    this.searchError,
+    this.hasSearched = false,
+    this.selectedMedicine,
+    this.categories = const [],
+    this.isLoadingCategories = false,
+    this.categoriesError,
+    this.categoryId,
   });
 
   double? get priceValue => double.tryParse(price);
 
   int? get quantityValue => int.tryParse(quantity);
 
+  /// True when nothing was picked from the catalog: the typed fields are sent
+  /// to the by-name endpoint.
+  bool get isManualEntry => selectedMedicine == null;
+
   /// The backend rejects `trade_name` if it contains Arabic characters.
   bool get nameHasArabicChars => containsArabicChars(nameQuery);
 
   bool get canSubmit =>
       (isManualEntry
-          ? nameQuery.trim().isNotEmpty && !nameHasArabicChars
-          : selectedMedicine != null) &&
+          ? nameQuery.trim().isNotEmpty && !nameHasArabicChars && categoryId != null
+          : true) &&
       (quantityValue ?? 0) > 0 &&
       (priceValue ?? 0) > 0 &&
       !isUploadingImage;
 
   AddMedicineFormData copyWith({
     String? nameQuery,
-    List<MedicineCatalogItem>? suggestions,
-    bool? isSearching,
-    String? searchError,
-    bool clearSearchError = false,
-    MedicineCatalogItem? selectedMedicine,
-    bool clearSelectedMedicine = false,
-    bool? isManualEntry,
     String? nameAr,
     String? activeIngredient,
     String? quantity,
@@ -84,15 +97,21 @@ class AddMedicineFormData {
     bool? isUploadingImage,
     String? imageError,
     bool clearImageError = false,
+    List<MedicineCatalogItem>? suggestions,
+    bool? isSearching,
+    String? searchError,
+    bool clearSearchError = false,
+    bool? hasSearched,
+    MedicineCatalogItem? selectedMedicine,
+    bool clearSelectedMedicine = false,
+    List<Category>? categories,
+    bool? isLoadingCategories,
+    String? categoriesError,
+    bool clearCategoriesError = false,
+    int? categoryId,
   }) {
     return AddMedicineFormData(
       nameQuery: nameQuery ?? this.nameQuery,
-      suggestions: suggestions ?? this.suggestions,
-      isSearching: isSearching ?? this.isSearching,
-      searchError: clearSearchError ? null : (searchError ?? this.searchError),
-      selectedMedicine:
-          clearSelectedMedicine ? null : (selectedMedicine ?? this.selectedMedicine),
-      isManualEntry: isManualEntry ?? this.isManualEntry,
       nameAr: nameAr ?? this.nameAr,
       activeIngredient: activeIngredient ?? this.activeIngredient,
       quantity: quantity ?? this.quantity,
@@ -102,6 +121,16 @@ class AddMedicineFormData {
       imageUrl: clearImageUrl ? null : (imageUrl ?? this.imageUrl),
       isUploadingImage: isUploadingImage ?? this.isUploadingImage,
       imageError: clearImageError ? null : (imageError ?? this.imageError),
+      suggestions: suggestions ?? this.suggestions,
+      isSearching: isSearching ?? this.isSearching,
+      searchError: clearSearchError ? null : (searchError ?? this.searchError),
+      hasSearched: hasSearched ?? this.hasSearched,
+      selectedMedicine:
+          clearSelectedMedicine ? null : (selectedMedicine ?? this.selectedMedicine),
+      categories: categories ?? this.categories,
+      isLoadingCategories: isLoadingCategories ?? this.isLoadingCategories,
+      categoriesError: clearCategoriesError ? null : (categoriesError ?? this.categoriesError),
+      categoryId: categoryId ?? this.categoryId,
     );
   }
 }

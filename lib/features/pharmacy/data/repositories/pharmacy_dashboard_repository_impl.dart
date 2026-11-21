@@ -39,6 +39,7 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
       final statsResponseFuture = _remoteDataSource.getStats(token: token);
       final averageRatingFuture = _averageRating(token: token);
       final recentInquiriesFuture = _recentInquiries(token: token);
+      final monthlySalesFuture = _monthlySales(token: token);
 
       final statsResponse = await statsResponseFuture;
       final stats = PharmacyDashboardStatsModel.fromJson(
@@ -58,10 +59,31 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
           ratingsCount: ratingsCount,
           lowStockItems: stats.lowStockItems,
           recentInquiries: recentInquiries,
+          monthlySales: await monthlySalesFuture,
         ),
       );
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
+    }
+  }
+
+  /// This month's sales: `GET /pharmacy/accounting/sales-summary?range=month`
+  /// answers `data.summary.total` (cancelled invoices already left out).
+  /// Best-effort like the other enrichments: a failure, or a response without
+  /// the figure, leaves the card on its dash.
+  Future<double?> _monthlySales({required String token}) async {
+    try {
+      final response = await _remoteDataSource.getSalesSummary(token: token);
+      final body = response.data;
+      if (body is! Map<String, dynamic>) return null;
+      final data = body['data'];
+      final summary = data is Map<String, dynamic> ? data['summary'] : null;
+      final total = summary is Map<String, dynamic> ? summary['total'] : null;
+      if (total is num) return total.toDouble();
+      if (total is String) return double.tryParse(total);
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -106,7 +128,10 @@ class PharmacyDashboardRepositoryImpl implements PharmacyDashboardRepository {
       // record with an unexpected `stars` type instead of throwing and
       // losing the average for every other, well-formed record.
       final stars = ratingsJson
-          .map((json) => (json as Map<String, dynamic>)['stars'])
+          .map((json) {
+            final map = json as Map<String, dynamic>;
+            return map['stars'] ?? map['stars_rating'] ?? map['rating'];
+          })
           .whereType<num>()
           .map((stars) => stars.toDouble())
           .toList();

@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -86,7 +87,7 @@ class ProductCard extends StatelessWidget {
                           name,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           textDirection: textDirectionFor(name),
                           style: AppTextStyles.pharmacyProductName,
                         ),
@@ -103,7 +104,7 @@ class ProductCard extends StatelessWidget {
                       isShoutyLatinName(ingredient) ? ingredient.toLowerCase() : ingredient,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       textDirection: textDirectionFor(ingredient),
                       style: AppTextStyles.pharmacyProductIngredient,
                     ),
@@ -145,7 +146,7 @@ class _Price extends StatelessWidget {
       '₪ ${formatPrice(price)}',
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.right,
+      textAlign: TextAlign.start,
       // The sign is drawn from another font, whose taller line would push the
       // row down.
       strutStyle: StrutStyle.fromTextStyle(style, forceStrutHeight: true),
@@ -175,7 +176,7 @@ class _ProductImage extends StatelessWidget {
       ),
       child: (url == null || url.isEmpty)
           ? null
-          : Image.network(
+          : networkImage(
               url,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),

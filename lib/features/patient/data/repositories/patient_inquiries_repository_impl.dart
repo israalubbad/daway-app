@@ -12,8 +12,8 @@ class PatientInquiriesRepositoryImpl implements PatientInquiriesRepository {
   const PatientInquiriesRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<PharmacyInquiry>>> getInquiries({required String token}) async {
-    try {
+  Future<ApiResult<List<PharmacyInquiry>>> getInquiries({required String token}) {
+    return guardApi(() async {
       final inquiriesJson = await fetchAllPages(
         source: 'GET /patient/inquiries',
         fetchPage: (page) async =>
@@ -23,9 +23,7 @@ class PatientInquiriesRepositoryImpl implements PatientInquiriesRepository {
           .map((json) => PharmacyInquiryModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(inquiries);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -34,8 +32,8 @@ class PatientInquiriesRepositoryImpl implements PatientInquiriesRepository {
     required int pharmacyId,
     int? medicineId,
     required String message,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.createInquiry(
         token: token,
         pharmacyId: pharmacyId,
@@ -52,8 +50,6 @@ class PatientInquiriesRepositoryImpl implements PatientInquiriesRepository {
         throw FormatException('Unexpected POST /patient/inquiries response shape: $body');
       }
       return Success(PharmacyInquiryModel.fromJson(data).toEntity());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

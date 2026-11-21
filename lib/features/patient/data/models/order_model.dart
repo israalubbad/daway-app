@@ -3,6 +3,7 @@ import '../../domain/entities/order.dart';
 
 class OrderModel {
   final String orderNumber;
+  final int? pharmacyId;
   final String pharmacyName;
   final OrderStatus status;
   final int itemsCount;
@@ -11,6 +12,7 @@ class OrderModel {
   final DateTime createdAt;
 
   const OrderModel({
+    this.pharmacyId,
     required this.orderNumber,
     required this.pharmacyName,
     required this.status,
@@ -26,6 +28,7 @@ class OrderModel {
     final createdAtRaw = json['created_at'] as String?;
 
     return OrderModel(
+      pharmacyId: (pharmacy?['id'] as num?)?.toInt() ?? (json['pharmacy_id'] as num?)?.toInt(),
       orderNumber: (json['id'] as num?)?.toInt().toString() ?? '',
       pharmacyName: pharmacy?['name'] as String? ?? '',
       status: OrderStatus.fromApi(json['status'] as String? ?? ''),
@@ -37,6 +40,7 @@ class OrderModel {
   }
 
   Order toEntity() => Order(
+        pharmacyId: pharmacyId,
         orderNumber: orderNumber,
         pharmacyName: pharmacyName,
         status: status,

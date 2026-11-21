@@ -1,5 +1,4 @@
 class RateExperienceState {
-  final int appRating;
   final int pharmacyRating;
   final String notes;
   final bool isSubmitting;
@@ -7,7 +6,6 @@ class RateExperienceState {
   final bool submitted;
 
   const RateExperienceState({
-    this.appRating = 0,
     this.pharmacyRating = 0,
     this.notes = '',
     this.isSubmitting = false,
@@ -16,7 +14,6 @@ class RateExperienceState {
   });
 
   RateExperienceState copyWith({
-    int? appRating,
     int? pharmacyRating,
     String? notes,
     bool? isSubmitting,
@@ -25,7 +22,6 @@ class RateExperienceState {
     bool? submitted,
   }) {
     return RateExperienceState(
-      appRating: appRating ?? this.appRating,
       pharmacyRating: pharmacyRating ?? this.pharmacyRating,
       notes: notes ?? this.notes,
       isSubmitting: isSubmitting ?? this.isSubmitting,

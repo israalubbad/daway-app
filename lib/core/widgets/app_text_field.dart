@@ -34,7 +34,7 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.keyboardType = TextInputType.text,
     this.onChanged,
-    this.textAlign = TextAlign.right,
+    this.textAlign = TextAlign.start,
     this.obscureText = false,
     this.readOnly = false,
     this.onSubmitted,

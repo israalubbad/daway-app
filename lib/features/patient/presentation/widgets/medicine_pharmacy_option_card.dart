@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -5,6 +6,8 @@ import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/medicine_pharmacy_offer.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// One selectable row in "اختر الصيدلية المناسبة لك" — a radio-style choice,
 /// not a navigation target, so selection is the screen's own local UI state
@@ -60,7 +63,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           offer.pharmacyName,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.medicinePharmacyName,
@@ -69,7 +72,7 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                       if (distanceKm != null) ...[
                         SizedBox(width: 8.w),
                         Text(
-                          'يبعد عنك ${distanceKm.toStringAsFixed(1)} كيلو',
+                          'يبعد عنك {0} كيلو'.trArgs([distanceKm.toStringAsFixed(1)]),
                           style: AppTextStyles.medicinePharmacyDistance,
                         ),
                       ],
@@ -77,8 +80,8 @@ class MedicinePharmacyOptionCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '${formatPrice(offer.price)} \$/الشريط',
-                    textAlign: TextAlign.right,
+                    '{0} \$/الشريط'.trArgs([formatPrice(offer.price)]),
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.medicinePharmacyPrice,
                   ),
                 ],
@@ -112,7 +115,7 @@ class _PharmacyThumbnail extends StatelessWidget {
       child: (url != null && url.isNotEmpty)
           ? ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
+              child: networkImage(
                 url,
                 fit: BoxFit.cover,
                 width: 45.w,

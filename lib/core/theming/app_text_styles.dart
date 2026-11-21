@@ -17,12 +17,6 @@ abstract class AppTextStyles {
         color: AppColors.primaryTeal,
       );
 
-  static TextStyle get accountOptionTitle => TextStyle(
-        fontSize: 16.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textDark,
-      );
-
   static TextStyle get accountTypeSubtitle => TextStyle(
         fontSize: 16.sp,
         fontWeight: FontWeight.w400,
@@ -148,12 +142,6 @@ abstract class AppTextStyles {
         color: AppColors.greyText,
       );
 
-  static TextStyle get authTitle => TextStyle(
-        fontSize: 24.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.mainTeal,
-      );
-
   static TextStyle get authSubtitle => TextStyle(
         fontSize: 14.sp,
         color: AppColors.greyText,
@@ -165,21 +153,9 @@ abstract class AppTextStyles {
         color: AppColors.mainTeal,
       );
 
-  static TextStyle get helperText => TextStyle(
-        fontSize: 12.sp,
-        color: AppColors.grey,
-      );
-
   static TextStyle get errorText => TextStyle(
         fontSize: 13.sp,
         color: AppColors.error,
-      );
-
-  /// The bold name header on a person's card (patient inquiries, ratings, ...).
-  static TextStyle get personName => TextStyle(
-        fontSize: 14.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textDark,
       );
 
   static TextStyle get onboardingTitle => TextStyle(

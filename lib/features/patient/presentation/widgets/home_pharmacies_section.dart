@@ -5,7 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// "الصيدليات" section — a single discovery card (no nearby-pharmacies API
+
 /// yet, so it just hands off to [onDiscoverTap]) plus its plain section
 /// title. Unlike [HomeCategoriesSection], there's no "عرض الكل" chip here.
 class HomePharmaciesSection extends StatelessWidget {
@@ -48,14 +51,14 @@ class HomePharmaciesSection extends StatelessWidget {
                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('صيدليات', style: AppTextStyles.homePharmacyCardTitle),
+                      Text('صيدليات'.tr, style: AppTextStyles.homePharmacyCardTitle),
                       SizedBox(height: 4.h),
-                      Text('اكتشف الصيدليات القريبة منك', style: AppTextStyles.homePharmacyCardSubtitle),
+                      Text('اكتشف الصيدليات القريبة منك'.tr, style: AppTextStyles.homePharmacyCardSubtitle),
                     ],
                   ),
                 ),
                 SizedBox(width: 12.w),
-                SvgPicture.asset('assets/icons/arrow_icon.svg', width: 16.w, height: 16.w),
+                MirrorWhenLtr(child: SvgPicture.asset('assets/icons/arrow_icon.svg', width: 16.w, height: 16.w)),
               ],
             ),
           ),

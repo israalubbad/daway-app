@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../localization/presentation/cubit/language_cubit.dart';
 import '../../../../core/helpers/open_location_picker.dart';
+import '../../../../core/helpers/open_support_chat.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/account_row_card.dart';
@@ -14,6 +16,8 @@ import '../../../../core/widgets/logout_confirmation_sheet.dart';
 import '../../../../core/widgets/settings_brand_footer.dart';
 import '../../../../core/widgets/settings_section_label.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
+import '../../../auth/presentation/cubit/pharmacy_closure_cubit.dart';
+import '../../../auth/presentation/widgets/pharmacy_closure_row.dart';
 import '../../../auth/presentation/screens/privacy_policy_screen.dart';
 import '../../../auth/presentation/screens/terms_screen.dart';
 import '../../../patient/domain/entities/device_setting.dart';
@@ -24,6 +28,8 @@ import '../../../patient/presentation/widgets/patient_sub_screen_header.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../cubit/pharmacy_profile_state.dart';
 import 'pharmacy_account_info_screen.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// The pharmacy's الإعدادات tab: the account-info page, language,
 /// notifications, the location, the privacy links, logout and the app version.
@@ -40,8 +46,11 @@ class PharmacySettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<AccountSettingsCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<AccountSettingsCubit>()),
+        BlocProvider(create: (_) => getIt<PharmacyClosureCubit>()..load()),
+      ],
       child: const _SettingsBody(),
     );
   }
@@ -56,8 +65,7 @@ class _SettingsBody extends StatefulWidget {
 
 class _SettingsBodyState extends State<_SettingsBody>
     with WidgetsBindingObserver {
-  /// The app only ships in Arabic today, so this is fixed.
-  static const _currentLanguage = AppLanguage.arabic;
+  AppLanguage get _currentLanguage => getIt<LanguageCubit>().state;
 
   @override
   void initState() {
@@ -93,7 +101,7 @@ class _SettingsBodyState extends State<_SettingsBody>
       selected: _currentLanguage,
     );
     if (!mounted || picked == null || picked == _currentLanguage) return;
-    AppSnackbar.show(context, 'قريباً');
+    await getIt<LanguageCubit>().select(picked);
   }
 
   void _openAccountInfo() {
@@ -114,7 +122,7 @@ class _SettingsBodyState extends State<_SettingsBody>
     final cubit = context.read<PharmacyProfileCubit>();
     final current = cubit.state;
     if (current is! PharmacyProfileLoaded) {
-      AppSnackbar.show(context, 'تعذّر تحميل بيانات الصيدلية، حاول مرة أخرى');
+      AppSnackbar.show(context, 'تعذّر تحميل بيانات الصيدلية، حاول مرة أخرى'.tr);
       return;
     }
     final picked = await openLocationPicker(
@@ -135,7 +143,7 @@ class _SettingsBodyState extends State<_SettingsBody>
       // shared profile for the account-info screen to pick up.
       cubit.discardEdits();
     } else {
-      AppSnackbar.show(context, 'تم تحديث الموقع');
+      AppSnackbar.show(context, 'تم تحديث الموقع'.tr);
     }
   }
 
@@ -171,9 +179,9 @@ class _SettingsBodyState extends State<_SettingsBody>
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: const PatientSubScreenHeader(
-                  title: 'الإعدادات',
-                  description: 'إدارة معلوماتك الشخصية وتفاصيل حسابك',
+                child: PatientSubScreenHeader(
+                  title: 'الإعدادات'.tr,
+                  description: 'إدارة معلوماتك الشخصية وتفاصيل حسابك'.tr,
                   showBackButton: false,
                 ),
               ),
@@ -212,18 +220,18 @@ class _SettingsBodyState extends State<_SettingsBody>
                   )
                 : const SizedBox.shrink(),
           ),
-          const SettingsSectionLabel('التفضيلات'),
+          SettingsSectionLabel('التفضيلات'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/user_icon.svg'),
-            label: 'معلومات الحساب',
+            label: 'معلومات الحساب'.tr,
             trailing: const AccountRowChevron(),
             onTap: _openAccountInfo,
           ),
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/globe_icon.svg'),
-            label: 'اللغة',
+            label: 'اللغة'.tr,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -240,37 +248,44 @@ class _SettingsBodyState extends State<_SettingsBody>
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/bell_icon.svg'),
-            label: 'الإشعارات',
+            label: 'الإشعارات'.tr,
             trailing: _notificationsSwitch(state),
             onTap: _openNotificationSettings,
           ),
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/map_pin_icon.svg'),
-            label: 'تحديث الموقع',
+            label: 'تحديث الموقع'.tr,
             onTap: _updateLocation,
           ),
           SizedBox(height: 32.h),
-          const SettingsSectionLabel('الخصوصية والأمان'),
+          SettingsSectionLabel('الخصوصية والأمان'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/shield_icon.svg'),
-            label: 'سياسة الخصوصية',
+            label: 'سياسة الخصوصية'.tr,
             trailing: const AccountRowChevron(),
             onTap: () => _push(const PrivacyPolicyScreen()),
           ),
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/file_text_icon.svg'),
-            label: 'الشروط والأحكام',
+            label: 'الشروط والأحكام'.tr,
             trailing: const AccountRowChevron(),
             onTap: () => _push(const TermsScreen()),
           ),
+          SizedBox(height: 16.h),
+          AccountRowCard(
+            leading: const AccountRowIcon('assets/icons/headphones_icon.svg'),
+            label: 'المساعدة والدعم'.tr,
+            trailing: const AccountRowChevron(),
+            onTap: () => openSupportChat(context),
+          ),
           SizedBox(height: 24.h),
-          const SettingsSectionLabel('الحساب'),
+          SettingsSectionLabel('الحساب'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
-            label: 'تسجيل الخروج',
+            label: 'تسجيل الخروج'.tr,
             labelColor: AppColors.logoutRed,
             trailing: const AccountRowIcon(
               'assets/icons/log_out_icon.svg',
@@ -280,6 +295,8 @@ class _SettingsBodyState extends State<_SettingsBody>
             radius: 12,
             onTap: _confirmLogout,
           ),
+          SizedBox(height: 16.h),
+          const PharmacyClosureRow(),
           SizedBox(height: 40.h),
           const Spacer(),
           SettingsBrandFooter(version: version),

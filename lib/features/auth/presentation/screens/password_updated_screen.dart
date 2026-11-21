@@ -6,7 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The last screen of resetting a password: a card in the middle of the screen
+
 /// saying it worked. It has nothing to press — after [displayTime] it goes, and
 /// the pharmacy is back at what the flow was opened from (the login): the
 /// screens of the flow were removed when this one opened, so it is right under
@@ -74,7 +76,7 @@ class _PasswordUpdatedScreenState extends State<PasswordUpdatedScreen> {
                   Semantics(
                     liveRegion: true,
                     child: Text(
-                      'تم تحديث كلمة مرورك بنجاح',
+                      'تم تحديث كلمة مرورك بنجاح'.tr,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.passwordUpdatedMessage,
                     ),

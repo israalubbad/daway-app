@@ -10,7 +10,9 @@ import '../cubit/categories_cubit.dart';
 import '../cubit/categories_state.dart';
 import 'category_icon.dart';
 
+import '../../../../core/localization/translations.dart';
 /// How many categories the home grid shows — matches the design's 3x2 grid;
+
 /// the rest are reachable through "عرض الكل".
 const int _homeCategoriesLimit = 6;
 
@@ -29,7 +31,7 @@ class HomeCategoriesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(title: 'الاقسام', onActionTap: onViewAllTap),
+        SectionHeader(title: 'الاقسام'.tr, onActionTap: onViewAllTap),
         SizedBox(height: 16.h),
         BlocBuilder<CategoriesCubit, CategoriesState>(
           builder: (context, state) {
@@ -48,7 +50,7 @@ class HomeCategoriesSection extends StatelessWidget {
                   height: 110.h,
                   child: Center(
                     child: Text(
-                      'لا توجد أقسام متاحة حالياً',
+                      'لا توجد أقسام متاحة حالياً'.tr,
                       textAlign: TextAlign.center,
 
                       style: AppTextStyles.homePharmacyCardSubtitle,
@@ -109,20 +111,20 @@ class _CategoryCard extends StatelessWidget {
           border: Border.all(color: AppColors.iconBlueBorder),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        padding: EdgeInsets.only(top: 8.h, right: 8.w, left: 4.w, bottom: 4.h),
+        padding: EdgeInsetsDirectional.only(top: 8.h, start: 8.w, end: 4.w, bottom: 4.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              category.nameAr,
-              textAlign: TextAlign.right,
+              category.name,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.homeCategoryLabel,
             ),
             Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: AlignmentDirectional.bottomEnd,
                 child: CategoryIcon(category: category),
               ),
             ),

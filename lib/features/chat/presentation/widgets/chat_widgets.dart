@@ -1,9 +1,13 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../domain/entities/chat_message.dart';
+
+import '../../../../core/localization/translations.dart';
 
 // Pieces of the conversation UI shared by the pharmacy inquiry chat and the
 // assistant (chatbot) chat, so both look the same.
@@ -25,7 +29,7 @@ class ChatHeader extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             title,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 16.sp, color: AppColors.textDark),
@@ -34,7 +38,7 @@ class ChatHeader extends StatelessWidget {
             SizedBox(height: 2.h),
             Text(
               subtitle!,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
@@ -98,8 +102,8 @@ class _DayChip extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff == 0) return 'اليوم';
-    if (diff == 1) return 'أمس';
+    if (diff == 0) return 'اليوم'.tr;
+    if (diff == 1) return 'أمس'.tr;
     return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
   }
 
@@ -120,12 +124,6 @@ class _DayChip extends StatelessWidget {
   }
 }
 
-String _formatTime(DateTime time) {
-  final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
-  final minute = time.minute.toString().padLeft(2, '0');
-  return '$hour:$minute ${time.hour < 12 ? 'ص' : 'م'}';
-}
-
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
 
@@ -135,7 +133,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final mine = message.isMine;
     final textColor = mine ? Colors.white : AppColors.textDark;
-    final time = _formatTime(message.createdAt);
+    final time = formatClockTime(message.createdAt);
     final imageOnly = message.imageUrl != null &&
         (message.text.isEmpty || message.text.trim() == message.imageUrl);
 
@@ -173,7 +171,7 @@ class ChatBubble extends StatelessWidget {
                         onTap: () => _openImage(context, message.imageUrl!),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(6.r),
-                          child: Image.network(
+                          child: networkImage(
                             message.imageUrl!,
                             fit: BoxFit.cover,
                             width: imageOnly ? 240.w : null,
@@ -198,7 +196,7 @@ class ChatBubble extends StatelessWidget {
                   if (message.text.isNotEmpty && message.imageUrl != message.text.trim())
                     Text(
                       message.text,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: TextStyle(fontSize: 14.sp, color: textColor, height: 1.4),
                     ),
                 ],
@@ -207,7 +205,7 @@ class ChatBubble extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            mine ? 'أنت: $time' : time,
+            mine ? 'أنت: {0}'.trArgs([time]) : time,
             style: TextStyle(fontSize: 11.sp, color: AppColors.grey),
           ),
         ],
@@ -232,7 +230,7 @@ void _openImage(BuildContext context, String url) {
           child: InteractiveViewer(
             minScale: 1,
             maxScale: 5,
-            child: Image.network(
+            child: networkImage(
               url,
               fit: BoxFit.contain,
               loadingBuilder: (context, child, progress) => progress == null

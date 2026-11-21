@@ -5,7 +5,9 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/medicine.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The small tinted tag on a product card that says how the stock stands:
+
 /// متوفر, مخزون منخفض or نافد.
 class ProductStatusBadge extends StatelessWidget {
   final MedicineStatus status;
@@ -16,17 +18,17 @@ class ProductStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, textColor, tint) = switch (status) {
       MedicineStatus.available => (
-        'متوفر',
+        'متوفر'.tr,
         AppColors.productAvailableText,
         AppColors.productAvailableTint,
       ),
       MedicineStatus.low => (
-        'مخزون منخفض',
+        'مخزون منخفض'.tr,
         AppColors.statLowStock,
         AppColors.productLowStockTint,
       ),
       MedicineStatus.outOfStock => (
-        'نافد',
+        'نافد'.tr,
         AppColors.statOutOfStock,
         AppColors.productOutOfStockTint,
       ),

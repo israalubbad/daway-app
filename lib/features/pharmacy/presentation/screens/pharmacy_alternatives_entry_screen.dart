@@ -15,7 +15,9 @@ import '../cubit/pharmacy_alternatives_medicines_state.dart';
 import '../helpers/medicine_text_display.dart';
 import '../widgets/medicine_status_badge.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Entry point for "البدائل" from the side menu: every medicine in stock,
+
 /// each showing whether it already has an alternative linked and whether it
 /// still needs one — matching the pharmacy web dashboard's "إدارة البدائل"
 /// page, which lists every medicine rather than only the ones running low.
@@ -53,7 +55,7 @@ class _PharmacyAlternativesEntryScreenState
         scrolledUnderElevation: 0,
         centerTitle: true,
         title: Text(
-          'البدائل',
+          'البدائل'.tr,
           style: AppTextStyles.screenTitle.copyWith(
             color: AppColors.mainTeal,
             fontSize: 20.sp,
@@ -106,20 +108,20 @@ class _PharmacyAlternativesEntryScreenState
                     icon: Icons.warning_amber_rounded,
                     color: AppColors.warning,
                     value: '${state.needingAlternativeIds.length}',
-                    label: 'أدوية تحتاج بديلاً',
+                    label: 'أدوية تحتاج بديلاً'.tr,
                   ),
                   StatCard(
                     icon: Icons.check_circle_outline,
                     color: AppColors.success,
                     value: '${state.alreadyHandledIds.length}',
-                    label: 'بدائل محددة',
+                    label: 'بدائل محددة'.tr,
                   ),
                 ],
               ),
               SizedBox(height: 12.h),
               AppTextField(
                 controller: _searchController,
-                hintText: 'ابحث عن دواء أو مادة فعالة...',
+                hintText: 'ابحث عن دواء أو مادة فعالة...'.tr,
                 prefixIcon: Icon(Icons.search, color: AppColors.grey),
                 onChanged: (value) => context
                     .read<PharmacyAlternativesMedicinesCubit>()
@@ -135,8 +137,8 @@ class _PharmacyAlternativesEntryScreenState
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Text(
                       state.medicines.isEmpty
-                          ? 'لا توجد أدوية في المخزون بعد'
-                          : 'لا توجد نتائج مطابقة للبحث',
+                          ? 'لا توجد أدوية في المخزون بعد'.tr
+                          : 'لا توجد نتائج مطابقة للبحث'.tr,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.cardDescription,
                     ),
@@ -199,7 +201,7 @@ class _MedicineTile extends StatelessWidget {
                 children: [
                   Text(
                     medicine.displayName,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     textDirection: textDirectionFor(medicine.displayName),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -214,7 +216,7 @@ class _MedicineTile extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       medicine.activeIngredient!,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       textDirection: textDirectionFor(
                         medicine.activeIngredient!,
                       ),
@@ -235,7 +237,7 @@ class _MedicineTile extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          'بديل محدد',
+                          'بديل محدد'.tr,
                           style: TextStyle(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.w600,
@@ -254,7 +256,7 @@ class _MedicineTile extends StatelessWidget {
                 MedicineStatusBadge(status: medicine.status),
                 SizedBox(height: 4.h),
                 Text(
-                  '${medicine.quantity} متبقي',
+                  '{0} متبقي'.trArgs([medicine.quantity]),
                   style: TextStyle(fontSize: 10.5.sp, color: AppColors.grey),
                 ),
               ],

@@ -1,9 +1,12 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/searched_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 import 'medicine_grid_card.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// A medicine card for the search results grid — unlike
 /// [CategoryMedicineCard], `GET /medicines/search` does return a real image
@@ -26,7 +29,7 @@ class SearchedMedicineCard extends StatelessWidget {
 
     return MedicineGridCard(
       media: (imageUrl != null && imageUrl.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               imageUrl,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const MedicinePlaceholderIcon(),
@@ -35,9 +38,9 @@ class SearchedMedicineCard extends StatelessWidget {
       title: medicine.tradeName,
       subtitle: hasPharmacies
           ? pharmaciesAvailabilityLabel(medicine.availablePharmaciesCount)
-          : 'غير متوفر حالياً',
+          : 'غير متوفر حالياً'.tr,
       subtitleColor: hasPharmacies ? AppColors.success : AppColors.grey,
-      detailsLabel: 'عرض التفاصيل',
+      detailsLabel: 'عرض التفاصيل'.tr,
       onDetailsTap: onDetailsTap,
     );
   }

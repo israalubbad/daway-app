@@ -27,12 +27,13 @@ Future<void> setDesignViewport(WidgetTester tester) async {
 Widget buildArabicTestApp({
   required Widget home,
   RouteFactory? onGenerateRoute,
+  Locale locale = const Locale('ar'),
 }) {
   return ScreenUtilInit(
     designSize: testDesignSize,
     builder: (context, _) => MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar')],
+      locale: locale,
+      supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

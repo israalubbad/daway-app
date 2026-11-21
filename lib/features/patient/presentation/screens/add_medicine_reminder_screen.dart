@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -9,6 +10,8 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/entities/medicine_reminder.dart';
 import '../cubit/reminders_cubit.dart';
 import '../widgets/patient_sub_screen_header.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// "إضافة تذكير للدواء" — a full screen (redesigned 2026-09-28 from a
 /// bottom sheet), reused for editing too: [existing] pre-fills the fields
@@ -88,11 +91,11 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PatientSubScreenHeader(
-                title: isEditing ? 'تعديل التذكير' : 'إضافة تذكير للدواء',
-                description: 'أضف الادوية لتذكيرك فيها بالوقت المناسب',
+                title: isEditing ? 'تعديل التذكير'.tr : 'إضافة تذكير للدواء'.tr,
+                description: 'أضف الادوية لتذكيرك فيها بالوقت المناسب'.tr,
               ),
               SizedBox(height: 24.h),
-              Text('اسم الدواء', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+              Text('اسم الدواء'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
               SizedBox(height: 8.h),
               AppTextField(
                 controller: _nameController,
@@ -101,8 +104,8 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'مواعيد التذكير',
-                textAlign: TextAlign.right,
+                'مواعيد التذكير'.tr,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.profileFieldLabel,
               ),
               SizedBox(height: 8.h),
@@ -132,8 +135,8 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'وقت التذكير',
-                textAlign: TextAlign.right,
+                'وقت التذكير'.tr,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.profileFieldLabel,
               ),
               SizedBox(height: 8.h),
@@ -150,8 +153,8 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          _selectedTime == null ? '' : _formatTime(_selectedTime!),
-                          textAlign: TextAlign.right,
+                          _selectedTime == null ? '' : formatClockHourMinute(_selectedTime!.hour, _selectedTime!.minute),
+                          textAlign: TextAlign.start,
                           style: AppTextStyles.profileFieldValue,
                         ),
                       ),
@@ -170,7 +173,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   child: Text(
-                    'حذف',
+                    'حذف'.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,
@@ -180,7 +183,7 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
                 ),
                 SizedBox(height: 16.h),
               ],
-              AppCustomButton(text: 'التالي', onPressed: _save),
+              AppCustomButton(text: 'التالي'.tr, onPressed: _save),
               SizedBox(height: 24.h),
             ],
           ),
@@ -190,13 +193,6 @@ class _AddMedicineReminderScreenState extends State<AddMedicineReminderScreen> {
   }
 }
 
-/// Matches [MedicineReminder.formattedTime]'s format, for the time picker
-/// field's display before a reminder object even exists to ask.
-String _formatTime(TimeOfDay time) {
-  final period = time.hour < 12 ? 'ص' : 'م';
-  final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
-  return '$hour:${time.minute.toString().padLeft(2, '0')} $period';
-}
 
 class _FrequencyChip extends StatelessWidget {
   final String label;

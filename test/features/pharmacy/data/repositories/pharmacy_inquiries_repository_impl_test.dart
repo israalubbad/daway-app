@@ -26,18 +26,6 @@ class _StubRemoteDataSource extends PharmacyInquiriesRemoteDataSource {
       statusCode: 200,
     );
   }
-
-  @override
-  Future<Response<dynamic>> updateStatus({
-    required String token,
-    required int inquiryId,
-    required String status,
-  }) async {
-    if (updateThrows) throw DioException(requestOptions: RequestOptions());
-    lastUpdateId = inquiryId;
-    lastUpdateBody = {'status': status};
-    return Response(requestOptions: RequestOptions(), statusCode: 200);
-  }
 }
 
 const _responseJson = {
@@ -115,33 +103,6 @@ void main() {
     remoteDataSource.getThrows = true;
 
     final result = await repository.getInquiries(token: 'tok-1');
-
-    expect(result, isA<ApiError<Object?>>());
-  });
-
-  test(
-    'updateInquiryStatus sends the wire status string for the given id',
-    () async {
-      final result = await repository.updateInquiryStatus(
-        token: 'tok-1',
-        inquiryId: 7,
-        status: InquiryStatus.answered,
-      );
-
-      expect(result, isA<Success<Object?>>());
-      expect(remoteDataSource.lastUpdateId, 7);
-      expect(remoteDataSource.lastUpdateBody, {'status': 'answered'});
-    },
-  );
-
-  test('updateInquiryStatus surfaces a failure as an ApiError', () async {
-    remoteDataSource.updateThrows = true;
-
-    final result = await repository.updateInquiryStatus(
-      token: 'tok-1',
-      inquiryId: 7,
-      status: InquiryStatus.closed,
-    );
 
     expect(result, isA<ApiError<Object?>>());
   });

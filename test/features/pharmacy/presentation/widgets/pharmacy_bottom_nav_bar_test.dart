@@ -2,6 +2,7 @@ import 'package:daway_app/core/theming/app_colors.dart';
 import 'package:daway_app/features/pharmacy/presentation/widgets/pharmacy_bottom_nav_bar.dart';
 import 'package:daway_app/features/pharmacy/presentation/widgets/pharmacy_dashboard_tab_scope.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
@@ -37,6 +38,20 @@ void main() {
     // RTL: each tab further along the list sits further to the left.
     final xs = [for (final label in labels) tester.getCenter(find.text(label)).dx];
     expect(xs, orderedEquals([...xs]..sort((a, b) => b.compareTo(a))));
+  });
+
+  testWidgets('every tab has an icon of its own: products is not the orders magnifier', (tester) async {
+    await setDesignViewport(tester);
+    await tester.pumpWidget(buildTestable(selected: PharmacyDashboardTab.home));
+
+    final assets = [
+      for (final picture in tester.widgetList<SvgPicture>(find.byType(SvgPicture)))
+        (picture.bytesLoader as SvgAssetLoader).assetName,
+    ];
+
+    expect(assets, hasLength(5));
+    expect(assets.toSet(), hasLength(5), reason: 'no two tabs share an icon: $assets');
+    expect(assets, contains('assets/icons/products_icon.svg'));
   });
 
   testWidgets('tapping a tab reports it', (tester) async {

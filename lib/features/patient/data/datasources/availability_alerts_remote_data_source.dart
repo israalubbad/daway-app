@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class AvailabilityAlertsRemoteDataSource {
@@ -13,7 +14,7 @@ class AvailabilityAlertsRemoteDataSource {
     return _dio.post(
       ApiConstants.patientAvailabilityAlerts,
       data: {'medicine_id': medicineId},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

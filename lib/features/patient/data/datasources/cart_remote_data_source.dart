@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class CartRemoteDataSource {
@@ -10,7 +11,7 @@ class CartRemoteDataSource {
   Future<Response<dynamic>> getCart({required String token}) {
     return _dio.get(
       ApiConstants.patientCart,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -33,21 +34,21 @@ class CartRemoteDataSource {
         else ...{'pharmacy_id': pharmacyId, 'medicine_id': medicineId},
         'quantity': quantity,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
   Future<Response<dynamic>> deleteItem({required String token, required int itemId}) {
     return _dio.delete(
       '${ApiConstants.patientCartItems}/$itemId',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
   Future<Response<dynamic>> clearCart({required String token}) {
     return _dio.delete(
       ApiConstants.patientCart,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -59,7 +60,7 @@ class CartRemoteDataSource {
     return _dio.put(
       '${ApiConstants.patientCartItems}/$itemId',
       data: {'quantity': quantity},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

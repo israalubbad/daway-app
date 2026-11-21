@@ -1,8 +1,10 @@
 import '../../../../core/helpers/api_result.dart';
 import '../../../chat/domain/entities/chat_conversation.dart';
-import '../../../chat/domain/entities/chat_message.dart';
 import '../entities/pharmacy_inquiry.dart';
+import '../../../chat/domain/usecases/group_conversations.dart';
 import 'get_patient_inquiries_usecase.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// The patient's conversations: one per pharmacy, however many inquiries
 /// (one per medicine) they have with it, most recently active first.
@@ -20,28 +22,13 @@ class GetPharmacyConversationsUseCase implements ConversationsSource {
     };
   }
 
-  List<ChatConversation> _group(List<PharmacyInquiry> inquiries) {
-    final byPharmacy = <int, List<PharmacyInquiry>>{};
-    for (final inquiry in inquiries) {
-      byPharmacy.putIfAbsent(inquiry.pharmacyId, () => []).add(inquiry);
-    }
-
-    final groups = [
-      for (final list in byPharmacy.values)
-        [...list]..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
-    ]..sort((a, b) => b.first.createdAt.compareTo(a.first.createdAt));
-
-    return [
-      for (final group in groups)
-        ChatConversation(
-          title: group.first.pharmacyName ?? 'صيدلية',
-          lastText: chatPreviewText(
-            group.first.lastMessage ?? group.first.reply ?? group.first.message,
-          ),
-          unreadCount: group.fold(0, (sum, i) => sum + i.unreadCount),
-          inquiryIds: [for (final i in group) i.id],
-          lastActivity: group.first.createdAt,
-        ),
-    ];
-  }
+  List<ChatConversation> _group(List<PharmacyInquiry> inquiries) => groupConversations(
+    inquiries,
+    groupKey: (inquiry) => inquiry.pharmacyId,
+    id: (inquiry) => inquiry.id,
+    createdAt: (inquiry) => inquiry.createdAt,
+    unreadCount: (inquiry) => inquiry.unreadCount,
+    title: (latest) => latest.pharmacyName ?? 'صيدلية'.tr,
+    lastText: (latest) => latest.lastMessage ?? latest.reply ?? latest.message,
+  );
 }

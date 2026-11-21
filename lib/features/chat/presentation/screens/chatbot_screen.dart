@@ -11,6 +11,8 @@ import '../cubit/chatbot_state.dart';
 import '../widgets/chat_widgets.dart';
 import '../widgets/chatbot_result_widgets.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The patient's conversation with the assistant — same look as the pharmacy
 /// inquiry chat, without pictures.
 class ChatbotScreen extends StatelessWidget {
@@ -80,9 +82,9 @@ class _ChatbotViewState extends State<_ChatbotView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const ChatHeader(
-              title: 'المساعد الذكي',
-              subtitle: 'اسأل عن أي دواء وسأدلّك على الصيدليات المتوفر فيها',
+            ChatHeader(
+              title: 'المساعد الذكي'.tr,
+              subtitle: 'اسأل عن أي دواء وسأدلّك على الصيدليات المتوفر فيها'.tr,
             ),
             Divider(height: 1, color: AppColors.cardBorder),
             Expanded(
@@ -108,7 +110,7 @@ class _ChatbotViewState extends State<_ChatbotView> {
                   selector: (state) => state.isSending,
                   builder: (context, isSending) => AppTextField(
                     controller: _controller,
-                    hintText: 'اكتب رسالة',
+                    hintText: 'اكتب رسالة'.tr,
                     maxLines: 1,
                     fillColor: Colors.white,
                     textInputAction: TextInputAction.send,

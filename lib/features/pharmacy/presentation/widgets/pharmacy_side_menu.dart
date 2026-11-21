@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/helpers/open_support_chat.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_logo.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/logout_confirmation_sheet.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
 import 'pharmacy_dashboard_tab_scope.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// Drawer shown from every tab inside [PharmacyDashboardShellScreen] — each
 /// tab owns its own instance rather than the shell owning one shared Drawer,
@@ -24,14 +26,14 @@ class PharmacySideMenu extends StatelessWidget {
     PharmacyDashboardTabScope.switchToTabOrShowComingSoon(context, tab);
   }
 
-  void _handleComingSoon(BuildContext context) {
-    Navigator.of(context).pop();
-    AppSnackbar.show(context, 'قريباً');
-  }
-
   void _openAlternatives(BuildContext context) {
     Navigator.of(context).pop();
     Navigator.of(context).pushNamed(Routes.pharmacyAlternativesEntryScreen);
+  }
+
+  void _openAccounting(BuildContext context) {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushNamed(Routes.accountingScreen);
   }
 
   void _openRatings(BuildContext context) {
@@ -52,52 +54,57 @@ class PharmacySideMenu extends StatelessWidget {
             SizedBox(height: 16.h),
             _MenuItem(
               icon: Icons.home_outlined,
-              label: 'الرئيسية',
+              label: 'الرئيسية'.tr,
               onTap: () => _switchToTab(context, PharmacyDashboardTab.home),
             ),
             _MenuItem(
               icon: Icons.medication_outlined,
-              label: 'الأدوية',
+              label: 'الأدوية'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.medicines),
             ),
             _MenuItem(
               icon: Icons.inventory_2_outlined,
-              label: 'المخزون',
+              label: 'المخزون'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.inventory),
             ),
             _MenuItem(
               icon: Icons.chat_bubble_outline,
-              label: 'الاستفسارات',
+              label: 'الاستفسارات'.tr,
               onTap: () =>
                   _switchToTab(context, PharmacyDashboardTab.inquiries),
             ),
             _MenuItem(
               icon: Icons.sync_alt,
-              label: 'البدائل',
+              label: 'البدائل'.tr,
               onTap: () => _openAlternatives(context),
             ),
             _MenuItem(
               icon: Icons.star_outline_rounded,
-              label: 'التقييمات والمراجعات',
+              label: 'التقييمات والمراجعات'.tr,
               onTap: () => _openRatings(context),
             ),
             _MenuItem(
+              icon: Icons.account_balance_wallet_outlined,
+              label: 'المحاسبة'.tr,
+              onTap: () => _openAccounting(context),
+            ),
+            _MenuItem(
               icon: Icons.settings_outlined,
-              label: 'الإعدادات',
+              label: 'الإعدادات'.tr,
               onTap: () => _switchToTab(context, PharmacyDashboardTab.settings),
             ),
             _MenuItem(
               icon: Icons.support_agent_outlined,
-              label: 'المساعدة والدعم',
-              onTap: () => _handleComingSoon(context),
+              label: 'المساعدة والدعم'.tr,
+              onTap: () => openSupportFromDrawer(context),
             ),
             const Spacer(),
             Divider(color: AppColors.borderGrey, height: 1),
             _MenuItem(
               icon: Icons.logout,
-              label: 'تسجيل الخروج',
+              label: 'تسجيل الخروج'.tr,
               iconColor: AppColors.error,
               labelColor: AppColors.error,
               onTap: () => LogoutConfirmationSheet.show(
@@ -134,7 +141,7 @@ class _MenuItem extends StatelessWidget {
       leading: Icon(icon, color: iconColor ?? AppColors.textDark),
       title: Text(
         label,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.cardDescription.copyWith(
           color: labelColor ?? AppColors.textDark,
           fontWeight: FontWeight.w600,

@@ -3,13 +3,12 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/pharmacy_login_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/save_session_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/pharmacy_auth_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   ApiResult<PharmacyAuthResult> loginResult =
@@ -54,31 +53,14 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakeAuthRepository repository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late PharmacyAuthCubit cubit;
 
   setUp(() {
     repository = _FakeAuthRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository();
     cubit = PharmacyAuthCubit(
       PharmacyLoginUseCase(repository),
       SaveSessionUseCase(sessionRepository),

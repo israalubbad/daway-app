@@ -2,13 +2,11 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
 import 'package:daway_app/core/routing/routes.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
 import 'package:daway_app/features/patient/domain/entities/checkout_flow.dart';
 import 'package:daway_app/features/patient/domain/repositories/checkout_flow_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_flow_usecases.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
@@ -17,6 +15,7 @@ import 'package:daway_app/features/patient/domain/repositories/orders_repository
 import 'package:daway_app/features/patient/domain/repositories/patient_addresses_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_profile_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/clear_cart_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/delete_cart_item_usecase.dart';
@@ -31,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _items = [
   CartItem(
@@ -189,6 +189,16 @@ class _FakeProfileRepository implements PatientProfileRepository {
 }
 
 class _FakeOrdersRepository implements OrdersRepository {
+  /// What the quote call answers. By default delivery pricing is off (the
+  /// server answers 422), so a flow that does not care about the quote runs
+  /// without one.
+  ApiResult<CheckoutQuote> quoteResult =
+      const ApiError(ApiFailure(message: 'pricing off', statusCode: 422));
+  int quoteCallCount = 0;
+  String? lastQuoteCouponCode;
+  CheckoutQuote? lastQuote;
+  String? lastIdempotencyKey;
+
   @override
   Future<ApiResult<void>> cancelOrder({
     required String token,
@@ -202,12 +212,27 @@ class _FakeOrdersRepository implements OrdersRepository {
       const Success([]);
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    quoteCallCount++;
+    lastQuoteCouponCode = couponCode;
+    return quoteResult;
+  }
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async {
+    lastQuote = quote;
+    lastIdempotencyKey = idempotencyKey;
     lastAddressId = addressId;
     return checkoutResult;
   }
@@ -250,22 +275,6 @@ class _FakeCheckoutFlowRepository implements CheckoutFlowRepository {
   }) => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.patient,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(440, 956);
@@ -278,13 +287,13 @@ void main() {
   late _FakeCartRepository cartRepository;
   late _FakeAddressesRepository addressesRepository;
   late _FakeOrdersRepository ordersRepository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
 
   setUp(() {
     cartRepository = _FakeCartRepository();
     addressesRepository = _FakeAddressesRepository();
     ordersRepository = _FakeOrdersRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.patient();
 
     getIt.registerFactory<CartCubit>(
       () => CartCubit(
@@ -302,6 +311,7 @@ void main() {
         GetPatientProfileUseCase(_FakeProfileRepository(), sessionRepository),
         ValidateCouponUseCase(_FakeCheckoutFlowRepository(), sessionRepository),
         CheckoutUseCase(ordersRepository, sessionRepository),
+        GetCheckoutQuoteUseCase(ordersRepository, sessionRepository),
       ),
     );
   });

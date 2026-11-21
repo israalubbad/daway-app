@@ -6,23 +6,32 @@ import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// The two big cards under the pharmacy home's header: the number of
+
 /// products (which opens the products tab) and the month's sales.
 class PharmacySummaryCards extends StatelessWidget {
   final int totalProducts;
 
-  /// In shekels, or null while there is no figure to show — the mobile API
-  /// has no sales endpoint yet, so the home passes null and the card shows a
-  /// dash rather than a made-up 0.
+  /// In shekels, or null while there is no figure to show — the card then
+  /// shows a dash rather than a made-up 0.
   final double? monthlySales;
   final VoidCallback onProductsTap;
+
+  /// Lets a caller dress the products card from outside (the onboarding picture
+  /// scales it as a finger taps it); the app's own screens leave it out.
+  final Widget Function(Widget card)? productsCardBuilder;
 
   const PharmacySummaryCards({
     super.key,
     required this.totalProducts,
     required this.monthlySales,
     required this.onProductsTap,
+    this.productsCardBuilder,
   });
+
+  Widget _dressed(Widget card) => productsCardBuilder?.call(card) ?? card;
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +42,19 @@ class PharmacySummaryCards extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _SummaryCard(
-              title: 'إجمالي\nالمنتجات',
-              onTap: onProductsTap,
-              value: Text('$totalProducts', style: AppTextStyles.pharmacySummaryValue),
-              trailing: const _ArrowIcon(),
+            child: _dressed(
+              _SummaryCard(
+                title: 'إجمالي\nالمنتجات'.tr,
+                onTap: onProductsTap,
+                value: Text('$totalProducts', style: AppTextStyles.pharmacySummaryValue),
+                trailing: const _ArrowIcon(),
+              ),
             ),
           ),
           SizedBox(width: 8.w),
           Expanded(
             child: _SummaryCard(
-              title: 'إجمالي المبيعات\nالشهرية',
+              title: 'إجمالي المبيعات\nالشهرية'.tr,
               value: _SalesValue(amount: monthlySales),
             ),
           ),
@@ -110,7 +121,7 @@ class _ArrowIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsetsDirectional.only(end: 8.w),
-      child: SvgPicture.asset('assets/icons/arrow_left_icon.svg', width: 24.w, height: 24.w),
+      child: MirrorWhenLtr(child: SvgPicture.asset('assets/icons/arrow_left_icon.svg', width: 24.w, height: 24.w)),
     );
   }
 }

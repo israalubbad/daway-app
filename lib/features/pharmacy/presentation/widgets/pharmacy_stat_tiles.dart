@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The row of four small stat tiles under the summary cards: available, low
+
 /// stock, out of stock, and the pharmacy's average rating.
 class PharmacyStatTiles extends StatelessWidget {
   final int available;
@@ -33,21 +35,21 @@ class PharmacyStatTiles extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _StatTile(value: '$available', label: 'متوفرة', color: AppColors.statAvailable),
+            child: _StatTile(value: '$available', label: 'متوفرة'.tr, color: AppColors.statAvailable),
           ),
           SizedBox(width: 8.w),
           Expanded(
-            child: _StatTile(value: '$lowStock', label: 'مخزون منخفض', color: AppColors.statLowStock),
+            child: _StatTile(value: '$lowStock', label: 'مخزون منخفض'.tr, color: AppColors.statLowStock),
           ),
           SizedBox(width: 8.w),
           Expanded(
-            child: _StatTile(value: '$outOfStock', label: 'نافد', color: AppColors.statOutOfStock),
+            child: _StatTile(value: '$outOfStock', label: 'نافد'.tr, color: AppColors.statOutOfStock),
           ),
           SizedBox(width: 8.w),
           Expanded(
             child: _StatTile(
               value: averageRating?.toStringAsFixed(1) ?? '-',
-              label: 'التقييمات',
+              label: 'التقييمات'.tr,
               color: AppColors.statRatings,
               onTap: onRatingsTap,
             ),

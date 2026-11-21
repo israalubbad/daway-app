@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class HealthProfileRemoteDataSource {
@@ -10,7 +11,7 @@ class HealthProfileRemoteDataSource {
   Future<Response<dynamic>> getHealthProfile({required String token}) {
     return _dio.get(
       ApiConstants.patientHealthProfile,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -29,7 +30,7 @@ class HealthProfileRemoteDataSource {
         'blood_type': bloodType,
         'notes': notes,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

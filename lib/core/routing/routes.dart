@@ -17,6 +17,9 @@ class Routes {
   static const String pharmacyAlternativesScreen =
       '/pharmacyAlternativesScreen';
   static const String pharmacyRatingsScreen = '/pharmacyRatingsScreen';
+  static const String pharmacyStockImportScreen = '/pharmacyStockImportScreen';
+  static const String accountingScreen = '/accountingScreen';
+  static const String phoneScannerScreen = '/phoneScannerScreen';
   static const String pharmacyNotificationsScreen =
       '/pharmacyNotificationsScreen';
   static const String allCategoriesScreen = '/allCategoriesScreen';
@@ -24,6 +27,7 @@ class Routes {
   static const String medicineRemindersScreen = '/medicineRemindersScreen';
   static const String medicineDetailScreen = '/medicineDetailScreen';
   static const String patientCartScreen = '/patientCartScreen';
+  static const String patientNotificationsScreen = '/patientNotificationsScreen';
   static const String patientPharmaciesMapScreen = '/patientPharmaciesMapScreen';
   static const String logoutFarewellScreen = '/logoutFarewellScreen';
   static const String rateExperienceScreen = '/rateExperienceScreen';

@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -5,6 +6,8 @@ import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/cart_item.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// One row in "السلة" — the medicine/pharmacy line, its price, and a
 /// quantity stepper. No per-line delete here (the design has none): the
@@ -51,14 +54,14 @@ class CartItemCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  '${formatPrice(item.price)} \$/الشريط',
-                  textAlign: TextAlign.right,
+                  '{0} \$/الشريط'.trArgs([formatPrice(item.price)]),
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.cartItemPrice,
                 ),
               ],
@@ -109,7 +112,7 @@ class _Thumbnail extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: (url != null && url.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               url,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(

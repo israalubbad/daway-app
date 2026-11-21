@@ -2,37 +2,24 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_notification.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_notifications_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_notifications_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakeRepository implements PatientNotificationsRepository {
   ApiResult<List<PatientNotification>> result = const Success([]);
   String? lastToken;
 
   @override
+  Future<ApiResult<void>> markAsRead({required String token, required int notificationId}) async =>
+      const Success(null);
+
+  @override
   Future<ApiResult<List<PatientNotification>>> getNotifications({required String token}) async {
     lastToken = token;
     return result;
-  }
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
   }
 }
 
@@ -48,7 +35,7 @@ void main() {
         createdAt: DateTime(2026, 9, 24),
       ),
     ]);
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = GetPatientNotificationsUseCase(repository, sessionRepository);
 
@@ -61,7 +48,7 @@ void main() {
 
   test('returns a session failure without calling the repository when logged out', () async {
     final repository = _FakeRepository();
-    final useCase = GetPatientNotificationsUseCase(repository, _FakeSessionRepository());
+    final useCase = GetPatientNotificationsUseCase(repository, InMemorySessionRepository());
 
     final result = await useCase();
 
@@ -72,7 +59,7 @@ void main() {
   test('surfaces a repository failure unchanged', () async {
     final repository = _FakeRepository();
     repository.result = const ApiError(NetworkFailure('تعذر الاتصال بالخادم'));
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = GetPatientNotificationsUseCase(repository, sessionRepository);
 

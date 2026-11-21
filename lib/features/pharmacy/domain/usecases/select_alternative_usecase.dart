@@ -1,7 +1,7 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../repositories/pharmacy_alternatives_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 /// Picking a new alternative for a medicine is exclusive in this app's UI —
 /// only one candidate ever shows as "تم اختياره" — even though the backend
@@ -21,34 +21,29 @@ class SelectAlternativeUseCase {
     required int baseMedicineId,
     required int newAlternativeId,
     required Set<int> previousAlternativeIds,
-  }) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return const ApiError(
-        ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
+  }) {
+    return withSessionToken(_sessionRepository, (token) async {
+      final idsToRemove = previousAlternativeIds.where(
+        (id) => id != newAlternativeId,
       );
-    }
-
-    final idsToRemove = previousAlternativeIds.where(
-      (id) => id != newAlternativeId,
-    );
-    final removeResults = await Future.wait(
-      idsToRemove.map(
-        (previousId) => _repository.removeAlternative(
-          token: session.token,
-          baseMedicineId: baseMedicineId,
-          alternativeId: previousId,
+      final removeResults = await Future.wait(
+        idsToRemove.map(
+          (previousId) => _repository.removeAlternative(
+            token: token,
+            baseMedicineId: baseMedicineId,
+            alternativeId: previousId,
+          ),
         ),
-      ),
-    );
-    for (final removeResult in removeResults) {
-      if (removeResult is ApiError) return removeResult;
-    }
+      );
+      for (final removeResult in removeResults) {
+        if (removeResult is ApiError) return removeResult;
+      }
 
-    return _repository.selectAlternative(
-      token: session.token,
-      baseMedicineId: baseMedicineId,
-      alternativeId: newAlternativeId,
-    );
+      return _repository.selectAlternative(
+        token: token,
+        baseMedicineId: baseMedicineId,
+        alternativeId: newAlternativeId,
+      );
+    });
   }
 }

@@ -1,3 +1,5 @@
+import '../../../../core/localization/translations.dart';
+
 /// A medicine the assistant found (`medicine` / one of `alternatives`).
 class ChatbotMedicine {
   final int id;
@@ -47,9 +49,9 @@ class ChatbotPharmacy {
   /// Arabic label of the availability word, or null for one that is not known
   /// (it is then not shown rather than shown raw).
   String? get availabilityLabel => switch (availability) {
-        'available' => 'متوفر',
-        'low_stock' || 'low' => 'كمية قليلة',
-        'out_of_stock' || 'unavailable' => 'غير متوفر',
+        'available' => 'متوفر'.tr,
+        'low_stock' || 'low' => 'كمية قليلة'.tr,
+        'out_of_stock' || 'unavailable' => 'غير متوفر'.tr,
         _ => null,
       };
 }

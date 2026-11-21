@@ -10,7 +10,9 @@ import '../../../../core/helpers/api_result.dart';
 import '../../../../core/models/picked_location.dart';
 import '../../domain/repositories/location_repository.dart';
 
+import '../../../../core/localization/translations.dart';
 class LocationRepositoryImpl implements LocationRepository {
+
   final Geocoding _geocoding = Geocoding();
 
   // Geocoders default to the device's locale; the app is Arabic-only, so
@@ -23,8 +25,8 @@ class LocationRepositoryImpl implements LocationRepository {
   Future<ApiResult<PickedLocation>> getCurrentLocation() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return const ApiError(
-        PermissionFailure('خدمة تحديد الموقع غير مفعّلة على جهازك، يرجى تفعيلها'),
+      return ApiError(
+        PermissionFailure('خدمة تحديد الموقع غير مفعّلة على جهازك، يرجى تفعيلها'.tr),
       );
     }
 
@@ -34,8 +36,8 @@ class LocationRepositoryImpl implements LocationRepository {
     }
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      return const ApiError(
-        PermissionFailure('يرجى السماح بالوصول لموقعك لتحديد عنوانك، أو اختر الموقع يدوياً'),
+      return ApiError(
+        PermissionFailure('يرجى السماح بالوصول لموقعك لتحديد عنوانك، أو اختر الموقع يدوياً'.tr),
       );
     }
 
@@ -64,8 +66,8 @@ class LocationRepositoryImpl implements LocationRepository {
         address: address,
       ));
     } on TimeoutException {
-      return const ApiError(
-        PermissionFailure('تعذر تحديد موقعك، تأكد من تفعيل GPS وحاول مرة أخرى'),
+      return ApiError(
+        PermissionFailure('تعذر تحديد موقعك، تأكد من تفعيل GPS وحاول مرة أخرى'.tr),
       );
     } catch (e) {
       return ApiError(mapExceptionToFailure(e));
@@ -76,8 +78,8 @@ class LocationRepositoryImpl implements LocationRepository {
   Future<ApiResult<String>> reverseGeocode({
     required double latitude,
     required double longitude,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final placemarks = await _geocoding.placemarkFromCoordinates(
         latitude,
         longitude,
@@ -91,18 +93,16 @@ class LocationRepositoryImpl implements LocationRepository {
         placemark.administrativeArea,
         placemark.country,
       ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
-      return Success(parts.isNotEmpty ? parts.join('، ') : (placemark.name ?? ''));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+      return Success(parts.isNotEmpty ? parts.join('، '.tr) : (placemark.name ?? ''));
+    });
   }
 
   @override
-  Future<ApiResult<PickedLocation>> searchAddress(String query) async {
-    try {
+  Future<ApiResult<PickedLocation>> searchAddress(String query) {
+    return guardApi(() async {
       final locations = await _geocoding.locationFromAddress(query, locale: _arabic);
       if (locations.isEmpty) {
-        return const ApiError(ValidationFailure('لم يتم العثور على هذا العنوان'));
+        return ApiError(ValidationFailure('لم يتم العثور على هذا العنوان'.tr));
       }
 
       final location = locations.first;
@@ -119,8 +119,6 @@ class LocationRepositoryImpl implements LocationRepository {
         longitude: location.longitude,
         address: address,
       ));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

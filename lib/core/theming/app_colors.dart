@@ -20,9 +20,6 @@ abstract class AppColors {
 
   // Account Type Screen
   static const Color patientIconBackground = Color(0xFFA6EDE2);
-  static const Color pharmacyIconBackground = Color(0xFFB3EBFF);
-  static const Color continueButtonBackground = Color(0xFF7BAFBB);
-  static const Color cardChevron = Color(0xFFBDC8CD);
 
   // Account Option Cards
   static const Color cardBorder = Color(0xFFDCE6E9);

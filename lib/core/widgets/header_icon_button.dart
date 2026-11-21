@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../theming/app_colors.dart';
+import 'mirror_when_ltr.dart';
 
 /// The 42x42 outlined square that holds a header icon at the top of a screen:
 /// an action (notifications, cart), a back chevron, or a save/bookmark
@@ -34,6 +35,11 @@ class HeaderIconButton extends StatelessWidget {
     this.semanticLabel,
   });
 
+  /// The back and arrow pictures point the way of right-to-left text, so they are
+  /// turned around in English; the other icons (bell, cart, bookmark) are not.
+  Widget _maybeMirrored(Widget icon) =>
+      assetName.contains('back_icon') ? MirrorWhenLtr(child: icon) : icon;
+
   @override
   Widget build(BuildContext context) {
     final button = GestureDetector(
@@ -47,11 +53,13 @@ class HeaderIconButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.iconBlueBorder),
         ),
-        child: SvgPicture.asset(
-          assetName,
-          width: iconSize.w,
-          height: iconSize.w,
-          colorFilter: iconColor == null ? null : ColorFilter.mode(iconColor!, BlendMode.srcIn),
+        child: _maybeMirrored(
+          SvgPicture.asset(
+            assetName,
+            width: iconSize.w,
+            height: iconSize.w,
+            colorFilter: iconColor == null ? null : ColorFilter.mode(iconColor!, BlendMode.srcIn),
+          ),
         ),
       ),
     );

@@ -1,8 +1,10 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/patient/domain/entities/cart_item.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_flow_usecases.dart';
 import 'package:daway_app/features/patient/domain/usecases/checkout_usecase.dart';
+import 'package:daway_app/features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_addresses_usecase.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_patient_profile_usecase.dart';
@@ -56,6 +58,7 @@ void main() {
         GetPatientProfileUseCase(FakeProfileRepository(), session),
         ValidateCouponUseCase(flow, session),
         CheckoutUseCase(orders, session),
+        GetCheckoutQuoteUseCase(orders, session),
       ),
     );
     getIt.registerFactoryParam<PaymentCubit, int, void>(
@@ -183,5 +186,86 @@ void main() {
 
     expect(find.text('السلة فارغة'), findsOneWidget);
     expect(find.text('ملخص الطلب'), findsOneWidget);
+  });
+
+  group('with the server delivery quote', () {
+    const quote = CheckoutQuote(
+      subtotal: 42,
+      discount: 0,
+      total: 42,
+      deliveryFee: 9,
+      grandTotal: 51,
+    );
+
+    testWidgets('shows the delivery fee and the grand total that includes it', (tester) async {
+      orders.quoteResult = const Success(quote);
+
+      await open(tester);
+
+      expect(find.text('سعر الطلبات : 42 \$'), findsOneWidget);
+      expect(find.text('دليفري : 9 \$'), findsOneWidget);
+      expect(find.text('الاجمالي : 51 \$'), findsOneWidget);
+      expect(find.text('دليفري : يحدده الأدمن بعد إرسال الطلب'), findsNothing);
+    });
+
+    testWidgets('an accepted coupon is priced by the server', (tester) async {
+      orders.quoteResult = const Success(quote);
+      await open(tester);
+      orders.quoteResult = const Success(
+        CheckoutQuote(subtotal: 42, discount: 4, total: 38, deliveryFee: 9, grandTotal: 47),
+      );
+
+      await tester.enterText(find.byType(TextField), 'SAVE4');
+      await tester.tap(find.text('تطبيق'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('الخصم : 4 \$'), findsOneWidget);
+      expect(find.text('الاجمالي : 47 \$'), findsOneWidget);
+    });
+
+    testWidgets('the order is created with the quote the patient saw', (tester) async {
+      orders.quoteResult = const Success(quote);
+      await open(tester);
+
+      await tester.tap(find.text('التالي'));
+      await tester.pumpAndSettle();
+
+      expect(orders.lastQuote, quote);
+      expect(orders.lastIdempotencyKey, isNotNull);
+    });
+
+    testWidgets('a price that moved is explained and the new total is shown', (tester) async {
+      orders.quoteResult = const Success(quote);
+      orders.checkoutResult = const ApiError(
+        ApiFailure(message: 'quote_changed', code: 'quote_changed', statusCode: 409),
+      );
+      await open(tester);
+      orders.quoteResult = const Success(
+        CheckoutQuote(subtotal: 42, discount: 0, total: 42, deliveryFee: 15, grandTotal: 57),
+      );
+
+      await tester.tap(find.text('التالي'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(quoteChangedMessage), findsOneWidget);
+      expect(find.text('دليفري : 15 \$'), findsOneWidget);
+      expect(find.text('الاجمالي : 57 \$'), findsOneWidget);
+      expect(find.text('ملخص الطلب'), findsOneWidget);
+    });
+
+    testWidgets('a quote that could not be read says so and can be retried', (tester) async {
+      orders.quoteResult = const ApiError(ApiFailure(message: 'تعذر الاتصال', statusCode: 500));
+      await open(tester);
+      const failedLine = 'دليفري : تعذر حساب الرسوم، اضغط لإعادة المحاولة';
+      expect(find.text(failedLine), findsOneWidget);
+
+      orders.quoteResult = const Success(quote);
+      await tester.tap(find.text(failedLine));
+      await tester.pumpAndSettle();
+
+      expect(find.text(failedLine), findsNothing);
+      expect(find.text('دليفري : 9 \$'), findsOneWidget);
+      expect(find.text('الاجمالي : 51 \$'), findsOneWidget);
+    });
   });
 }

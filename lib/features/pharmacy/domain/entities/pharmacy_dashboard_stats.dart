@@ -30,7 +30,12 @@ class PharmacyDashboardStats {
   final List<PharmacyDashboardLowStockItem> lowStockItems;
   final List<Inquiry> recentInquiries;
 
+  /// This month's sales in shekels, from `GET /pharmacy/accounting/sales-summary`;
+  /// null when that call fails or its figure cannot be read.
+  final double? monthlySales;
+
   const PharmacyDashboardStats({
+    this.monthlySales,
     required this.totalMedicines,
     required this.availableCount,
     required this.lowStockCount,

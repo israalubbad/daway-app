@@ -6,7 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Helper link under a verification-code field to ask for the code again, gated
+
 /// by a 30-second countdown that starts with the screen and restarts on every
 /// send.
 ///
@@ -88,7 +90,7 @@ class _ResendCodeLinkState extends State<ResendCodeLink> {
 
     if (_secondsLeft > 0) {
       return Text(
-        'إعادة الإرسال خلال $_formattedCountdown',
+        'إعادة الإرسال خلال {0}'.trArgs([_formattedCountdown]),
         style: style.copyWith(color: AppColors.authInputBorder),
       );
     }
@@ -101,7 +103,7 @@ class _ResendCodeLinkState extends State<ResendCodeLink> {
           Icon(Icons.refresh, size: 16.sp, color: AppColors.primaryTeal),
           SizedBox(width: 4.w),
           Text(
-            'إعادة إرسال الرمز',
+            'إعادة إرسال الرمز'.tr,
             style: style.copyWith(color: AppColors.primaryTeal, fontWeight: FontWeight.w600),
           ),
         ],

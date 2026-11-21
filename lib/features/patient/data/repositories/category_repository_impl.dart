@@ -14,16 +14,14 @@ class CategoryRepositoryImpl implements CategoryRepository {
   const CategoryRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<List<Category>>> getCategories() async {
-    try {
+  Future<ApiResult<List<Category>>> getCategories() {
+    return guardApi(() async {
       final response = await _remoteDataSource.getCategories();
       final categories = extractJsonList(response.data, source: 'GET /categories')
           .map((json) => CategoryModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(categories);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -34,8 +32,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
     String? query,
     int page = 1,
     int perPage = 20,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getCategoryMedicines(
         categorySlug: categorySlug,
         subcategorySlug: subcategorySlug,
@@ -61,21 +59,17 @@ class CategoryRepositoryImpl implements CategoryRepository {
         currentPage: pagination['current_page'] as int? ?? page,
         lastPage: pagination['last_page'] as int? ?? page,
       ));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<List<String>>> getDosageForms() async {
-    try {
+  Future<ApiResult<List<String>>> getDosageForms() {
+    return guardApi(() async {
       final response = await _remoteDataSource.getDosageForms();
       final dosageForms = extractJsonList(response.data, source: 'GET /dosage-forms')
           .map((form) => form as String)
           .toList();
       return Success(dosageForms);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

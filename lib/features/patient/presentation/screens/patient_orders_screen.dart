@@ -17,10 +17,12 @@ import '../widgets/order_card.dart';
 import 'payment_method_screen.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 enum _StatusFilter { completed, inProgress, cancelled }
 
 /// What the patient chose in an order's sheet.
-enum _OrderAction { cancel, continueOrder }
+enum _OrderAction { cancel, continueOrder, ratePharmacy }
 
 bool _matches(Order order, _StatusFilter? filter) => switch (filter) {
       null => true,
@@ -78,10 +80,19 @@ class _OrdersViewState extends State<_OrdersView> {
       if (mounted) cubit.load();
       return;
     }
+    if (action == _OrderAction.ratePharmacy) {
+      final pharmacyId = order.pharmacyId;
+      if (pharmacyId == null) return;
+      await Navigator.of(context).pushNamed(
+        Routes.rateExperienceScreen,
+        arguments: {'pharmacyId': pharmacyId, 'pharmacyName': order.pharmacyName},
+      );
+      return;
+    }
     if (action != _OrderAction.cancel) return;
     final error = await cubit.cancel(order);
     if (!mounted) return;
-    AppSnackbar.show(context, error ?? 'تم إلغاء الطلب');
+    AppSnackbar.show(context, error ?? 'تم إلغاء الطلب'.tr);
   }
 
   @override
@@ -94,9 +105,9 @@ class _OrdersViewState extends State<_OrdersView> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: const PatientSubScreenHeader(
-                  title: 'طلباتي',
-                  description: 'تابع طلباتك وراجع سجل مشترياتك',
+                child: PatientSubScreenHeader(
+                  title: 'طلباتي'.tr,
+                  description: 'تابع طلباتك وراجع سجل مشترياتك'.tr,
                 ),
               ),
               SizedBox(height: 24.h),
@@ -118,9 +129,9 @@ class _OrdersViewState extends State<_OrdersView> {
                         padding: EdgeInsets.symmetric(horizontal: 24.w),
                         child: EmptyStateView(
                           imageAsset: 'assets/images/empty_order.png',
-                          title: 'لا يوجد طلبات',
-                          subtitle: 'أضف الطلبات حتى تتمكن من تتبعها',
-                          actionLabel: 'تصفح الاقسام',
+                          title: 'لا يوجد طلبات'.tr,
+                          subtitle: 'أضف الطلبات حتى تتمكن من تتبعها'.tr,
+                          actionLabel: 'تصفح الاقسام'.tr,
                           onActionTap: _browseCategories,
                           topSpacing: 56,
                         ),
@@ -159,27 +170,32 @@ class _OrderSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'طلب رقم ${order.orderNumber} — ${order.pharmacyName}',
-              textAlign: TextAlign.right,
+              'طلب رقم {0} — {1}'.trArgs([order.orderNumber, order.pharmacyName]),
+              textAlign: TextAlign.start,
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 12.h),
             Text(
-              'عدد المنتجات: ${order.itemsCount}\nالإجمالي: ${order.price} \$\nالعنوان: ${order.address}',
-              textAlign: TextAlign.right,
+              'عدد المنتجات: {0}\nالإجمالي: {1} \$\nالعنوان: {2}'.trArgs([order.itemsCount, order.price, order.address]),
+              textAlign: TextAlign.start,
               style: TextStyle(fontSize: 14.sp, height: 1.6),
             ),
             SizedBox(height: 24.h),
             if (order.status.isInProgress) ...[
               AppCustomButton(
-                text: 'متابعة الطلب والدفع',
+                text: 'متابعة الطلب والدفع'.tr,
                 onPressed: () => Navigator.of(context).pop(_OrderAction.continueOrder),
               ),
               SizedBox(height: 8.h),
             ],
+            if (order.status.isCompleted && order.pharmacyId != null)
+              AppCustomButton(
+                text: 'قيّم الصيدلية'.tr,
+                onPressed: () => Navigator.of(context).pop(_OrderAction.ratePharmacy),
+              ),
             if (order.status.canCancel)
               AppCustomButton(
-                text: 'إلغاء الطلب',
+                text: 'إلغاء الطلب'.tr,
                 backgroundColor: AppColors.logoutRed,
                 onPressed: () => Navigator.of(context).pop(_OrderAction.cancel),
               ),
@@ -216,18 +232,18 @@ class _OrdersList extends StatelessWidget {
           selected: selectedFilter,
           onSelected: onFilterSelected,
           tabs: [
-            FilterTabItem(value: null, label: 'الكل (${countFor(null)})'),
+            FilterTabItem(value: null, label: 'الكل ({0})'.trArgs([countFor(null)])),
             FilterTabItem(
               value: _StatusFilter.completed,
-              label: 'مكتملة (${countFor(_StatusFilter.completed)})',
+              label: 'مكتملة ({0})'.trArgs([countFor(_StatusFilter.completed)]),
             ),
             FilterTabItem(
               value: _StatusFilter.inProgress,
-              label: 'قيد التنفيذ (${countFor(_StatusFilter.inProgress)})',
+              label: 'قيد التنفيذ ({0})'.trArgs([countFor(_StatusFilter.inProgress)]),
             ),
             FilterTabItem(
               value: _StatusFilter.cancelled,
-              label: 'ملغاة (${countFor(_StatusFilter.cancelled)})',
+              label: 'ملغاة ({0})'.trArgs([countFor(_StatusFilter.cancelled)]),
             ),
           ],
         ),
@@ -237,9 +253,9 @@ class _OrdersList extends StatelessWidget {
           // leaving them floating above blank space.
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: const EmptyStateView(
+            child: EmptyStateView(
               imageAsset: 'assets/images/empty_order.png',
-              title: 'لا يوجد طلبات',
+              title: 'لا يوجد طلبات'.tr,
               topSpacing: 64,
             ),
           )

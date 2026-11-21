@@ -11,7 +11,9 @@ import '../widgets/otp_verification_form.dart';
 import 'location_permission_screen.dart';
 import 'notifications_permission_screen.dart';
 
+import '../../../../core/localization/translations.dart';
 class OtpVerificationScreen extends StatelessWidget {
+
   const OtpVerificationScreen({super.key});
 
   @override
@@ -61,8 +63,8 @@ class OtpVerificationScreen extends StatelessWidget {
                   SizedBox(height: 32.h),
 
                   Text(
-                    'خطوة أخيرة!',
-                    textAlign: TextAlign.right,
+                    'خطوة أخيرة!'.tr,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authScreenTitle,
                   ),
                   SizedBox(height: 8.h),
@@ -70,8 +72,8 @@ class OtpVerificationScreen extends StatelessWidget {
                   BlocSelector<PatientAuthCubit, PatientAuthState, String>(
                     selector: (state) => state.phone,
                     builder: (context, phone) => Text(
-                      'أدخل رمز التحقق المرسل إلى رقم هاتفك\n للمتابعة $phone',
-                      textAlign: TextAlign.right,
+                      'أدخل رمز التحقق المرسل إلى رقم هاتفك\n للمتابعة {0}'.trArgs([phone]),
+                      textAlign: TextAlign.start,
                       style: AppTextStyles.authScreenSubtitle,
                     ),
                   ),

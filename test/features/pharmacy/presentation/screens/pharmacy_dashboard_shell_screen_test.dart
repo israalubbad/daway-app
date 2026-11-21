@@ -1,11 +1,8 @@
 import 'package:daway_app/core/di/dependency_injection.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:daway_app/features/chat/presentation/cubit/conversations_cubit.dart';
@@ -18,6 +15,8 @@ import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_inventor
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_inventory_state.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_state.dart';
+import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
+import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_orders_state.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_profile_state.dart';
 import 'package:daway_app/core/widgets/header_icon_button.dart';
@@ -26,11 +25,13 @@ import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_dashbo
 import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_home_screen.dart';
 import 'package:daway_app/features/pharmacy/presentation/screens/pharmacy_products_screen.dart';
 import 'package:daway_app/features/pharmacy/presentation/widgets/pharmacy_dashboard_tab_scope.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../auth/account_closure_test_fakes.dart';
+
 import '../../../../helpers/arabic_test_app.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 // The tabs' own cubits are stood in for by cubits that just sit in their
 // loading state: what these tests are about is the shell — which screen a nav
@@ -59,6 +60,17 @@ class _FakeMedicinesCubit extends Cubit<PharmacyMedicinesState>
 
   /// Moves the cubit on from loading, to show the page's loaded state.
   void show(PharmacyMedicinesState state) => emit(state);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeOrdersCubit extends Cubit<PharmacyOrdersState>
+    implements PharmacyOrdersCubit {
+  _FakeOrdersCubit() : super(const PharmacyOrdersLoaded([]));
+
+  @override
+  Future<void> refresh() async {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -129,18 +141,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 /// The settings tab's header line — the tab has no AppBar to find by title.
 const _settingsDescription = 'إدارة معلوماتك الشخصية وتفاصيل حسابك';
 
@@ -154,7 +154,7 @@ void main() {
   setUp(() {
     dashboardCubit = _FakeDashboardCubit();
     medicinesCubits = [];
-    logoutCubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), _FakeSessionRepository()));
+    logoutCubit = LogoutCubit(LogoutUseCase(_FakeAuthRepository(), InMemorySessionRepository.pharmacy()));
     getIt
       ..registerFactory<PharmacyDashboardCubit>(() => dashboardCubit)
       ..registerFactory<PharmacyMedicinesCubit>(() {
@@ -162,6 +162,7 @@ void main() {
         medicinesCubits.add(cubit);
         return cubit;
       })
+      ..registerFactory<PharmacyOrdersCubit>(_FakeOrdersCubit.new)
       ..registerFactory<PharmacyInventoryCubit>(_FakeInventoryCubit.new)
       ..registerFactory<ConversationsCubit>(
         _FakeConversationsCubit.new,
@@ -169,6 +170,7 @@ void main() {
       )
       ..registerFactory<PharmacyProfileCubit>(_FakeProfileCubit.new)
       ..registerFactory<AccountSettingsCubit>(_FakeAccountSettingsCubit.new);
+    registerClosureCubits(getIt);
   });
 
   tearDown(() async {
@@ -193,14 +195,11 @@ void main() {
     await tester.pump();
   }
 
-  Finder appBarTitle(String title) {
-    return find.descendant(of: find.byType(AppBar), matching: find.text(title));
-  }
-
-  testWidgets('lands on the settings tab', (tester) async {
+  testWidgets('lands on the home tab, not on the settings', (tester) async {
     await pumpShell(tester);
 
-    expect(find.text(_settingsDescription), findsOneWidget);
+    expect(find.textContaining('أهلا بك'), findsOneWidget);
+    expect(find.text(_settingsDescription), findsNothing);
   });
 
   testWidgets('each nav item shows its own screen', (tester) async {
@@ -241,10 +240,11 @@ void main() {
       await pumpShell(tester);
       final semantics = tester.ensureSemantics();
 
+      await tapNavItem(tester, 'المنتجات');
       await tapNavItem(tester, 'الرئيسية');
       expect(dashboardCubit.refreshes, 1);
 
-      await tapNavItem(tester, 'المنتجات');
+      await tapNavItem(tester, 'الإعدادات');
       await tapNavItem(tester, 'الرئيسية');
       expect(dashboardCubit.refreshes, 2);
 
@@ -254,6 +254,7 @@ void main() {
     testWidgets('is not repeated by tapping الرئيسية while already on it', (tester) async {
       await pumpShell(tester);
       final semantics = tester.ensureSemantics();
+      await tapNavItem(tester, 'المنتجات');
       await tapNavItem(tester, 'الرئيسية');
 
       await tapNavItem(tester, 'الرئيسية');
@@ -308,7 +309,7 @@ void main() {
   group('the products page', () {
     // What the home card does: ask the shell for the page.
     Future<void> openProductsPage(WidgetTester tester) async {
-      // The shell lands on الإعدادات, so the home tab is offstage.
+      // The shell lands on الرئيسية, so the home tab is on show.
       final scope = PharmacyDashboardTabScope.maybeOf(
         tester.element(find.byType(PharmacyHomeScreen, skipOffstage: false)),
       )!;
@@ -383,18 +384,6 @@ void main() {
       // page's own header is offstage.
       expect(find.text('اجمالي المنتجات'), findsNothing);
       expect(find.textContaining('أهلا بك'), findsOneWidget);
-    });
-
-    testWidgets('تحديث المنتجات opens the inventory tab', (tester) async {
-      await pumpShell(tester);
-      await openProductsPage(tester);
-      medicinesCubits.last.show(const PharmacyMedicinesLoaded(medicines: []));
-      await tester.pump();
-
-      await tester.tap(find.text('تحديث المنتجات'));
-      await tester.pump();
-
-      expect(appBarTitle('إدارة المخزون'), findsOneWidget);
     });
   });
 }

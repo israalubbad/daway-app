@@ -14,18 +14,20 @@ import '../cubit/medicine_search_cubit.dart';
 import '../cubit/medicine_search_state.dart';
 import '../widgets/searched_medicine_card.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Static fallback for "الأكثر بحثاً" — there's no trending/popular-search
+
 /// endpoint yet, so this is a fixed editorial list rather than real
 /// analytics. Swap for a real usecase call once the backend adds one.
-const _trendingSearches = [
-  'بانادول',
-  'فيتامين C',
-  'دواء للمعدة',
-  'أكامول',
-  'مضاد حيوي',
-  'مسكن ألم موضعي',
-  'فيتامين D',
-  'مسكنات الألم',
+List<String> get _trendingSearches => [
+  'بانادول'.tr,
+  'فيتامين C'.tr,
+  'دواء للمعدة'.tr,
+  'أكامول'.tr,
+  'مضاد حيوي'.tr,
+  'مسكن ألم موضعي'.tr,
+  'فيتامين D'.tr,
+  'مسكنات الألم'.tr,
 ];
 
 /// Home tab's "البحث" search screen. Has no Scaffold/AppBar/Drawer of its
@@ -108,7 +110,7 @@ class _MedicineSearchViewState extends State<_MedicineSearchView> {
                       ),
                     MedicineSearchLoaded(:final results) when results.isEmpty => Center(
                         child: Text(
-                          'لا توجد نتائج مطابقة',
+                          'لا توجد نتائج مطابقة'.tr,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.homePharmacyCardSubtitle,
                         ),
@@ -153,12 +155,12 @@ class _SearchField extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.homeSearchHint.copyWith(color: AppColors.onboardingText),
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
-                hintText: 'ابحث عن احتياجك',
+                hintText: 'ابحث عن احتياجك'.tr,
                 hintStyle: AppTextStyles.homeSearchHint,
               ),
             ),
@@ -180,7 +182,7 @@ class _TrendingSearches extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('الأكثر بحثاً', textAlign: TextAlign.right, style: AppTextStyles.searchSectionTitle),
+          Text('الأكثر بحثاً'.tr, textAlign: TextAlign.start, style: AppTextStyles.searchSectionTitle),
           for (var i = 0; i < _trendingSearches.length; i++)
             _TrendingSearchRow(
               term: _trendingSearches[i],
@@ -228,7 +230,7 @@ class _TrendingSearchRow extends StatelessWidget {
             Expanded(
               child: Text(
                 term,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.searchTermText,

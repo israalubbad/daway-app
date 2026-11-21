@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,42 +8,71 @@ import '../../../../core/helpers/price_formatter.dart';
 import '../../../../core/helpers/smart_date_formatter.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
-import '../../../../core/widgets/app_custom_button.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../domain/entities/medicine.dart';
 import '../../domain/entities/pharmacy_order.dart';
 import '../widgets/pharmacy_products_header.dart';
 import '../widgets/product_status_badge.dart';
 
+import '../../../../core/localization/translations.dart';
+
+/// Fetches the full record of an order (medicines, quantities, patient); null
+/// when it cannot be had, and the screen keeps what the list gave it.
+typedef PharmacyOrderLoader = Future<PharmacyOrder?> Function(PharmacyOrder order);
+
 /// "تفاصيل الطلب": one order in full — its number, strip and time, each
-/// medicine, where it goes, how it is paid — and the two decisions, "قبول
-/// الطلب" and "رفض الطلب".
-///
-/// There is no orders API yet, so accepting and rejecting go to [onAccept] and
-/// [onReject], and without them answer "قريباً".
-class PharmacyOrderDetailsScreen extends StatelessWidget {
+/// medicine with its quantity and price, the patient, where it goes, how it is
+/// paid. It is read-only: the pharmacy neither accepts nor rejects orders.
+class PharmacyOrderDetailsScreen extends StatefulWidget {
   final PharmacyOrder order;
-  final VoidCallback? onAccept;
-  final VoidCallback? onReject;
+  final PharmacyOrderLoader? onLoadDetails;
 
   const PharmacyOrderDetailsScreen({
     super.key,
     required this.order,
-    this.onAccept,
-    this.onReject,
+    this.onLoadDetails,
   });
 
   /// Pushes the screen for [order] above the dashboard.
-  static Future<void> open(BuildContext context, PharmacyOrder order) {
+  static Future<void> open(
+    BuildContext context,
+    PharmacyOrder order, {
+    PharmacyOrderLoader? onLoadDetails,
+  }) {
     return Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => PharmacyOrderDetailsScreen(order: order)),
+      MaterialPageRoute<void>(
+        builder: (_) => PharmacyOrderDetailsScreen(
+          order: order,
+          onLoadDetails: onLoadDetails,
+        ),
+      ),
     );
   }
 
-  void _comingSoon(BuildContext context) => AppSnackbar.show(context, 'قريباً');
+  @override
+  State<PharmacyOrderDetailsScreen> createState() => _PharmacyOrderDetailsScreenState();
+}
+
+class _PharmacyOrderDetailsScreenState extends State<PharmacyOrderDetailsScreen> {
+  late PharmacyOrder _order = widget.order;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDetails();
+  }
+
+  /// The list may leave out the lines or the patient; the details route has them.
+  Future<void> _loadDetails() async {
+    final load = widget.onLoadDetails;
+    if (load == null) return;
+    final full = await load(widget.order);
+    if (!mounted || full == null) return;
+    setState(() => _order = full);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final order = _order;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -51,8 +81,8 @@ class PharmacyOrderDetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PharmacyProductsHeader(
-                title: 'تفاصيل الطلب',
-                subtitle: 'راجع تفاصيل طلب العميل',
+                title: 'تفاصيل الطلب'.tr,
+                subtitle: 'راجع تفاصيل طلب العميل'.tr,
                 onBack: () => Navigator.of(context).pop(),
               ),
               SizedBox(height: 24.h),
@@ -67,19 +97,6 @@ class PharmacyOrderDetailsScreen extends StatelessWidget {
                 SizedBox(height: 16.h),
                 _PaymentCard(payment: payment),
               ],
-              SizedBox(height: 16.h),
-              AppCustomButton(
-                text: 'قبول الطلب',
-                onPressed: onAccept ?? () => _comingSoon(context),
-              ),
-              SizedBox(height: 16.h),
-              AppCustomButton(
-                text: 'رفض الطلب',
-                backgroundColor: Colors.white,
-                textColor: AppColors.authError,
-                borderColor: AppColors.cardBorder,
-                onPressed: onReject ?? () => _comingSoon(context),
-              ),
             ],
           ),
         ),
@@ -163,6 +180,10 @@ class _SummaryCard extends StatelessWidget {
             textAlign: TextAlign.end,
             style: AppTextStyles.settingsMutedText,
           ),
+          if (order.patientName case final patient?) ...[
+            SizedBox(height: 8.h),
+            Text('العميل: {0}'.trArgs([patient]), style: AppTextStyles.pharmacyOrderNumber),
+          ],
           SizedBox(height: 16.h),
           Container(
             padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -178,10 +199,10 @@ class _SummaryCard extends StatelessWidget {
                   glyph: '💊',
                   label: arabicCountedNoun(
                     order.itemsCount,
-                    singular: 'دواء',
-                    dual: 'دواءان',
-                    plural: 'أدوية',
-                    one: 'دواء واحد',
+                    singular: 'دواء'.tr,
+                    dual: 'دواءان'.tr,
+                    plural: 'أدوية'.tr,
+                    one: 'دواء واحد'.tr,
                   ),
                 ),
                 const _CellDivider(),
@@ -276,7 +297,7 @@ class _ItemCard extends StatelessWidget {
             ),
             child: imageUrl == null || imageUrl.isEmpty
                 ? null
-                : Image.network(
+                : networkImage(
                     imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
@@ -288,7 +309,14 @@ class _ItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.name, style: AppTextStyles.pharmacyOrderNumber),
-                SizedBox(height: 12.h),
+                SizedBox(height: 4.h),
+                Text(
+                  item.unitPrice == null
+                      ? 'الكمية: {0}'.trArgs([item.quantity])
+                      : 'الكمية: {0} × {1} ₪'.trArgs([item.quantity, formatPrice(item.unitPrice!)]),
+                  style: AppTextStyles.settingsMutedText,
+                ),
+                SizedBox(height: 8.h),
                 Text(
                   '${formatPrice(item.price)} ₪',
                   textDirection: TextDirection.ltr,
@@ -318,7 +346,7 @@ class _DeliveryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _CardTitle(icon: 'assets/icons/map_pin_icon.svg', title: 'عنوان التوصيل'),
+          _CardTitle(icon: 'assets/icons/map_pin_icon.svg', title: 'عنوان التوصيل'.tr),
           SizedBox(height: 16.h),
           Text(area, style: AppTextStyles.settingsMutedText),
           if (street != null && street!.isNotEmpty) ...[
@@ -339,8 +367,8 @@ class _PaymentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, textColor, tint) = payment.isPaid
-        ? ('مدفوع', AppColors.productAvailableText, AppColors.productAvailableTint)
-        : ('غير مدفوع', AppColors.statLowStock, AppColors.productLowStockTint);
+        ? ('مدفوع'.tr, AppColors.productAvailableText, AppColors.productAvailableTint)
+        : ('غير مدفوع'.tr, AppColors.statLowStock, AppColors.productLowStockTint);
 
     return _Card(
       child: Column(
@@ -348,7 +376,7 @@ class _PaymentCard extends StatelessWidget {
         children: [
           _CardTitle(
             icon: 'assets/icons/credit_card_icon.svg',
-            title: 'طريقة الدفع',
+            title: 'طريقة الدفع'.tr,
             trailing: Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
               decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(4.r)),
@@ -358,8 +386,10 @@ class _PaymentCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 16.h),
-          Text(payment.method, style: AppTextStyles.pharmacyOrderNumber),
+          if (payment.method case final method?) ...[
+            SizedBox(height: 16.h),
+            Text(method, style: AppTextStyles.pharmacyOrderNumber),
+          ],
           if (payment.detail case final detail?) ...[
             SizedBox(height: 8.h),
             Text(detail, style: AppTextStyles.settingsMutedText),

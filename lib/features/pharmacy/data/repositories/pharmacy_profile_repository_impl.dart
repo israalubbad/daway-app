@@ -11,22 +11,20 @@ class PharmacyProfileRepositoryImpl implements PharmacyProfileRepository {
   const PharmacyProfileRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<ApiResult<PharmacyProfile>> getProfile({required String token}) async {
-    try {
+  Future<ApiResult<PharmacyProfile>> getProfile({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getProfile(token: token);
       final model = PharmacyProfileModel.fromJson(response.data as Map<String, dynamic>);
       return Success(model.toEntity());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> updateProfile({
     required String token,
     required PharmacyProfile profile,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.updateProfile(
         token: token,
         body: {
@@ -43,8 +41,6 @@ class PharmacyProfileRepositoryImpl implements PharmacyProfileRepository {
         },
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

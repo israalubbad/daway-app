@@ -16,6 +16,8 @@ import '../cubit/payment_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
 import 'order_confirmation_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// "ارفع اشعار التحويل" — the receipt picture of the transfer, or, for a
 /// patient who cannot upload it, the transfer details typed in by hand.
 class PaymentReceiptScreen extends StatefulWidget {
@@ -80,7 +82,7 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
           holder.isEmpty ||
           amount == null ||
           amount <= 0) {
-        AppSnackbar.show(context, 'أكمل بيانات التحويل أولاً');
+        AppSnackbar.show(context, 'أكمل بيانات التحويل أولاً'.tr);
         return;
       }
       error = await cubit.reportTransferDetails(
@@ -90,7 +92,7 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
       );
     } else {
       if (_receipt == null) {
-        AppSnackbar.show(context, 'ارفع صورة إشعار التحويل أولاً');
+        AppSnackbar.show(context, 'ارفع صورة إشعار التحويل أولاً'.tr);
         return;
       }
       error = await cubit.submitReceipt(_receipt!.path);
@@ -121,9 +123,9 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: const PatientSubScreenHeader(
-                    title: 'ارفع اشعار التحويل',
-                    description: 'ارفع صورة إشعار التحويل لتأكيد الدفع',
+                  child: PatientSubScreenHeader(
+                    title: 'ارفع اشعار التحويل'.tr,
+                    description: 'ارفع صورة إشعار التحويل لتأكيد الدفع'.tr,
                   ),
                 ),
                 Expanded(
@@ -137,17 +139,17 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
                         SizedBox(height: 56.h),
                         Text(
                           _hasProblem
-                              ? 'اكتب بيانات التحويل لإتمام الطلب'
-                              : 'رفع إشعار الدفع',
-                          textAlign: TextAlign.right,
+                              ? 'اكتب بيانات التحويل لإتمام الطلب'.tr
+                              : 'رفع إشعار الدفع'.tr,
+                          textAlign: TextAlign.start,
                           style: _headingStyle,
                         ),
                         SizedBox(height: 8.h),
                         Text(
                           _hasProblem
-                              ? 'أدخل بيانات التحويل يدويًا بدلًا من رفع الإشعار.'
-                              : 'قم برفع صورة إشعار التحويل لتأكيد عملية الدفع.',
-                          textAlign: TextAlign.right,
+                              ? 'أدخل بيانات التحويل يدويًا بدلًا من رفع الإشعار.'.tr
+                              : 'قم برفع صورة إشعار التحويل لتأكيد عملية الدفع.'.tr,
+                          textAlign: TextAlign.start,
                           style: _bodyStyle,
                         ),
                         SizedBox(height: 16.h),
@@ -178,7 +180,7 @@ class _PaymentReceiptScreenState extends State<PaymentReceiptScreen> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
                   child: AppCustomButton(
-                    text: 'إتمام الطلب',
+                    text: 'إتمام الطلب'.tr,
                     isLoading: state.isSubmitting,
                     onPressed: _submit,
                   ),
@@ -231,7 +233,7 @@ class _SelectedMethod extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'طريقة الدفع المختارة',
+                'طريقة الدفع المختارة'.tr,
                 style: AppFonts.tajawal(
                   TextStyle(
                     fontSize: 12.sp,
@@ -314,7 +316,7 @@ class _UploadArea extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      'اضغط لرفع إشعار التحويل',
+                      'اضغط لرفع إشعار التحويل'.tr,
                       style: AppFonts.tajawal(
                         TextStyle(
                           fontSize: 14.sp,
@@ -325,7 +327,7 @@ class _UploadArea extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'PNG أو JPG',
+                      'PNG أو JPG'.tr,
                       style: AppFonts.tajawal(
                         TextStyle(
                           fontSize: 12.sp,
@@ -401,7 +403,7 @@ class _ProblemToggle extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'لديك مشكلة في رفع الإشعار؟',
+                'لديك مشكلة في رفع الإشعار؟'.tr,
                 style: AppTextStyles.cartItemPharmacyName,
               ),
             ),
@@ -450,7 +452,7 @@ class _ManualFields extends StatelessWidget {
 
   Widget _label(String text) => Padding(
     padding: EdgeInsets.only(top: 16.h, bottom: 8.h),
-    child: Text(text, textAlign: TextAlign.right, style: _bodyStyle),
+    child: Text(text, textAlign: TextAlign.start, style: _bodyStyle),
   );
 
   @override
@@ -458,29 +460,29 @@ class _ManualFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _label('اسم البنك'),
+        _label('اسم البنك'.tr),
         DropdownButtonFormField<String>(
           initialValue: bankName,
           isExpanded: true,
-          decoration: _decoration('اختر البنك'),
+          decoration: _decoration('اختر البنك'.tr),
           items: [
             for (final name in bankNames)
               DropdownMenuItem(value: name, child: Text(name)),
           ],
           onChanged: onBankChanged,
         ),
-        _label('اسم صاحب الحساب'),
+        _label('اسم صاحب الحساب'.tr),
         TextField(
           controller: holderController,
-          textAlign: TextAlign.right,
-          decoration: _decoration('أدخل اسم صاحب الحساب'),
+          textAlign: TextAlign.start,
+          decoration: _decoration('أدخل اسم صاحب الحساب'.tr),
         ),
-        _label('المبلغ'),
+        _label('المبلغ'.tr),
         TextField(
           controller: amountController,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: _decoration('أدخل مبلغ التحويل'),
+          decoration: _decoration('أدخل مبلغ التحويل'.tr),
         ),
       ],
     );

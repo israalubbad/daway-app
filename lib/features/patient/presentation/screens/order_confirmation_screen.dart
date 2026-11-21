@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../core/helpers/smart_date_formatter.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/routing/routes.dart';
@@ -12,6 +13,8 @@ import '../../../../core/widgets/profile_load_error.dart';
 import '../../domain/entities/checkout_flow.dart';
 import '../../domain/entities/order.dart';
 import '../cubit/order_tracking_cubit.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// "تم تأكيد الطلب" — the order number and where the order is now.
 class OrderConfirmationScreen extends StatelessWidget {
@@ -47,14 +50,14 @@ class OrderConfirmationScreen extends StatelessWidget {
               children: [
                 SizedBox(height: 32.h),
                 Text(
-                  'تم تأكيد طلبك',
-                  textAlign: TextAlign.right,
+                  'تم تأكيد طلبك'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'تابع حالة طلبك من هنا.',
-                  textAlign: TextAlign.right,
+                  'تابع حالة طلبك من هنا.'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),
@@ -104,14 +107,14 @@ class OrderConfirmationScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 AppCustomButton(
-                  text: 'نبّهني عند اقتراب الطلب',
+                  text: 'نبّهني عند اقتراب الطلب'.tr,
                   trailingIcon: Icons.notifications_none,
                   onPressed: () =>
-                      AppSnackbar.show(context, 'سيصلك إشعار عند اقتراب طلبك'),
+                      AppSnackbar.show(context, 'سيصلك إشعار عند اقتراب طلبك'.tr),
                 ),
                 SizedBox(height: 8.h),
                 AppCustomButton(
-                  text: 'العودة للرئيسية',
+                  text: 'العودة للرئيسية'.tr,
                   backgroundColor: Colors.white,
                   textColor: AppColors.onboardingText,
                   borderColor: AppColors.cardBorder,
@@ -132,12 +135,12 @@ class OrderConfirmationScreen extends StatelessWidget {
 }
 
 String _statusLabel(OrderStatus status) => switch (status) {
-  OrderStatus.pending => 'قيد المراجعة',
-  OrderStatus.confirmed => 'تم التأكيد',
-  OrderStatus.preparing => 'قيد التجهيز',
-  OrderStatus.outForDelivery => 'في الطريق',
-  OrderStatus.delivered => 'تم التسليم',
-  OrderStatus.cancelled => 'ملغي',
+  OrderStatus.pending => 'قيد المراجعة'.tr,
+  OrderStatus.confirmed => 'تم التأكيد'.tr,
+  OrderStatus.preparing => 'قيد التجهيز'.tr,
+  OrderStatus.outForDelivery => 'في الطريق'.tr,
+  OrderStatus.delivered => 'تم التسليم'.tr,
+  OrderStatus.cancelled => 'ملغي'.tr,
 };
 
 class _OrderHeader extends StatelessWidget {
@@ -184,7 +187,7 @@ class _OrderHeader extends StatelessWidget {
                 if (pharmacyName.isNotEmpty)
                   Text(pharmacyName, style: AppTextStyles.cartItemPharmacyName),
                 SizedBox(height: 4.h),
-                Text('طلب #$orderId', style: AppTextStyles.cartItemName),
+                Text('طلب #{0}'.trArgs([orderId]), style: AppTextStyles.cartItemName),
               ],
             ),
           ),
@@ -196,7 +199,7 @@ class _OrderHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Text(
-                awaitingPayment ? 'بانتظار تأكيد الدفع' : _statusLabel(status!),
+                awaitingPayment ? 'بانتظار تأكيد الدفع'.tr : _statusLabel(status!),
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
@@ -220,15 +223,15 @@ class _Step {
 
 // The stages of an order, in order; a step is done once the order has reached
 // its status.
-const _steps = [
+List<_Step> get _steps => [
   _Step(
-    'تم تأكيد طلبك',
-    'تم استلام طلبك من قبل الصيدلية',
+    'تم تأكيد طلبك'.tr,
+    'تم استلام طلبك من قبل الصيدلية'.tr,
     OrderStatus.confirmed,
   ),
-  _Step('تم استلام طلبك', 'جاري تجهيز الأدوية', OrderStatus.preparing),
-  _Step('في الطريق إليك', 'المندوب في طريقه إليك', OrderStatus.outForDelivery),
-  _Step('تم تسليم طلبك بنجاح', null, OrderStatus.delivered),
+  _Step('تم استلام طلبك'.tr, 'جاري تجهيز الأدوية'.tr, OrderStatus.preparing),
+  _Step('في الطريق إليك'.tr, 'المندوب في طريقه إليك'.tr, OrderStatus.outForDelivery),
+  _Step('تم تسليم طلبك بنجاح'.tr, null, OrderStatus.delivered),
 ];
 
 const _progress = [
@@ -259,8 +262,7 @@ class _Timeline extends StatelessWidget {
     final status = _steps[index].status;
     final at = tracking.timeOf(status);
     if (at == null) return null;
-    final hour = at.hour % 12 == 0 ? 12 : at.hour % 12;
-    return '$hour:${at.minute.toString().padLeft(2, '0')} ${at.hour < 12 ? 'ص' : 'م'}';
+    return formatClockTime(at);
   }
 
   @override

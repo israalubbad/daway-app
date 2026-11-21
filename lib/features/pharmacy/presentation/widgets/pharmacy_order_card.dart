@@ -9,7 +9,10 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/pharmacy_order.dart';
 
+import '../../../../core/localization/translations.dart';
+import '../../../../core/widgets/mirror_when_ltr.dart';
 /// One order on the pharmacy home: its number and how long ago it came in, a
+
 /// strip with what is in it, and a "عرض الطلب" button.
 class PharmacyOrderCard extends StatelessWidget {
   final PharmacyOrder order;
@@ -98,10 +101,10 @@ class _SummaryStrip extends StatelessWidget {
             glyph: '💊',
             label: arabicCountedNoun(
               order.itemsCount,
-              singular: 'دواء',
-              dual: 'دواءان',
-              plural: 'أدوية',
-              one: 'دواء واحد',
+              singular: 'دواء'.tr,
+              dual: 'دواءان'.tr,
+              plural: 'أدوية'.tr,
+              one: 'دواء واحد'.tr,
             ),
           ),
           const _CellDivider(),
@@ -210,13 +213,13 @@ class _ViewOrderButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('عرض الطلب', style: AppTextStyles.pharmacyOrderButton),
-            SvgPicture.asset(
+            Text('عرض الطلب'.tr, style: AppTextStyles.pharmacyOrderButton),
+            MirrorWhenLtr(child: SvgPicture.asset(
               'assets/icons/arrow_icon.svg',
               width: 20.w,
               height: 20.w,
               colorFilter: const ColorFilter.mode(AppColors.mainTeal, BlendMode.srcIn),
-            ),
+            )),
           ],
         ),
       ),

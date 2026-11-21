@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,11 +10,11 @@ import '../../../../core/helpers/image_source_picker.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Account-info screen's avatar: a 96x96 circle (falling back to the
 /// patient's first initial when no picture is set) with a small upload
-/// badge. Kept separate from [ProfileAvatarPicker] since that widget's
-/// look is shared with the pharmacy profile and medicine-image pickers —
-/// this one is specific to this screen's redesign.
+/// badge.
 class PatientProfileAvatar extends StatelessWidget {
   final String name;
   final String? avatarLocalPath;
@@ -42,7 +43,7 @@ class PatientProfileAvatar extends StatelessWidget {
 
   Widget _buildInitial() {
     final trimmed = name.trim();
-    final letter = trimmed.isNotEmpty ? trimmed[0] : '؟';
+    final letter = trimmed.isNotEmpty ? trimmed[0] : '؟'.tr;
     return Text(
       letter,
       style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: AppColors.mainTeal),
@@ -63,7 +64,7 @@ class PatientProfileAvatar extends StatelessWidget {
     final url = avatarUrl;
     if (url != null && url.isNotEmpty) {
       return ClipOval(
-        child: Image.network(
+        child: networkImage(
           cacheBustedUrl(url, version: avatarVersion),
           width: 96.w,
           height: 96.w,

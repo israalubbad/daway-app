@@ -1,7 +1,7 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../repositories/cart_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class ClearCartUseCase {
   final CartRepository _repository;
@@ -9,13 +9,10 @@ class ClearCartUseCase {
 
   const ClearCartUseCase(this._repository, this._sessionRepository);
 
-  Future<ApiResult<void>> call() async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return const ApiError(
-        ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
-      );
-    }
-    return _repository.clearCart(token: session.token);
+  Future<ApiResult<void>> call() {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.clearCart(token: token),
+    );
   }
 }
