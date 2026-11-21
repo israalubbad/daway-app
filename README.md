@@ -39,9 +39,9 @@ Key screens, from the Figma design the app follows:
 - Accounting: sales and PDF invoices, returns, cash drawer, phone as a barcode scanner.
 - Settings: details, location, working hours, password, account closure.
 
-| Home | Products | Add product | Orders | Ratings | Account |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| <img src="docs/design/pharmacy-home.png" width="120"> | <img src="docs/design/pharmacy-products.png" width="120"> | <img src="docs/design/pharmacy-add-product.png" width="120"> | <img src="docs/design/pharmacy-orders.png" width="120"> | <img src="docs/design/pharmacy-ratings.png" width="120"> | <img src="docs/design/pharmacy-account.png" width="120"> |
+| Home | Products | Orders | Ratings | Account |
+|:--:|:--:|:--:|:--:|:--:|
+| <img src="docs/design/pharmacy-home.png" width="120"> | <img src="docs/design/pharmacy-products.png" width="120"> | <img src="docs/design/pharmacy-orders.png" width="120"> | <img src="docs/design/pharmacy-ratings.png" width="120"> | <img src="docs/design/pharmacy-account.png" width="120"> |
 
 ## Status
 
