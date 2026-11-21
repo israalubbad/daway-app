@@ -2,8 +2,6 @@
 
 **A mobile app that connects patients with pharmacies: find your medicine, see which pharmacy has it and for how much, and get it delivered. Pharmacies run their stock, orders, chat and accounting from the same app.**
 
-**[العربية](README.ar.md)** · English
-
 One app, two accounts: **User** (a patient who searches, orders and tracks) and **Pharmacist** (manages products, orders, chat and accounting). Arabic-first (right-to-left), with an English mode in Settings.
 
 ## Screenshots
@@ -93,17 +91,6 @@ Release signing: copy `android/key.properties.example` to `android/key.propertie
 - A 401 on a request with a token clears the session and returns to the account chooser. For 5xx the app shows its own message, not the server's.
 - `ResponseCacheInterceptor` caches chosen GET routes (max 2 MB, cleared with the session).
 - Checkout: `POST /patient/checkout/quote`, then `quoted_*` fields plus an `idempotency_key`. Order stages: [BACKEND_ORDER_FLOW.md](BACKEND_ORDER_FLOW.md) (Arabic).
-
-```mermaid
-stateDiagram-v2
-    [*] --> pending
-    pending --> awaiting_payment: admin approves, sets delivery price
-    awaiting_payment --> payment_under_review: receipt uploaded
-    payment_under_review --> confirmed: admin approves payment
-    confirmed --> preparing
-    preparing --> out_for_delivery
-    out_for_delivery --> delivered
-```
 
 **Localization.** Texts are written in Arabic with `.tr` (`'نص {0}'.trArgs([x])`); the English tables are in `lib/core/localization/en/`, keyed by the Arabic text. A test fails if a `.tr` text has no English. No `const` around `.tr`, and never `.tr` on text sent to the backend. Use `start`/`end` (not `left`/`right`) and `MirrorWhenLtr` for arrows.
 
