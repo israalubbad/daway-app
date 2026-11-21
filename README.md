@@ -8,13 +8,9 @@ One app, two accounts: **User** (a patient who searches, orders and tracks) and 
 
 From the release build on an Android emulator. The pictures inside the pharmacy onboarding are drawn with the app's own widgets and animate.
 
-| Choose account | Patient sign in | Pharmacy sign in | Pharmacy sign up | Patient home |
-|:--:|:--:|:--:|:--:|:--:|
-| <img src="docs/screenshots/01-choose-account.png" width="170"> | <img src="docs/screenshots/05-patient-login.png" width="170"> | <img src="docs/screenshots/10-pharmacy-login.png" width="170"> | <img src="docs/screenshots/11-pharmacy-sign-up.png" width="170"> | <img src="docs/screenshots/12-patient-home.png" width="170"> |
-
-| Patient onboarding | | | Pharmacy onboarding | | |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| <img src="docs/screenshots/02-patient-onboarding-1.png" width="120"> | <img src="docs/screenshots/03-patient-onboarding-2.png" width="120"> | <img src="docs/screenshots/04-patient-onboarding-3.png" width="120"> | <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="120"> | <img src="docs/screenshots/08-pharmacy-onboarding-2.png" width="120"> | <img src="docs/screenshots/09-pharmacy-onboarding-3.png" width="120"> |
+| Choose account | Sign in | Onboarding | Patient home |
+|:--:|:--:|:--:|:--:|
+| <img src="docs/screenshots/01-choose-account.png" width="170"> | <img src="docs/screenshots/05-patient-login.png" width="170"> | <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="170"> | <img src="docs/screenshots/12-patient-home.png" width="170"> |
 
 ## Features
 
