@@ -117,6 +117,4 @@ stateDiagram-v2
 
 **Git.** Branches `feature/`, `fix/`, `refactor/`, `docs/` off `develop`. CI (`.github/workflows/dart.yml`) runs `flutter analyze` and `flutter test` on pushes and PRs to `develop`.
 
-**Adding a feature.** Create `features/<name>/{data,domain,presentation}`: entity and use case (domain), datasource, model and repository (data), Cubit and screen (presentation). Register it in `core/di/dependency_injection.dart` and `AppRouter`, add the English texts, write the tests, run `flutter analyze` and `flutter test`.
-
 Repository: <https://github.com/daway-app/daway-mobile>

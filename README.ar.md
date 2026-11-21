@@ -117,6 +117,4 @@ stateDiagram-v2
 
 **Git.** فروع `feature/` و`fix/` و`refactor/` و`docs/` من `develop`. الـ CI (`.github/workflows/dart.yml`) بيشغّل `flutter analyze` و`flutter test` على كل push و PR على `develop`.
 
-**إضافة ميزة.** أنشئ `features/<name>/{data,domain,presentation}`: الـ entity والـ use case (domain)، الـ datasource والـ model والريبوزيتوري (data)، الـ Cubit والشاشة (presentation). سجّلها بـ `core/di/dependency_injection.dart` و`AppRouter`، وأضف نصوص الإنجليزي، واكتب الاختبارات، وشغّل `flutter analyze` و`flutter test`.
-
 المستودع: <https://github.com/daway-app/daway-mobile>
