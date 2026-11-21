@@ -14,8 +14,8 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   @override
   Future<ApiResult<List<FavoriteMedicine>>> getFavoriteMedicines({
     required String token,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final medicinesJson = await fetchAllPages(
         source: 'GET /patient/favorites/medicines',
         fetchPage: (page) async =>
@@ -26,34 +26,28 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
               FavoriteMedicineModel.fromJson(json as Map<String, dynamic>).toEntity())
           .toList();
       return Success(medicines);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> addFavoriteMedicine({
     required String token,
     required int medicineId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.addFavoriteMedicine(token: token, medicineId: medicineId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<void>> removeFavoriteMedicine({
     required String token,
     required int medicineId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.removeFavoriteMedicine(token: token, medicineId: medicineId);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

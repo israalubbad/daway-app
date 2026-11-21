@@ -2,8 +2,24 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path_provider/path_provider.dart';
 
+import '../../features/localization/data/repositories/language_repository_impl.dart';
+import '../../features/localization/domain/repositories/language_repository.dart';
+import '../../features/localization/domain/usecases/get_app_language_usecase.dart';
+import '../../features/localization/domain/usecases/save_app_language_usecase.dart';
+import '../../features/localization/presentation/cubit/language_cubit.dart';
+import '../../features/auth/data/datasources/account_closure_remote_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/repositories/account_closure_repository_impl.dart';
+import '../../features/auth/data/repositories/cache_clearing_session_repository.dart';
+import '../networking/response_cache_store.dart';
+import '../../features/auth/domain/repositories/account_closure_repository.dart';
+import '../../features/auth/domain/usecases/close_patient_account_usecase.dart';
+import '../../features/auth/domain/usecases/get_pharmacy_closure_request_usecase.dart';
+import '../../features/auth/domain/usecases/request_pharmacy_closure_usecase.dart';
+import '../../features/auth/presentation/cubit/account_closure_cubit.dart';
+import '../../features/auth/presentation/cubit/pharmacy_closure_cubit.dart';
 import '../../features/auth/data/datasources/device_tokens_remote_data_source.dart';
 import '../../features/auth/data/repositories/device_token_syncing_session_repository.dart';
 import '../../features/auth/data/repositories/device_tokens_repository_impl.dart';
@@ -145,11 +161,13 @@ import '../../features/patient/domain/usecases/get_medicine_detail_usecase.dart'
 import '../../features/patient/domain/usecases/get_medicine_pharmacies_usecase.dart';
 import '../../features/patient/domain/usecases/get_nearby_pharmacies_usecase.dart';
 import '../../features/patient/domain/usecases/get_orders_usecase.dart';
+import '../../features/patient/domain/usecases/get_checkout_quote_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_addresses_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_inquiries_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_profile_usecase.dart';
 import '../../features/patient/domain/usecases/update_patient_address_usecase.dart';
 import '../../features/patient/domain/usecases/get_patient_notifications_usecase.dart';
+import '../../features/patient/domain/usecases/mark_patient_notification_read_usecase.dart';
 import '../../features/patient/domain/usecases/get_pharmacy_conversations_usecase.dart';
 import '../../features/patient/domain/usecases/get_pharmacy_working_hours_usecase.dart';
 import '../../features/patient/domain/usecases/open_device_settings_usecase.dart';
@@ -190,7 +208,21 @@ import '../../features/pharmacy/data/repositories/notifications_repository_impl.
 import '../../features/pharmacy/data/repositories/pharmacy_alternatives_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_dashboard_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inquiries_repository_impl.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_inventory_import_remote_data_source.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_inventory_import_repository_impl.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_password_remote_data_source.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_inventory_repository_impl.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_password_repository_impl.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_password_repository.dart';
+import '../../features/pharmacy/domain/usecases/change_pharmacy_password_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/change_pharmacy_password_cubit.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_inventory_import_repository.dart';
+import '../../features/pharmacy/domain/usecases/analyze_inventory_import_usecase.dart';
+import '../../features/pharmacy/domain/usecases/cancel_inventory_import_usecase.dart';
+import '../../features/pharmacy/domain/usecases/commit_inventory_import_usecase.dart';
+import '../../features/pharmacy/domain/usecases/download_inventory_import_template_usecase.dart';
+import '../../features/pharmacy/domain/usecases/export_current_inventory_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/pharmacy_stock_import_cubit.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_medicine_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_profile_repository_impl.dart';
 import '../../features/pharmacy/data/repositories/pharmacy_ratings_repository_impl.dart';
@@ -214,11 +246,31 @@ import '../../features/pharmacy/domain/usecases/get_pharmacy_inventory_usecase.d
 import '../../features/pharmacy/domain/usecases/get_pharmacy_medicines_usecase.dart';
 import '../../features/pharmacy/domain/usecases/remove_alternative_usecase.dart';
 import '../../features/pharmacy/domain/usecases/select_alternative_usecase.dart';
-import '../../features/pharmacy/domain/usecases/update_inquiry_status_usecase.dart';
 import '../../features/pharmacy/domain/usecases/update_pharmacy_inventory_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_notifications_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_profile_usecase.dart';
+import '../../features/accounting/data/datasources/accounting_remote_data_source.dart';
+import '../../features/scanner/data/datasources/scan_session_remote_data_source.dart';
+import '../../features/scanner/data/repositories/scan_session_repository_impl.dart';
+import '../../features/scanner/domain/repositories/scan_session_repository.dart';
+import '../../features/scanner/domain/usecases/scan_session_usecases.dart';
+import '../../features/scanner/presentation/cubit/phone_scanner_cubit.dart';
+import '../../features/accounting/data/repositories/accounting_repository_impl.dart';
+import '../../features/accounting/data/repositories/sample_accounting_repository.dart';
+import '../../features/accounting/domain/repositories/accounting_repository.dart';
+import '../../features/accounting/domain/usecases/accounting_usecases.dart';
+import '../../features/accounting/presentation/cubit/accounting_overview_cubit.dart';
+import '../../features/accounting/presentation/cubit/cash_cubit.dart';
+import '../../features/accounting/presentation/cubit/new_sale_cubit.dart';
+import '../../features/accounting/presentation/cubit/refunds_cubit.dart';
+import '../../features/accounting/presentation/cubit/sales_cubit.dart';
+import '../../features/pharmacy/data/datasources/pharmacy_orders_remote_data_source.dart';
+import '../../features/pharmacy/data/repositories/pharmacy_orders_repository_impl.dart';
+import '../../features/pharmacy/domain/repositories/pharmacy_orders_repository.dart';
+import '../../features/pharmacy/domain/usecases/get_pharmacy_order_usecase.dart';
+import '../../features/pharmacy/domain/usecases/get_pharmacy_orders_usecase.dart';
 import '../../features/pharmacy/domain/usecases/get_pharmacy_ratings_usecase.dart';
+import '../../features/pharmacy/presentation/cubit/pharmacy_orders_cubit.dart';
 import '../../features/pharmacy/domain/usecases/mark_all_notifications_read_usecase.dart';
 import '../../features/pharmacy/domain/usecases/mark_notification_read_usecase.dart';
 import '../../features/pharmacy/domain/usecases/search_medicine_catalog_usecase.dart';
@@ -229,7 +281,6 @@ import '../../features/pharmacy/presentation/cubit/add_medicine_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/edit_medicine_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_dashboard_cubit.dart';
-import '../../features/pharmacy/presentation/cubit/pharmacy_inquiries_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_inventory_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_cubit.dart';
 import '../../features/pharmacy/presentation/cubit/notifications_cubit.dart';
@@ -247,9 +298,15 @@ final getIt = GetIt.instance;
 
 Future<void> setupGetIt() async {
   // ---------------- Networking ----------------
+  // Small on-disk copy of the catalogue and the user's lists, for speed and for
+  // when the connection drops; emptied when the session ends.
+  getIt.registerLazySingleton<ResponseCacheStore>(
+    () => FileResponseCacheStore(getTemporaryDirectory),
+  );
   getIt.registerLazySingleton(
     () => DioFactory.getDio(
       onSessionExpired: () => getIt<SessionExpiryHandler>().handle(),
+      cacheStore: getIt<ResponseCacheStore>(),
     ),
   );
   getIt.registerLazySingleton(() => SessionExpiryHandler(getIt()));
@@ -257,6 +314,12 @@ Future<void> setupGetIt() async {
   // ---------------- Local Storage ----------------
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
   getIt.registerLazySingleton(() => SecureStorageService(getIt()));
+
+  // ---------------- Language ----------------
+  getIt.registerLazySingleton<LanguageRepository>(() => const LanguageRepositoryImpl());
+  getIt.registerLazySingleton(() => GetAppLanguageUseCase(getIt()));
+  getIt.registerLazySingleton(() => SaveAppLanguageUseCase(getIt()));
+  getIt.registerLazySingleton(() => LanguageCubit(getIt(), getIt()));
 
   // ---------------- Auth ----------------
   getIt.registerLazySingleton(() => AuthRemoteDataSource(getIt()));
@@ -278,9 +341,12 @@ Future<void> setupGetIt() async {
     () => PushNotificationService(getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<SessionRepository>(
-    () => DeviceTokenSyncingSessionRepository(
-      SessionRepositoryImpl(getIt()),
-      getIt(),
+    () => CacheClearingSessionRepository(
+      DeviceTokenSyncingSessionRepository(
+        SessionRepositoryImpl(getIt()),
+        getIt(),
+        getIt(),
+      ),
       getIt(),
     ),
   );
@@ -291,6 +357,15 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => SaveSessionUseCase(getIt()));
   getIt.registerLazySingleton(() => GetSessionUseCase(getIt()));
   getIt.registerLazySingleton(() => LogoutUseCase(getIt(), getIt()));
+
+  // Closing the account: a patient deletes it, a pharmacy asks the admin to.
+  getIt.registerLazySingleton(() => AccountClosureRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<AccountClosureRepository>(
+    () => AccountClosureRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => ClosePatientAccountUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetPharmacyClosureRequestUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RequestPharmacyClosureUseCase(getIt(), getIt()));
 
   // Resetting a forgotten pharmacy password: the backend has no endpoints for
   // it yet, so the repository answers "قريباً" until one is written.
@@ -313,6 +388,8 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => PharmacySignUpCubit(getIt(), getIt()));
   getIt.registerFactory(() => PasswordResetCubit(getIt(), getIt(), getIt()));
   getIt.registerFactory(() => LogoutCubit(getIt()));
+  getIt.registerFactory(() => AccountClosureCubit(getIt()));
+  getIt.registerFactory(() => PharmacyClosureCubit(getIt(), getIt()));
 
   // ---------------- Patient Profile ----------------
   getIt.registerLazySingleton(() => PatientProfileRemoteDataSource(getIt()));
@@ -433,6 +510,7 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<CheckoutFlowRepository>(
     () => CheckoutFlowRepositoryImpl(getIt()),
   );
+  getIt.registerLazySingleton(() => GetCheckoutQuoteUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => ValidateCouponUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetOrderPaymentUseCase(getIt(), getIt()));
   getIt.registerLazySingleton(() => SubmitPaymentReceiptUseCase(getIt(), getIt()));
@@ -440,7 +518,8 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(() => GetOrderTrackingUseCase(getIt(), getIt()));
   // The subtotal of the cart being ordered (the coupon is checked against it).
   getIt.registerFactoryParam<CheckoutCubit, double, void>(
-    (subtotal, _) => CheckoutCubit(subtotal, getIt(), getIt(), getIt(), getIt(), getIt()),
+    (subtotal, _) =>
+        CheckoutCubit(subtotal, getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerFactoryParam<PaymentCubit, int, void>(
     (orderId, _) => PaymentCubit(orderId, getIt(), getIt(), getIt(), getIt()),
@@ -556,7 +635,8 @@ Future<void> setupGetIt() async {
     () => PatientNotificationsRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton(() => GetPatientNotificationsUseCase(getIt(), getIt()));
-  getIt.registerFactory(() => PatientNotificationsCubit(getIt()));
+  getIt.registerLazySingleton(() => MarkPatientNotificationReadUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => PatientNotificationsCubit(getIt(), getIt()));
 
   // ---------------- Account Settings ----------------
   getIt.registerLazySingleton(() => const DeviceSettingsDataSource());
@@ -569,7 +649,7 @@ Future<void> setupGetIt() async {
   getIt.registerFactory(() => AccountSettingsCubit(getIt(), getIt()));
 
   // ---------------- Medicine Reminders ----------------
-  getIt.registerLazySingleton(() => ReminderLocalDataSource());
+  getIt.registerLazySingleton(() => ReminderLocalDataSource(getIt()));
   getIt.registerLazySingleton<ReminderRepository>(
     () => ReminderRepositoryImpl(getIt()),
   );
@@ -590,6 +670,14 @@ Future<void> setupGetIt() async {
     () => UpdatePharmacyProfileUseCase(getIt(), getIt()),
   );
   getIt.registerFactory(() => PharmacyProfileCubit(getIt(), getIt(), getIt()));
+
+  // ---------------- Pharmacy Password ----------------
+  getIt.registerLazySingleton(() => PharmacyPasswordRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyPasswordRepository>(
+    () => PharmacyPasswordRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => ChangePharmacyPasswordUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => ChangePharmacyPasswordCubit(getIt()));
 
   // ---------------- Pharmacy Medicines ----------------
   getIt.registerLazySingleton(() => PharmacyMedicineRemoteDataSource(getIt()));
@@ -616,10 +704,24 @@ Future<void> setupGetIt() async {
   );
   getIt.registerFactory(() => PharmacyMedicinesCubit(getIt(), getIt(), getIt()));
   getIt.registerFactory(
-    () => AddMedicineCubit(getIt(), getIt(), getIt(), getIt()),
+    () => AddMedicineCubit(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerFactoryParam<EditMedicineCubit, Medicine, void>(
     (medicine, _) => EditMedicineCubit(getIt(), medicine),
+  );
+
+  // ---------------- Pharmacy Stock Import ----------------
+  getIt.registerLazySingleton(() => PharmacyInventoryImportRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyInventoryImportRepository>(
+    () => PharmacyInventoryImportRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => AnalyzeInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CommitInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CancelInventoryImportUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => DownloadInventoryImportTemplateUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => ExportCurrentInventoryUseCase(getIt()));
+  getIt.registerFactory(
+    () => PharmacyStockImportCubit(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
 
   // ---------------- Pharmacy Inventory ----------------
@@ -645,6 +747,49 @@ Future<void> setupGetIt() async {
   );
   getIt.registerFactory(() => PharmacyDashboardCubit(getIt()));
 
+  // ---------------- Accounting ----------------
+  // The real API, unless a build asks for invented in-memory figures with
+  // `--dart-define=ACCOUNTING_SAMPLE=true` (to look at the screens offline).
+  getIt.registerLazySingleton(() => AccountingRemoteDataSource(getIt()));
+  const useSampleAccounting = bool.fromEnvironment('ACCOUNTING_SAMPLE');
+  getIt.registerLazySingleton<AccountingRepository>(
+    () => useSampleAccounting ? SampleAccountingRepository() : AccountingRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => GetAccountingOverviewUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetSalesUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetInvoiceUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetRefundableLinesUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetRefundsUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetCashLedgerUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RecordCashMovementUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => SearchSaleItemsUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => FindSaleItemByBarcodeUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => SearchCustomersUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CreateSaleUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RecordInvoicePaymentUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => CreateRefundUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => AccountingOverviewCubit(getIt()));
+  getIt.registerFactory(() => SalesCubit(getIt(), getIt(), getIt(), getIt(), getIt()));
+  getIt.registerFactory(() => RefundsCubit(getIt()));
+  getIt.registerFactory(() => CashCubit(getIt(), getIt()));
+  getIt.registerFactory(() => NewSaleCubit(getIt(), getIt(), getIt(), getIt()));
+
+  // ---------------- Phone scanner (web sales screen pairing) ----------------
+  getIt.registerLazySingleton(() => ScanSessionRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<ScanSessionRepository>(() => ScanSessionRepositoryImpl(getIt()));
+  getIt.registerLazySingleton(() => PairScannerUseCase(getIt()));
+  getIt.registerLazySingleton(() => SendScannedBarcodeUseCase(getIt()));
+  getIt.registerFactory(() => PhoneScannerCubit(getIt(), getIt()));
+
+  // ---------------- Pharmacy Orders ----------------
+  getIt.registerLazySingleton(() => PharmacyOrdersRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<PharmacyOrdersRepository>(
+    () => PharmacyOrdersRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton(() => GetPharmacyOrdersUseCase(getIt(), getIt()));
+  getIt.registerLazySingleton(() => GetPharmacyOrderUseCase(getIt(), getIt()));
+  getIt.registerFactory(() => PharmacyOrdersCubit(getIt(), getIt()));
+
   // ---------------- Pharmacy Inquiries ----------------
   getIt.registerLazySingleton(() => PharmacyInquiriesRemoteDataSource(getIt()));
   getIt.registerLazySingleton<PharmacyInquiriesRepository>(
@@ -653,10 +798,6 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton(
     () => GetPharmacyInquiriesUseCase(getIt(), getIt()),
   );
-  getIt.registerLazySingleton(
-    () => UpdateInquiryStatusUseCase(getIt(), getIt()),
-  );
-  getIt.registerFactory(() => PharmacyInquiriesCubit(getIt(), getIt()));
   getIt.registerLazySingleton(() => GetPatientConversationsUseCase(getIt()));
   getIt.registerFactory<ConversationsCubit>(
     () => ConversationsCubit(getIt<GetPatientConversationsUseCase>(), activity: getIt()),

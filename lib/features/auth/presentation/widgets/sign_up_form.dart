@@ -12,6 +12,9 @@ import '../cubit/patient_auth_state.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/terms_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+import '../../../../core/theming/auth_field_decoration.dart';
+
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
 
@@ -76,25 +79,25 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('اسمك كامل', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('اسمك كامل'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _nameController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'الرجاء إدخال اسمك الكامل' : null,
-            decoration: _fieldDecoration(),
+                (value == null || value.trim().isEmpty) ? 'الرجاء إدخال اسمك الكامل'.tr : null,
+            decoration: authFieldDecoration(),
           ),
 
           SizedBox(height: 16.h),
 
-          Text('تاريخ الميلاد', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('تاريخ الميلاد'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           FormField<String>(
             initialValue: context.read<PatientAuthCubit>().state.birthDate,
             validator: (value) =>
-                (value == null || value.isEmpty) ? 'الرجاء اختيار تاريخ ميلادك' : null,
+                (value == null || value.isEmpty) ? 'الرجاء اختيار تاريخ ميلادك'.tr : null,
             builder: (field) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +119,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       child: Text(
                         field.errorText!,
                         style: AppTextStyles.authFieldError,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                       ),
                     ),
                 ],
@@ -126,7 +129,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
           SizedBox(height: 16.h),
 
-          Text('رقم هاتفك', style: AppTextStyles.authFieldLabel, textAlign: TextAlign.right),
+          Text('رقم هاتفك'.tr, style: AppTextStyles.authFieldLabel, textAlign: TextAlign.start),
           SizedBox(height: 8.h),
           TextFormField(
             controller: _phoneController,
@@ -135,8 +138,8 @@ class _SignUpFormState extends State<SignUpForm> {
             inputFormatters: [DigitsOnlyFormatter()],
             style: TextStyle(fontSize: 16.sp, color: AppColors.authTextPrimary),
             validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'الرجاء إدخال رقم الهاتف' : null,
-            decoration: _fieldDecoration(),
+                (value == null || value.trim().isEmpty) ? 'الرجاء إدخال رقم الهاتف'.tr : null,
+            decoration: authFieldDecoration(),
           ),
 
           BlocBuilder<PatientAuthCubit, PatientAuthState>(
@@ -148,7 +151,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 child: Text(
                   state.errorMessage!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },
@@ -160,7 +163,7 @@ class _SignUpFormState extends State<SignUpForm> {
             buildWhen: (previous, current) => previous.isSendingOtp != current.isSendingOtp,
             builder: (context, state) {
               return AppCustomButton(
-                text: 'التالي',
+                text: 'التالي'.tr,
                 backgroundColor: AppColors.mainTeal,
                 isLoading: state.isSendingOtp,
                 onPressed: () => _submit(context),
@@ -174,18 +177,18 @@ class _SignUpFormState extends State<SignUpForm> {
             TextSpan(
               style: AppTextStyles.authConsentText,
               children: [
-                const TextSpan(text: 'بالضغط على '),
-                TextSpan(text: 'التالي', style: AppTextStyles.authConsentLink),
-                const TextSpan(text: ' أنت توافق على '),
+                TextSpan(text: 'بالضغط على '.tr),
+                TextSpan(text: 'التالي'.tr, style: AppTextStyles.authConsentLink),
+                TextSpan(text: ' أنت توافق على '.tr),
                 _consentLink(
-                  'الشروط والأحكام',
+                  'الشروط والأحكام'.tr,
                   () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TermsScreen()),
                   ),
                 ),
-                const TextSpan(text: ' و '),
+                TextSpan(text: ' و '.tr),
                 _consentLink(
-                  'سياسة الخصوصية',
+                  'سياسة الخصوصية'.tr,
                   () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
                   ),
@@ -196,31 +199,6 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
         ],
       ),
-    );
-  }
-
-  InputDecoration _fieldDecoration() {
-    return InputDecoration(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-      fillColor: Colors.white,
-      filled: true,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authInputBorder, width: 1.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.0),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.r),
-        borderSide: const BorderSide(color: AppColors.authError, width: 1.5),
-      ),
-      errorStyle: AppTextStyles.authFieldError,
     );
   }
 }

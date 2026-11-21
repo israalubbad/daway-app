@@ -1,8 +1,4 @@
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/core/widgets/star_rating.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/rating.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_ratings_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_ratings_usecase.dart';
@@ -12,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 final _rating = Rating(
   id: 1,
@@ -37,26 +34,6 @@ class _FakePharmacyRatingsRepository implements PharmacyRatingsRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(375, 812);
@@ -67,7 +44,7 @@ void main() {
 
   Widget buildTestableScreen({_FakePharmacyRatingsRepository? repositoryOverride}) {
     final repository = repositoryOverride ?? _FakePharmacyRatingsRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     final cubit = PharmacyRatingsCubit(
       GetPharmacyRatingsUseCase(repository, sessionRepository),
     );
@@ -81,47 +58,15 @@ void main() {
     );
   }
 
-  testWidgets('shows the average, total count, and a review card', (tester) async {
+  testWidgets('puts the reviews right under the title', (tester) async {
     await setPhoneViewport(tester);
 
     await tester.pumpWidget(buildTestableScreen());
     await tester.pumpAndSettle();
 
-    expect(find.text('4.7'), findsOneWidget);
-    expect(find.text('128 تقييمًا'), findsOneWidget);
+    expect(find.text('التقييمات'), findsOneWidget);
     expect(find.text('أحمد العتيبي'), findsOneWidget);
+    expect(find.text('5.0'), findsOneWidget);
     expect(find.text('خدمة ممتازة وسريعة جدًا'), findsOneWidget);
   });
-
-  testWidgets('shows the star breakdown counts', (tester) async {
-    await setPhoneViewport(tester);
-
-    await tester.pumpWidget(buildTestableScreen());
-    await tester.pumpAndSettle();
-
-    expect(find.text('96'), findsOneWidget);
-    expect(find.text('21'), findsOneWidget);
-    expect(find.text('7'), findsOneWidget);
-    expect(find.text('3'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
-  });
-
-  testWidgets(
-    'the displayed average text and the star icons agree at a rounding boundary',
-    (tester) async {
-      await setPhoneViewport(tester);
-      final repository = _FakePharmacyRatingsRepository()..averageRating = 4.97;
-
-      await tester.pumpWidget(buildTestableScreen(repositoryOverride: repository));
-      await tester.pumpAndSettle();
-
-      expect(find.text('5.0'), findsOneWidget);
-      final starRatings = tester
-          .widgetList<StarRating>(find.byType(StarRating))
-          .toList();
-      // The summary header's StarRating (the review card's is a separate,
-      // unrelated instance showing its own whole-number rating).
-      expect(starRatings.first.rating, 5.0);
-    },
-  );
 }

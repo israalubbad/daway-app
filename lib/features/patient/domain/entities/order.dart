@@ -40,6 +40,7 @@ enum OrderStatus {
 /// A patient's order, as returned by `GET /patient/orders`.
 class Order {
   final String orderNumber;
+  final int? pharmacyId;
   final String pharmacyName;
   final OrderStatus status;
   final int itemsCount;
@@ -48,6 +49,7 @@ class Order {
   final DateTime createdAt;
 
   const Order({
+    this.pharmacyId,
     required this.orderNumber,
     required this.pharmacyName,
     required this.status,

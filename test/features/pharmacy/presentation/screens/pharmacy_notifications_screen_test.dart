@@ -1,7 +1,5 @@
+import 'package:daway_app/core/widgets/app_back_button.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/notification.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/notifications_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/get_notifications_usecase.dart';
@@ -13,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 final _unreadLowStock = AppNotification(
   id: 1,
@@ -61,26 +60,6 @@ class _FakeNotificationsRepository implements NotificationsRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(375, 812);
@@ -93,7 +72,7 @@ void main() {
 
   Widget buildTestableScreen() {
     repository = _FakeNotificationsRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     final cubit = NotificationsCubit(
       GetNotificationsUseCase(repository, sessionRepository),
       MarkAllNotificationsReadUseCase(repository, sessionRepository),
@@ -152,13 +131,10 @@ void main() {
     await tester.pumpWidget(buildTestableScreen());
     await tester.pumpAndSettle();
 
-    final chip = find.ancestor(
-      of: find.text('المخزون'),
-      matching: find.byWidgetPredicate(
-        (w) => w.runtimeType.toString() == 'AppFilterChip',
-      ),
-    );
-    await tester.tap(chip);
+    // The tabs scroll sideways, so this one may start off screen.
+    await tester.ensureVisible(find.text('المخزون (1)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('المخزون (1)'));
     await tester.pumpAndSettle();
 
     expect(find.text('تنبيه نقص مخزون دواء Panadol'), findsOneWidget);
@@ -184,7 +160,7 @@ void main() {
     (tester) async {
       await setPhoneViewport(tester);
       repository = _FakeNotificationsRepository();
-      final sessionRepository = _FakeSessionRepository();
+      final sessionRepository = InMemorySessionRepository.pharmacy();
       final cubit = NotificationsCubit(
         GetNotificationsUseCase(repository, sessionRepository),
         MarkAllNotificationsReadUseCase(repository, sessionRepository),
@@ -224,7 +200,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(BackButton), findsOneWidget);
+      expect(find.byType(AppBackButton), findsOneWidget);
       expect(find.byIcon(Icons.menu), findsNothing);
     },
   );

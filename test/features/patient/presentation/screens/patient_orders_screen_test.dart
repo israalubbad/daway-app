@@ -1,9 +1,7 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:daway_app/features/patient/domain/repositories/orders_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/cancel_order_usecase.dart';
@@ -15,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 Order _order(String number, OrderStatus status, {int items = 1, double price = 65}) => Order(
       orderNumber: number,
@@ -37,26 +36,22 @@ class _FakeOrdersRepository implements OrdersRepository {
   Future<ApiResult<List<Order>>> getOrders({required String token}) async => ordersResult;
 
   @override
+  Future<ApiResult<CheckoutQuote>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) => throw UnimplementedError();
+
+  @override
   Future<ApiResult<int>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    CheckoutQuote? quote,
+    String? idempotencyKey,
   }) async =>
       const Success(1);
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
 }
 
 void main() {
@@ -74,8 +69,8 @@ void main() {
     repository = _FakeOrdersRepository();
     getIt.registerFactory<OrdersCubit>(
       () => OrdersCubit(
-        GetOrdersUseCase(repository, _FakeSessionRepository()),
-        CancelOrderUseCase(repository, _FakeSessionRepository()),
+        GetOrdersUseCase(repository, InMemorySessionRepository.patient()),
+        CancelOrderUseCase(repository, InMemorySessionRepository.patient()),
       ),
     );
   });

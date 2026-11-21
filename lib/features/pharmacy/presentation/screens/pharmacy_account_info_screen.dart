@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -14,7 +15,10 @@ import '../../../patient/presentation/widgets/patient_sub_screen_header.dart';
 import '../cubit/pharmacy_profile_cubit.dart';
 import '../cubit/pharmacy_profile_state.dart';
 import '../helpers/working_hours_format.dart';
+import '../widgets/change_password_sheet.dart';
 import '../widgets/working_hours_dialog.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// "معلومات الحساب": the pharmacy's logo, name, phone, address, working hours
 /// and password, each on a row with a "تعديل" chip, and one save button.
@@ -22,9 +26,8 @@ import '../widgets/working_hours_dialog.dart';
 /// Expects the shell's [PharmacyProfileCubit] above it. The edits live in that
 /// shared cubit until saved, so leaving the screen discards them.
 ///
-/// The phone number and password have no edit flow yet — the number is what
-/// the pharmacy's account is known by, and there is no password endpoint — so
-/// their chips show "قريباً".
+/// The phone number is edited in place and saved with the rest of the profile;
+/// the password opens its own sheet and is sent right away.
 class PharmacyAccountInfoScreen extends StatefulWidget {
   const PharmacyAccountInfoScreen({super.key});
 
@@ -37,26 +40,36 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
   late final TextEditingController _nameController;
   final FocusNode _nameFocus = FocusNode();
   bool _editingName = false;
+  late final TextEditingController _phoneController;
+  final FocusNode _phoneFocus = FocusNode();
+  bool _editingPhone = false;
 
   @override
   void initState() {
     super.initState();
-    final state = context.read<PharmacyProfileCubit>().state;
-    _nameController = TextEditingController(
-      text: state is PharmacyProfileLoaded ? state.name : '',
-    );
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _nameFocus.dispose();
+    _phoneController.dispose();
+    _phoneFocus.dispose();
     super.dispose();
   }
 
-  void _comingSoon() => AppSnackbar.show(context, 'قريباً');
+  // The field is filled when editing starts, from the profile as it is by then:
+  // the screen can open before the profile has loaded.
+  void _editPhone(PharmacyProfileLoaded state) {
+    _phoneController.text = state.phone;
+    setState(() => _editingPhone = true);
+    _phoneFocus.requestFocus();
+  }
 
-  void _editName() {
+  void _editName(PharmacyProfileLoaded state) {
+    _nameController.text = state.name;
     setState(() => _editingName = true);
     _nameFocus.requestFocus();
   }
@@ -87,7 +100,7 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
     if (state.hasLocation) {
       return '${state.latitude!.toStringAsFixed(5)}, ${state.longitude!.toStringAsFixed(5)}';
     }
-    return 'اختر موقعك على الخريطة';
+    return 'اختر موقعك على الخريطة'.tr;
   }
 
   @override
@@ -138,9 +151,9 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PatientSubScreenHeader(
-            title: 'معلومات الحساب',
-            description: 'إدارة معلومات صيدليتك وتفاصيلها',
+          PatientSubScreenHeader(
+            title: 'معلومات الحساب'.tr,
+            description: 'إدارة معلومات صيدليتك وتفاصيلها'.tr,
           ),
           SizedBox(height: 32.h),
           Center(
@@ -163,14 +176,14 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('الاسم'),
+          _FieldLabel('الاسم'.tr),
           ProfileFieldRow(
-            onEditTap: _editName,
+            onEditTap: () => _editName(state),
             child: _editingName
                 ? TextField(
                     controller: _nameController,
                     focusNode: _nameFocus,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     onChanged: cubit.nameChanged,
                     style: AppTextStyles.profileFieldValue,
                     decoration: const InputDecoration(
@@ -181,55 +194,82 @@ class _PharmacyAccountInfoScreenState extends State<PharmacyAccountInfoScreen> {
                   )
                 : Text(
                     state.name,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.profileFieldValue,
                   ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('رقم الهاتف'),
+          _FieldLabel('رقم الهاتف'.tr),
           ProfileFieldRow(
-            onEditTap: _comingSoon,
-            child: Text(
-              state.profile.phone,
-              textAlign: TextAlign.right,
-              style: AppTextStyles.profileFieldValue,
-            ),
+            onEditTap: () => _editPhone(state),
+            child: _editingPhone
+                ? TextField(
+                    controller: _phoneController,
+                    focusNode: _phoneFocus,
+                    keyboardType: TextInputType.phone,
+                    textAlign: TextAlign.start,
+                    textDirection: TextDirection.ltr,
+                    onChanged: cubit.phoneChanged,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[+\d]')),
+                    ],
+                    style: AppTextStyles.profileFieldValue,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  )
+                : Text(
+                    state.phone,
+                    textAlign: TextAlign.start,
+                    style: AppTextStyles.profileFieldValue,
+                  ),
           ),
+          if (_editingPhone && !state.hasValidPhone)
+            Padding(
+              padding: EdgeInsets.only(top: 8.h),
+              child: Text(
+                'أدخل رقم جوال صحيح'.tr,
+                textAlign: TextAlign.start,
+                style: AppTextStyles.mutedCaption.copyWith(color: AppColors.error),
+              ),
+            ),
           SizedBox(height: 24.h),
-          _FieldLabel('العنوان'),
+          _FieldLabel('العنوان'.tr),
           ProfileFieldRow(
             onEditTap: () => _editAddress(state),
             child: Text(
               _addressText(state),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('ساعات العمل'),
+          _FieldLabel('ساعات العمل'.tr),
           ProfileFieldRow(
             onEditTap: () => _editWorkingHours(state),
             child: Text(
               summarizeWorkingHours(state.workingHours),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
           SizedBox(height: 24.h),
-          _FieldLabel('كلمة المرور'),
+          _FieldLabel('كلمة المرور'.tr),
           ProfileFieldRow(
-            onEditTap: _comingSoon,
+            onEditTap: () => ChangePasswordSheet.show(context),
             child: Text(
               '*******',
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTextStyles.profileFieldValue,
             ),
           ),
           SizedBox(height: 32.h),
           AppCustomButton(
-            text: 'حفظ التعديلات',
+            text: 'حفظ التعديلات'.tr,
             isLoading: state.isSaving,
             backgroundColor: canSave
                 ? AppColors.mainTeal
@@ -254,7 +294,7 @@ class _FieldLabel extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 8.h),
       child: Text(
         text,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: AppTextStyles.profileFieldLabel,
       ),
     );

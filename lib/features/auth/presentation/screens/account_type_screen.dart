@@ -14,6 +14,8 @@ import '../../domain/entities/account_type.dart';
 import '../cubit/account_type_cubit.dart';
 import '../widgets/account_option_card.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class AccountTypeScreen extends StatelessWidget {
   const AccountTypeScreen({super.key});
 
@@ -66,7 +68,7 @@ class AccountTypeScreen extends StatelessWidget {
                       const Center(child: AppLogo()),
                       SizedBox(height: 32.h),
                       Text(
-                        'كيف ستستخدم دواك؟',
+                        'كيف ستستخدم دواك؟'.tr,
                         style: AppTextStyles.screenTitle.copyWith(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -75,7 +77,7 @@ class AccountTypeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        'اختر نوع الحساب المناسب لاحتياجاتك.',
+                        'اختر نوع الحساب المناسب لاحتياجاتك.'.tr,
                         style: AppTextStyles.accountTypeSubtitle.copyWith(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w400, // Regular
@@ -88,8 +90,8 @@ class AccountTypeScreen extends StatelessWidget {
                         builder: (context, isSelected) => AccountOptionCard(
                           type: AccountType.patient,
                           isSelected: isSelected,
-                          title: 'مستخدم',
-                          description: 'اطلب أدويتك وتابع وصفاتك وطلباتك بسهولة.',
+                          title: 'مستخدم'.tr,
+                          description: 'اطلب أدويتك وتابع وصفاتك وطلباتك بسهولة.'.tr,
                           iconWidget: SvgPicture.asset(
                             "assets/icons/user_icon.svg",
                             width: 24.w,
@@ -108,8 +110,8 @@ class AccountTypeScreen extends StatelessWidget {
                         builder: (context, isSelected) => AccountOptionCard(
                           type: AccountType.pharmacy,
                           isSelected: isSelected,
-                          title: 'صيدلي',
-                          description: 'أدر الأدوية والطلبات واستقبل طلبات المستخدمين.',
+                          title: 'صيدلي'.tr,
+                          description: 'أدر الأدوية والطلبات واستقبل طلبات المستخدمين.'.tr,
                           iconWidget: Image.asset(
                            "assets/icons/pharmacy-icon.png",
                             width: 24.w,
@@ -129,7 +131,7 @@ class AccountTypeScreen extends StatelessWidget {
                 width: double.infinity,
                 child: AppCustomButton(
                   backgroundColor: AppColors.mainTeal,
-                  text: 'التالي',
+                  text: 'التالي'.tr,
                   onPressed: () =>
                       _continue(context, context.read<AccountTypeCubit>().state),
                 ),

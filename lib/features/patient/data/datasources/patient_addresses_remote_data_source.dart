@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PatientAddressesRemoteDataSource {
@@ -10,7 +11,7 @@ class PatientAddressesRemoteDataSource {
   Future<Response<dynamic>> getAddresses({required String token}) {
     return _dio.get(
       ApiConstants.patientAddresses,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -35,14 +36,14 @@ class PatientAddressesRemoteDataSource {
         'longitude': longitude,
         'is_default': isDefault,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
   Future<Response<dynamic>> deleteAddress({required String token, required int addressId}) {
     return _dio.delete(
       '${ApiConstants.patientAddresses}/$addressId',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -68,7 +69,7 @@ class PatientAddressesRemoteDataSource {
         'longitude': longitude,
         'is_default': isDefault,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

@@ -26,8 +26,7 @@ void main() {
   Future<void> pumpScreen(
     WidgetTester tester, {
     PharmacyOrder? order,
-    VoidCallback? onAccept,
-    VoidCallback? onReject,
+    PharmacyOrderLoader? onLoadDetails,
   }) async {
     await setDesignViewport(tester);
     await tester.pumpWidget(
@@ -39,8 +38,7 @@ void main() {
                 MaterialPageRoute<void>(
                   builder: (_) => PharmacyOrderDetailsScreen(
                     order: order ?? _order,
-                    onAccept: onAccept,
-                    onReject: onReject,
+                    onLoadDetails: onLoadDetails,
                   ),
                 ),
               ),
@@ -137,29 +135,38 @@ void main() {
     expect(find.text('طريقة الدفع'), findsNothing);
   });
 
-  testWidgets('قبول الطلب and رفض الطلب call back', (tester) async {
-    var accepted = 0;
-    var rejected = 0;
-    await pumpScreen(tester, onAccept: () => accepted++, onReject: () => rejected++);
-
-    await tester.ensureVisible(find.text('قبول الطلب'));
-    await tester.tap(find.text('قبول الطلب'));
-    await tester.ensureVisible(find.text('رفض الطلب'));
-    await tester.tap(find.text('رفض الطلب'));
-
-    expect(accepted, 1);
-    expect(rejected, 1);
-  });
-
-  testWidgets('without handlers both buttons say قريباً', (tester) async {
+  testWidgets('a pending order has no accept or reject buttons', (tester) async {
     await pumpScreen(tester);
 
-    await tester.ensureVisible(find.text('قبول الطلب'));
-    await tester.tap(find.text('قبول الطلب'));
-    await tester.pump();
+    expect(find.text('قبول الطلب'), findsNothing);
+    expect(find.text('رفض الطلب'), findsNothing);
+    expect(find.byType(AppCustomButton), findsNothing);
+  });
 
-    expect(find.text('قريباً'), findsOneWidget);
-    expect(find.byType(AppCustomButton), findsNWidgets(2));
+  testWidgets('shows the full record fetched on open', (tester) async {
+    await pumpScreen(
+      tester,
+      onLoadDetails: (order) async => PharmacyOrder(
+        id: order.id,
+        orderNumber: order.orderNumber,
+        createdAt: order.createdAt,
+        itemsCount: 1,
+        total: 12,
+        area: order.area,
+        patientName: 'أحمد',
+        items: const [PharmacyOrderItem(name: 'بنادول', price: 12, quantity: 3, unitPrice: 4)],
+      ),
+    );
+
+    expect(find.text('العميل: أحمد'), findsOneWidget);
+    expect(find.text('بنادول'), findsOneWidget);
+    expect(find.textContaining('الكمية: 3'), findsOneWidget);
+  });
+
+  testWidgets('keeps the list data when the full record cannot be fetched', (tester) async {
+    await pumpScreen(tester, onLoadDetails: (order) async => null);
+
+    expect(find.text('أموكسيسيلين 500 مج'), findsOneWidget);
   });
 
   testWidgets('the back chip returns to the previous screen', (tester) async {

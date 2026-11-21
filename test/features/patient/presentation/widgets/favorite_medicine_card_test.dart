@@ -14,14 +14,14 @@ void main() {
 
   // RTL like the real app (app.dart sets `locale: Locale('ar')`) — the
   // card's layout is right-to-left, so it has to be tested that way.
-  Widget buildTestable(FavoriteMedicine medicine, {VoidCallback? onCompareTap}) {
+  Widget buildTestable(FavoriteMedicine medicine, {VoidCallback? onDetailsTap}) {
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       builder: (context, child) => MaterialApp(
         home: Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
-            body: FavoriteMedicineCard(medicine: medicine, onCompareTap: onCompareTap ?? () {}),
+            body: FavoriteMedicineCard(medicine: medicine, onDetailsTap: onDetailsTap ?? () {}),
           ),
         ),
       ),
@@ -47,7 +47,7 @@ void main() {
     expect(find.text('Panadol Extra'), findsOneWidget);
     expect(find.text('متوفر في 3 صيدليات'), findsOneWidget);
     expect(find.text('12 ₪'), findsOneWidget);
-    expect(find.text('مقارنة الأسعار'), findsOneWidget);
+    expect(find.text('تفاصيل الدواء'), findsOneWidget);
   });
 
   testWidgets('the availability line agrees with the number of pharmacies', (tester) async {
@@ -153,7 +153,7 @@ void main() {
     expect(availability, greaterThan(price));
   });
 
-  testWidgets('tapping "مقارنة الأسعار" invokes onCompareTap', (tester) async {
+  testWidgets('tapping "تفاصيل الدواء" invokes onDetailsTap', (tester) async {
     await setPhoneViewport(tester);
     var tapped = false;
     const medicine = FavoriteMedicine(
@@ -164,8 +164,8 @@ void main() {
       minPrice: 60,
     );
 
-    await tester.pumpWidget(buildTestable(medicine, onCompareTap: () => tapped = true));
-    await tester.tap(find.text('مقارنة الأسعار'));
+    await tester.pumpWidget(buildTestable(medicine, onDetailsTap: () => tapped = true));
+    await tester.tap(find.text('تفاصيل الدواء'));
 
     expect(tapped, isTrue);
   });

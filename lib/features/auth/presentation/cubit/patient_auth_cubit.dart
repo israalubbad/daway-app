@@ -11,6 +11,8 @@ import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import 'patient_auth_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Drives both the plain phone-only login screen and the sign-up screen
 /// (name + birth date collected up front). There is no separate "register"
 /// endpoint — verifying the OTP either logs the patient in or creates their
@@ -47,7 +49,7 @@ class PatientAuthCubit extends Cubit<PatientAuthState> {
 
   Future<void> sendOtp() async {
     if (!Validators.isValidLocalPhone(state.phone)) {
-      emit(state.copyWith(errorMessage: 'يرجى إدخال رقم جوال صحيح مكوّن من 10 أرقام'));
+      emit(state.copyWith(errorMessage: 'يرجى إدخال رقم جوال صحيح مكوّن من 10 أرقام'.tr));
       return;
     }
 
@@ -75,7 +77,7 @@ class PatientAuthCubit extends Cubit<PatientAuthState> {
 
   Future<void> verifyOtp(String otp) async {
     if (otp.length != 6) {
-      emit(state.copyWith(errorMessage: 'يرجى إدخال رمز التحقق المكوّن من 6 أرقام'));
+      emit(state.copyWith(errorMessage: 'يرجى إدخال رمز التحقق المكوّن من 6 أرقام'.tr));
       return;
     }
 
@@ -140,7 +142,7 @@ class PatientAuthCubit extends Cubit<PatientAuthState> {
             // payload (name/birth date) we never collected here.
             emit(state.copyWith(
               isVerifying: false,
-              errorMessage: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد',
+              errorMessage: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد'.tr,
             ));
           }
         } else {

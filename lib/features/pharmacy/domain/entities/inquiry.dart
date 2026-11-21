@@ -11,26 +11,6 @@ InquiryStatus inquiryStatusFrom(String? raw) {
   };
 }
 
-/// Inverse of [inquiryStatusFrom], for `PUT /pharmacy/inquiries/{id}`.
-String inquiryStatusToWire(InquiryStatus status) {
-  return switch (status) {
-    InquiryStatus.newInquiry => 'new',
-    InquiryStatus.answered => 'answered',
-    InquiryStatus.closed => 'closed',
-  };
-}
-
-/// The valid status transitions a pharmacist can trigger from the app,
-/// mirroring the backend's documented flow (new → answered → closed) —
-/// kept on the entity rather than in a screen/widget so any future UI that
-/// lets a pharmacist act on an inquiry reuses the same rule instead of
-/// reimplementing it.
-extension InquiryStatusTransitions on InquiryStatus {
-  bool get canMarkAnswered => this == InquiryStatus.newInquiry;
-
-  bool get canClose => this != InquiryStatus.closed;
-}
-
 /// A patient's inquiry to the pharmacy about a medicine's availability.
 /// Shared by the home screen's "أحدث الاستفسارات" preview and the full
 /// الاستفسارات management screen, so both parse the same wire shape once.
@@ -62,9 +42,6 @@ class Inquiry {
     this.lastMessage,
   });
 }
-
-/// Shared by the الاستفسارات screen's filter chips and its cubit.
-enum InquiryStatusFilter { all, newInquiry, answered, closed }
 
 /// The full response shape of `GET /pharmacy/inquiries`: the page of
 /// inquiries plus the backend's own status counts (`counts.new/answered/

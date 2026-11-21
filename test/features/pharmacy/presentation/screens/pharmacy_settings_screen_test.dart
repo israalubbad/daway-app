@@ -1,8 +1,14 @@
 import 'package:daway_app/core/di/dependency_injection.dart';
+import 'package:daway_app/core/erroring/failure.dart';
+import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
 import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/core/widgets/incomplete_profile_banner.dart';
 import 'package:daway_app/core/widgets/app_toggle_switch.dart';
+import 'package:daway_app/features/auth/domain/entities/closure_request.dart';
+import 'package:daway_app/features/auth/domain/usecases/get_pharmacy_closure_request_usecase.dart';
+import 'package:daway_app/features/auth/domain/usecases/request_pharmacy_closure_usecase.dart';
+import 'package:daway_app/features/auth/presentation/cubit/pharmacy_closure_cubit.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_cubit.dart';
 import 'package:daway_app/features/auth/presentation/cubit/logout_state.dart';
 import 'package:daway_app/features/patient/domain/entities/account_settings.dart';
@@ -17,6 +23,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
+import '../../../auth/account_closure_test_fakes.dart';
+import '../../../localization/language_test_fakes.dart';
 
 const _located = PharmacyProfile(
   pharmacyId: 'PH-1234',
@@ -108,6 +116,8 @@ class _FakeLogoutCubit extends Cubit<LogoutState> implements LogoutCubit {
 void main() {
   late _FakeProfileCubit profileCubit;
   late _FakeLogoutCubit logoutCubit;
+  late FakeAccountClosureRepository closureRepository;
+  late FakeClosureSessionRepository closureSession;
 
   AccountSettingsState notificationsOn() => const AccountSettingsLoaded(
     AccountSettings(
@@ -118,7 +128,10 @@ void main() {
   );
 
   setUp(() {
+    registerLanguageCubit(getIt);
     logoutCubit = _FakeLogoutCubit();
+    closureRepository = FakeAccountClosureRepository();
+    closureSession = FakeClosureSessionRepository();
   });
 
   tearDown(() async {
@@ -137,6 +150,12 @@ void main() {
     );
     getIt.registerFactory<AccountSettingsCubit>(
       () => _FakeAccountSettingsCubit(settings ?? notificationsOn()),
+    );
+    getIt.registerFactory<PharmacyClosureCubit>(
+      () => PharmacyClosureCubit(
+        GetPharmacyClosureRequestUseCase(closureRepository, closureSession),
+        RequestPharmacyClosureUseCase(closureRepository, closureSession),
+      ),
     );
     await setDesignViewport(tester);
     await tester.pumpWidget(
@@ -186,6 +205,7 @@ void main() {
       'الشروط والأحكام',
       'الحساب',
       'تسجيل الخروج',
+      'طلب إغلاق الحساب',
       'دواك',
       'الإصدار 1.0.0',
     ]) {
@@ -308,5 +328,103 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(logoutCubit.logouts, 1);
+  });
+
+  group('asking to close the account', () {
+    Future<void> openClosureSheet(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('طلب إغلاق الحساب'));
+      await tester.tap(find.text('طلب إغلاق الحساب'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('asks first, and nothing is sent until it is confirmed', (tester) async {
+      await pumpScreen(tester);
+
+      await openClosureSheet(tester);
+
+      expect(find.text('طلب إغلاق الحساب؟'), findsOneWidget);
+      expect(find.text('السبب (اختياري)'), findsOneWidget);
+      expect(closureRepository.requestCount, 0);
+    });
+
+    testWidgets('confirming sends the reason, closes the sheet and says it was sent',
+        (tester) async {
+      await pumpScreen(tester);
+      await openClosureSheet(tester);
+      await tester.enterText(find.byType(TextField), 'إغلاق نهائي');
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'إرسال الطلب'));
+      await tester.pumpAndSettle();
+
+      expect(closureRepository.requestCount, 1);
+      expect(closureRepository.lastReason, 'إغلاق نهائي');
+      expect(find.text('طلب إغلاق الحساب؟'), findsNothing);
+      expect(find.text('تم إرسال طلب إغلاق الحساب، سيتم مراجعته من الإدارة'), findsOneWidget);
+      // The row now shows where the request stands, and the pharmacy stays signed in.
+      expect(find.text('قيد المراجعة'), findsOneWidget);
+      expect(closureSession.savedSession, isNotNull);
+    });
+
+    testWidgets('a refusal is shown in the sheet', (tester) async {
+      closureRepository.requestResult = const ApiError(ApiFailure(message: 'يوجد طلب مفتوح'));
+      await pumpScreen(tester);
+      await openClosureSheet(tester);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'إرسال الطلب'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('يوجد طلب مفتوح'), findsOneWidget);
+      expect(find.text('طلب إغلاق الحساب؟'), findsOneWidget);
+    });
+
+    testWidgets('cancelling sends nothing', (tester) async {
+      await pumpScreen(tester);
+      await openClosureSheet(tester);
+
+      await tester.tap(find.text('إلغاء'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('طلب إغلاق الحساب؟'), findsNothing);
+      expect(closureRepository.requestCount, 0);
+    });
+
+    testWidgets('a request already waiting shows its status and is not asked for again',
+        (tester) async {
+      closureRepository.getRequestResult = const Success(pendingRequest);
+      await pumpScreen(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.text('قيد المراجعة'), findsOneWidget);
+      await tester.ensureVisible(find.text('طلب إغلاق الحساب'));
+      await tester.tap(find.text('طلب إغلاق الحساب'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('طلب إغلاق الحساب؟'), findsNothing);
+      expect(find.text('طلب إغلاق حسابك قيد المراجعة من الإدارة'), findsOneWidget);
+      expect(closureRepository.requestCount, 0);
+    });
+
+    testWidgets('a rejected request may be asked again', (tester) async {
+      closureRepository.getRequestResult = const Success(
+        ClosureRequest(status: ClosureRequestStatus.rejected),
+      );
+      await pumpScreen(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.text('تم الرفض'), findsOneWidget);
+      await openClosureSheet(tester);
+
+      expect(find.text('طلب إغلاق الحساب؟'), findsOneWidget);
+    });
+
+    testWidgets('the row still works when the request could not be read', (tester) async {
+      closureRepository.getRequestResult = const ApiError(ApiFailure(message: 'تعذر الاتصال'));
+      await pumpScreen(tester);
+      await tester.pumpAndSettle();
+
+      await openClosureSheet(tester);
+
+      expect(find.text('طلب إغلاق الحساب؟'), findsOneWidget);
+    });
   });
 }

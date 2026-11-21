@@ -12,7 +12,9 @@ import '../cubit/location_picker_cubit.dart';
 import '../cubit/location_picker_state.dart';
 import '../widgets/location_search_bar.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Interactive map with a pin fixed at the screen center — the user drags
+
 /// the map underneath it, rather than dragging a marker. Returns the picked
 /// [PickedLocation] to the caller via [Navigator.pop].
 class LocationPickerScreen extends StatefulWidget {
@@ -82,7 +84,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           icon: Icon(Icons.arrow_back, color: AppColors.textDark),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('تحديد الموقع', style: AppTextStyles.screenTitle),
+        title: Text('تحديد الموقع'.tr, style: AppTextStyles.screenTitle),
       ),
       body: BlocConsumer<LocationPickerCubit, LocationPickerState>(
         // Runs on every emission (not gated by listenWhen) so _previousState
@@ -180,19 +182,19 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                           Expanded(
                             child: Text(
                               state.isResolvingAddress
-                                  ? 'جارِ تحديد العنوان...'
+                                  ? 'جارِ تحديد العنوان...'.tr
                                   : (state.address?.isNotEmpty == true
                                       ? state.address!
-                                      : 'اسحب الخريطة لتحديد الموقع'),
+                                      : 'اسحب الخريطة لتحديد الموقع'.tr),
                               style: AppTextStyles.authSubtitle,
-                              textAlign: TextAlign.right,
+                              textAlign: TextAlign.start,
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 16.h),
                       AppCustomButton(
-                        text: 'تأكيد الموقع',
+                        text: 'تأكيد الموقع'.tr,
                         isLoading: state.isResolvingAddress,
                         onPressed: () {
                           if (state.isResolvingAddress) return;

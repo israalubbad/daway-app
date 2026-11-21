@@ -91,7 +91,7 @@ void main() {
 
       final subtitle = tester.widget<Text>(find.text('متوفر'));
       expect(subtitle.style!.color, Colors.green);
-      expect(subtitle.textAlign, TextAlign.right);
+      expect(subtitle.textAlign, TextAlign.start);
       final card = tester.getRect(find.byType(MedicineGridCard));
       final button = tester.getRect(find.byType(OutlinedButton));
       // The details button sits at the left: 8 in from the card's 1px border.

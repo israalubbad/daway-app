@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/helpers/api_result.dart';
+import '../../../patient/domain/usecases/get_categories_usecase.dart';
 import '../../../patient/domain/usecases/upload_avatar_usecase.dart';
 import '../../domain/entities/medicine_catalog_item.dart';
 import '../../domain/usecases/add_pharmacy_medicine_by_name_usecase.dart';
@@ -11,106 +11,64 @@ import '../../domain/usecases/add_pharmacy_medicine_usecase.dart';
 import '../../domain/usecases/search_medicine_catalog_usecase.dart';
 import 'add_medicine_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
+/// Backs both pages of "إضافة منتج جديد": the form, and the search page that
+/// fills it from the catalog.
 class AddMedicineCubit extends Cubit<AddMedicineState> {
+  /// The backend answers a 1-character query with an empty list, so a search
+  /// shorter than this is refused here instead of looking like "no results".
+  static const int minSearchLength = 2;
+
   final SearchMedicineCatalogUseCase _searchMedicineCatalogUseCase;
   final AddPharmacyMedicineUseCase _addPharmacyMedicineUseCase;
   final AddPharmacyMedicineByNameUseCase _addPharmacyMedicineByNameUseCase;
   final UploadAvatarUseCase _uploadImageUseCase;
+  final GetCategoriesUseCase _getCategoriesUseCase;
 
   AddMedicineCubit(
     this._searchMedicineCatalogUseCase,
     this._addPharmacyMedicineUseCase,
     this._addPharmacyMedicineByNameUseCase,
     this._uploadImageUseCase,
+    this._getCategoriesUseCase,
   ) : super(const AddMedicineEditing(AddMedicineFormData()));
 
-  Timer? _searchDebounce;
-
-  // Bumped whenever the query is cleared or a suggestion is picked, so a
+  // Bumped whenever the results are reset or a medicine is picked, so a
   // search that was already in flight can tell its result is stale and
-  // discard it instead of resurrecting suggestions the user no longer wants.
+  // discard it instead of resurrecting results the user no longer wants.
   int _searchSession = 0;
 
   // Bumped on every image pick, so an earlier upload that's still in flight
   // can tell its result is stale and won't overwrite a newer pick.
   int _imageSession = 0;
 
-  @override
-  Future<void> close() {
-    _searchDebounce?.cancel();
-    return super.close();
-  }
-
-  void nameQueryChanged(String value) {
-    if (state.formData.isManualEntry) {
-      emit(AddMedicineEditing(state.formData.copyWith(nameQuery: value)));
-      return;
-    }
-
-    final session = ++_searchSession;
-    _searchDebounce?.cancel();
+  Future<void> loadCategories() async {
     emit(AddMedicineEditing(state.formData.copyWith(
-      nameQuery: value,
-      clearSelectedMedicine: true,
-      activeIngredient: '',
-      suggestions: const [],
-      isSearching: false,
-      clearSearchError: true,
+      isLoadingCategories: true,
+      clearCategoriesError: true,
     )));
 
-    if (value.trim().length < 2) return;
-
-    _searchDebounce = Timer(const Duration(milliseconds: 350), () => _search(value, session));
-  }
-
-  Future<void> _search(String query, int session) async {
-    emit(AddMedicineEditing(state.formData.copyWith(isSearching: true, clearSearchError: true)));
-
-    final result = await _searchMedicineCatalogUseCase(query);
-    if (session != _searchSession) return;
+    final result = await _getCategoriesUseCase();
 
     switch (result) {
       case Success(:final data):
-        emit(AddMedicineEditing(state.formData.copyWith(isSearching: false, suggestions: data)));
+        emit(AddMedicineEditing(
+          state.formData.copyWith(isLoadingCategories: false, categories: data),
+        ));
       case ApiError(:final failure):
-        emit(AddMedicineEditing(state.formData.copyWith(
-          isSearching: false,
-          suggestions: const [],
-          searchError: failure.message,
-        )));
+        emit(AddMedicineEditing(
+          state.formData.copyWith(isLoadingCategories: false, categoriesError: failure.message),
+        ));
     }
   }
 
-  void medicineSelected(MedicineCatalogItem medicine) {
-    _searchSession++;
-    _searchDebounce?.cancel();
-    emit(AddMedicineEditing(state.formData.copyWith(
-      nameQuery: medicine.name,
-      selectedMedicine: medicine,
-      activeIngredient: medicine.activeIngredient ?? '',
-      suggestions: const [],
-      isSearching: false,
-      clearSearchError: true,
-    )));
+  void categorySelected(int categoryId) {
+    emit(AddMedicineEditing(state.formData.copyWith(categoryId: categoryId)));
   }
 
-  /// Toggles the "الدواء غير موجود؟ أضفه يدوياً" flow — entering it drops any
-  /// catalog selection and stops treating the name field as a search query;
-  /// leaving it clears whatever was typed so the field goes back to search.
-  void manualEntryToggled() {
-    _searchDebounce?.cancel();
-    _searchSession++;
-    final enteringManualEntry = !state.formData.isManualEntry;
-    emit(AddMedicineEditing(state.formData.copyWith(
-      isManualEntry: enteringManualEntry,
-      clearSelectedMedicine: true,
-      nameQuery: enteringManualEntry ? state.formData.nameQuery : '',
-      nameAr: enteringManualEntry ? state.formData.nameAr : '',
-      activeIngredient: enteringManualEntry ? state.formData.activeIngredient : '',
-      suggestions: const [],
-      isSearching: false,
-      clearSearchError: true,
-    )));
+  void nameChanged(String value) {
+    emit(AddMedicineEditing(state.formData.copyWith(nameQuery: value)));
   }
 
   void nameArChanged(String value) {
@@ -131,6 +89,79 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
 
   void isAvailableChanged(bool value) {
     emit(AddMedicineEditing(state.formData.copyWith(isAvailable: value)));
+  }
+
+  /// Forgets the last search, for when the search page is opened again.
+  void searchReset() {
+    _searchSession++;
+    emit(AddMedicineEditing(state.formData.copyWith(
+      suggestions: const [],
+      isSearching: false,
+      hasSearched: false,
+      clearSearchError: true,
+    )));
+  }
+
+  Future<void> search(String query) async {
+    final trimmed = query.trim();
+    final session = ++_searchSession;
+
+    if (trimmed.length < minSearchLength) {
+      emit(AddMedicineEditing(state.formData.copyWith(
+        suggestions: const [],
+        isSearching: false,
+        hasSearched: false,
+        searchError: 'اكتب حرفين على الأقل للبحث'.tr,
+      )));
+      return;
+    }
+
+    emit(AddMedicineEditing(state.formData.copyWith(
+      isSearching: true,
+      suggestions: const [],
+      clearSearchError: true,
+    )));
+
+    final result = await _searchMedicineCatalogUseCase(trimmed);
+    if (session != _searchSession) return;
+
+    switch (result) {
+      case Success(:final data):
+        emit(AddMedicineEditing(
+          state.formData.copyWith(isSearching: false, hasSearched: true, suggestions: data),
+        ));
+      case ApiError(:final failure):
+        emit(AddMedicineEditing(state.formData.copyWith(
+          isSearching: false,
+          hasSearched: true,
+          suggestions: const [],
+          searchError: failure.message,
+        )));
+    }
+  }
+
+  void medicineSelected(MedicineCatalogItem medicine) {
+    _searchSession++;
+    emit(AddMedicineEditing(state.formData.copyWith(
+      nameQuery: medicine.name,
+      nameAr: medicine.nameAr ?? '',
+      activeIngredient: medicine.activeIngredient ?? '',
+      selectedMedicine: medicine,
+      suggestions: const [],
+      isSearching: false,
+      clearSearchError: true,
+    )));
+  }
+
+  /// Drops the picked catalog medicine and empties the fields it filled, so
+  /// the form goes back to adding a new medicine by name.
+  void selectionCleared() {
+    emit(AddMedicineEditing(state.formData.copyWith(
+      clearSelectedMedicine: true,
+      nameQuery: '',
+      nameAr: '',
+      activeIngredient: '',
+    )));
   }
 
   Future<void> imageSelected(File imageFile) async {
@@ -168,6 +199,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
             tradeNameAr: formData.nameAr.trim().isEmpty ? null : formData.nameAr.trim(),
             activeIngredient:
                 formData.activeIngredient.trim().isEmpty ? null : formData.activeIngredient.trim(),
+            categoryId: formData.categoryId,
             price: formData.priceValue!,
             quantity: formData.quantityValue!,
             isAvailable: formData.isAvailable,

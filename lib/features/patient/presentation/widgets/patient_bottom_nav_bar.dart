@@ -5,7 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import 'patient_dashboard_tab_scope.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Custom 5-item bottom navigation bar for [PatientDashboardShellScreen] —
+
 /// four labeled icon tabs plus a distinct, unlabeled "scan" action in the
 /// middle, per the design. Built as a plain widget (rather than
 /// [BottomNavigationBar]) since that center item's raised, unlabeled square
@@ -37,7 +39,7 @@ class PatientBottomNavBar extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   iconAsset: 'assets/icons/home_fill_icon.svg',
-                  label: 'الرئيسية',
+                  label: 'الرئيسية'.tr,
                   selected: selectedTab == PatientDashboardTab.home,
                   onTap: () => onTabSelected(PatientDashboardTab.home),
                 ),
@@ -45,7 +47,7 @@ class PatientBottomNavBar extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   iconAsset: 'assets/icons/Search_icon.svg',
-                  label: 'البحث',
+                  label: 'البحث'.tr,
                   selected: selectedTab == PatientDashboardTab.search,
                   onTap: () => onTabSelected(PatientDashboardTab.search),
                 ),
@@ -54,7 +56,7 @@ class PatientBottomNavBar extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   iconAsset: 'assets/icons/massage_icon.svg',
-                  label: 'المراسلات',
+                  label: 'المراسلات'.tr,
                   selected: selectedTab == PatientDashboardTab.messages,
                   onTap: () => onTabSelected(PatientDashboardTab.messages),
                 ),
@@ -62,7 +64,7 @@ class PatientBottomNavBar extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   iconAsset: 'assets/icons/user_icon.svg',
-                  label: 'الملف الشخصي',
+                  label: 'الملف الشخصي'.tr,
                   selected: selectedTab == PatientDashboardTab.profile,
                   onTap: () => onTabSelected(PatientDashboardTab.profile),
                 ),

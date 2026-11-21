@@ -1,9 +1,12 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/category_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 import 'medicine_grid_card.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// A medicine card for a category's results grid: the medicine's image when
 /// there is one (a stand-in icon otherwise), its name, and how many pharmacies
@@ -33,7 +36,7 @@ class CategoryMedicineCard extends StatelessWidget {
 
     return MedicineGridCard(
       media: (imageUrl != null && imageUrl.isNotEmpty)
-          ? Image.network(
+          ? networkImage(
               imageUrl,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const MedicinePlaceholderIcon(),
@@ -46,11 +49,11 @@ class CategoryMedicineCard extends StatelessWidget {
           ? secondaryLine
           : (pharmaciesCount > 0
               ? pharmaciesAvailabilityLabel(pharmaciesCount)
-              : 'غير متوفر حالياً'),
+              : 'غير متوفر حالياً'.tr),
       subtitleColor: pharmaciesCount == null
           ? null
           : (pharmaciesCount > 0 ? AppColors.success : AppColors.grey),
-      detailsLabel: 'عرض تفاصيل',
+      detailsLabel: 'عرض تفاصيل'.tr,
       onDetailsTap: onDetailsTap,
     );
   }

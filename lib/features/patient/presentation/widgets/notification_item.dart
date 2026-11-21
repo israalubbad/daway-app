@@ -15,17 +15,29 @@ class NotificationItem extends StatelessWidget {
   final PatientNotification notification;
   final VoidCallback onDismissTap;
 
+  /// Tapping the row — marks an unread notification read.
+  final VoidCallback? onTap;
+
   const NotificationItem({
     super.key,
     required this.notification,
     required this.onDismissTap,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: _row(),
+    );
+  }
+
+  Widget _row() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
+        color: notification.isRead ? null : AppColors.permissionIconBg.withValues(alpha: 0.6),
         border: Border(bottom: BorderSide(color: AppColors.authInputBorder, width: 0.5)),
       ),
       // RTL order (first child is rightmost): icon box, then the text
@@ -59,12 +71,12 @@ class NotificationItem extends StatelessWidget {
               children: [
                 Text(
                   titleFor(notification.type),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.notificationTitle,
                 ),
                 Text(
                   notification.message,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.notificationBody,
                 ),
                 SizedBox(height: 7.h),

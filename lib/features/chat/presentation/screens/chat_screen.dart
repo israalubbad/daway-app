@@ -12,7 +12,9 @@ import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 import '../widgets/chat_widgets.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Arguments to open a chat: the [inquiryIds] of a conversation (newest
+
 /// first), or — patient only — the [pharmacyId] (and [medicineId] to be able
 /// to start one).
 class ChatArgs {
@@ -151,9 +153,8 @@ class _ChatViewState extends State<_ChatView> {
                         child: Center(
                           child: Text(
                             canSend
-                                ? 'اكتب رسالتك للبدء بالمحادثة.'
-                                : 'لا توجد رسائل مع ${widget.args.title} بعد.\n'
-                                    'افتح صفحة دواء واضغط «اسأل الصيدلية» لبدء المراسلة.',
+                                ? 'اكتب رسالتك للبدء بالمحادثة.'.tr
+                                : 'لا توجد رسائل مع {0} بعد.\nافتح صفحة دواء واضغط «اسأل الصيدلية» لبدء المراسلة.'.trArgs([widget.args.title]),
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 14.sp, color: AppColors.grey, height: 1.6),
                           ),
@@ -181,7 +182,7 @@ class _ChatViewState extends State<_ChatView> {
                         height: 56.h,
                         child: AppTextField(
                           controller: _controller,
-                          hintText: 'اكتب رسالة',
+                          hintText: 'اكتب رسالة'.tr,
                           maxLines: 1,
                           fillColor: Colors.white,
                           textInputAction: TextInputAction.send,

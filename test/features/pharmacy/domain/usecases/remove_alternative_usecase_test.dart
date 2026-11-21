@@ -2,12 +2,12 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/alternatives_overview.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/repositories/pharmacy_alternatives_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/usecases/remove_alternative_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakePharmacyAlternativesRepository
     implements PharmacyAlternativesRepository {
@@ -48,31 +48,14 @@ class _FakePharmacyAlternativesRepository
   }) async => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePharmacyAlternativesRepository repository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late RemoveAlternativeUseCase useCase;
 
   setUp(() {
     repository = _FakePharmacyAlternativesRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository();
     useCase = RemoveAlternativeUseCase(repository, sessionRepository);
   });
 

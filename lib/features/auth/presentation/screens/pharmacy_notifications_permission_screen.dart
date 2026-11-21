@@ -5,6 +5,8 @@ import '../../../../core/theming/app_colors.dart';
 import '../widgets/notifications_permission_view.dart';
 import 'pharmacy_pending_approval_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Final step of the pharmacy sign-up flow — mirrors
 /// [NotificationsPermissionScreen] from the patient flow via the shared
 /// [NotificationsPermissionView]. The account was already created (pending
@@ -32,7 +34,7 @@ class PharmacyNotificationsPermissionScreen extends StatelessWidget {
       child: Scaffold(
         body: SafeArea(
           child: NotificationsPermissionView(
-            subtitle: 'فعّل الإشعارات لتصلك تحديثات الطلبات وتنبيهات المخزون المهمة.',
+            subtitle: 'فعّل الإشعارات لتصلك تحديثات الطلبات وتنبيهات المخزون المهمة.'.tr,
             buttonColor: AppColors.mainTeal,
             onAllow: () => _finish(context, requestPermission: true),
             onSkip: () => _finish(context, requestPermission: false),

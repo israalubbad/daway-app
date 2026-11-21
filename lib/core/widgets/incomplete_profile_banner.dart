@@ -4,16 +4,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 
+import '../../core/localization/translations.dart';
 /// Info banner prompting the user to finish setting up their profile —
+
 /// shown on any profile screen (patient, pharmacy, ...) whose data is
 /// missing required fields (currently: no location set yet).
 class IncompleteProfileBanner extends StatelessWidget {
-  final String message;
+  /// Defaults to the generic "incomplete data" line, looked up when built.
+  final String? message;
 
-  const IncompleteProfileBanner({
-    super.key,
-    this.message = 'بياناتك غير مكتملة، يرجى تعديل حسابك لإكمالها',
-  });
+  const IncompleteProfileBanner({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +30,9 @@ class IncompleteProfileBanner extends StatelessWidget {
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
-              message,
+              message ?? 'بياناتك غير مكتملة، يرجى تعديل حسابك لإكمالها'.tr,
               style: AppTextStyles.cardDescription.copyWith(color: AppColors.mainTeal),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
             ),
           ),
         ],

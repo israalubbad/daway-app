@@ -8,12 +8,10 @@ class AppInfoRepositoryImpl implements AppInfoRepository {
   const AppInfoRepositoryImpl();
 
   @override
-  Future<ApiResult<String>> getVersion() async {
-    try {
+  Future<ApiResult<String>> getVersion() {
+    return guardApi(() async {
       final info = await PackageInfo.fromPlatform();
       return Success(info.version);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

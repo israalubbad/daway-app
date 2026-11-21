@@ -52,13 +52,13 @@ class MedicineGridCard extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10.h, right: 9.w, left: 9.w),
+                  padding: EdgeInsetsDirectional.only(top: 10.h, start: 9.w, end: 9.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
                         title,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.categoryMedicineName,
@@ -67,7 +67,7 @@ class MedicineGridCard extends StatelessWidget {
                         SizedBox(height: 4.h),
                         Text(
                           subtitle,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.categoryMedicineSubtitle.copyWith(color: subtitleColor),

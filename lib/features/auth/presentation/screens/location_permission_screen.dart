@@ -8,6 +8,8 @@ import '../cubit/patient_auth_state.dart';
 import '../widgets/location_permission_view.dart';
 import 'notifications_permission_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Pushed by [OtpVerificationScreen] when the backend rejects a new
 /// account's OTP verify with `registration_required` (it still needs the
 /// device location). Capturing it here re-submits the same OTP.
@@ -53,14 +55,14 @@ class LocationPermissionScreen extends StatelessWidget {
             builder: (context, state) {
               return LocationPermissionView(
                 subtitle:
-                    'فعّل موقعك لمساعدتك في العثور على أقرب الصيدليات والمنتجات المتوفرة حولك.',
+                    'فعّل موقعك لمساعدتك في العثور على أقرب الصيدليات والمنتجات المتوفرة حولك.'.tr,
                 buttonColor: AppColors.mainTeal,
                 errorText: state.locationError,
                 isBusy: state.isFetchingLocation || state.isVerifying,
                 onAllow: () => context.read<PatientAuthCubit>().useCurrentLocation(),
                 onSkip: () => AppSnackbar.show(
                   context,
-                  'الموقع مطلوب لإتمام إنشاء حسابك',
+                  'الموقع مطلوب لإتمام إنشاء حسابك'.tr,
                 ),
               );
             },

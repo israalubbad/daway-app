@@ -1,0 +1,12 @@
+# Copy this file to android/key.properties (which git ignores) and fill it in.
+# The release build is then signed with this key instead of the debug one.
+#
+# Make the keystore once, keep it OUTSIDE the repository, and back it up: if it
+# is lost, the app can never be updated under the same signature.
+#
+#   keytool -genkey -v -keystore C:\keys\dawak-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias dawak
+#
+storeFile=C:\\keys\\dawak-upload.jks
+storePassword=change-me
+keyAlias=dawak
+keyPassword=change-me

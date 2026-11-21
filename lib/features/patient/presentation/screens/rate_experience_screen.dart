@@ -13,9 +13,11 @@ import '../cubit/rate_experience_cubit.dart';
 import '../cubit/rate_experience_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
-/// "قيم تجربتك معنا" — no exact spacing/typography was handed over for this
-/// one (just the design screenshots), so it follows this app's existing
-/// card/spacing conventions rather than measured values.
+import '../../../../core/localization/translations.dart';
+/// "قيم تجربتك معنا" — rates the pharmacy only (stars + notes) and sends it to
+
+/// `POST /ratings`. No exact spacing/typography was handed over, so it follows
+/// this app's existing card/spacing conventions.
 class RateExperienceScreen extends StatelessWidget {
   final int pharmacyId;
   final String pharmacyName;
@@ -69,7 +71,7 @@ class _RateExperienceViewState extends State<_RateExperienceView> {
               (current.errorMessage != null && current.errorMessage != previous.errorMessage),
           listener: (context, state) {
             if (state.submitted) {
-              AppSnackbar.show(context, 'شكراً لتقييمك');
+              AppSnackbar.show(context, 'شكراً لتقييمك'.tr);
               Navigator.of(context).maybePop();
             } else if (state.errorMessage != null) {
               AppSnackbar.show(context, state.errorMessage!);
@@ -83,20 +85,13 @@ class _RateExperienceViewState extends State<_RateExperienceView> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   PatientSubScreenHeader(
-                    title: 'قيم تجربتك معنا',
-                    description: 'شاركنا برأيك بالتطبيق وصيدلية ${widget.pharmacyName}',
+                    title: 'قيم تجربتك معنا'.tr,
+                    description: 'شاركنا برأيك بصيدلية {0}'.trArgs([widget.pharmacyName]),
                   ),
                   SizedBox(height: 24.h),
                   _RatingCard(
-                    title: 'تقييم التطبيق',
-                    subtitle: 'كيف كانت تجربتك مع التطبيق؟',
-                    rating: state.appRating,
-                    onChanged: cubit.appRatingChanged,
-                  ),
-                  SizedBox(height: 16.h),
-                  _RatingCard(
-                    title: 'تقييم الصيدلية',
-                    subtitle: 'كيف كانت تجربتك مع الصيدلية؟',
+                    title: 'تقييم الصيدلية'.tr,
+                    subtitle: 'كيف كانت تجربتك مع الصيدلية؟'.tr,
                     rating: state.pharmacyRating,
                     onChanged: cubit.pharmacyRatingChanged,
                   ),
@@ -110,13 +105,13 @@ class _RateExperienceViewState extends State<_RateExperienceView> {
                     child: AppTextField(
                       controller: _notesController,
                       onChanged: cubit.notesChanged,
-                      hintText: 'ملاحظات اضافية',
+                      hintText: 'ملاحظات اضافية'.tr,
                       maxLines: 4,
                     ),
                   ),
                   SizedBox(height: 24.h),
                   AppCustomButton(
-                    text: 'إرسال التقييم',
+                    text: 'إرسال التقييم'.tr,
                     isLoading: state.isSubmitting,
                     onPressed: cubit.submit,
                   ),
@@ -134,7 +129,7 @@ class _RateExperienceViewState extends State<_RateExperienceView> {
 /// 1★–2★ read as a bad experience, 3★ middling, 4★–5★ good — only the 1★
 /// "سيء" (red) case was in the design, so the rest of this scale/colour
 /// mapping is inferred, not confirmed.
-const _ratingLabels = {1: 'سيء', 2: 'ضعيف', 3: 'متوسط', 4: 'جيد', 5: 'ممتاز'};
+Map<int, String> get _ratingLabels => {1: 'سيء'.tr, 2: 'ضعيف'.tr, 3: 'متوسط'.tr, 4: 'جيد'.tr, 5: 'ممتاز'.tr};
 
 Color _ratingColor(int stars) {
   if (stars <= 2) return AppColors.error;
@@ -166,9 +161,9 @@ class _RatingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(title, textAlign: TextAlign.right, style: AppTextStyles.addressCardTitle),
+          Text(title, textAlign: TextAlign.start, style: AppTextStyles.addressCardTitle),
           SizedBox(height: 4.h),
-          Text(subtitle, textAlign: TextAlign.right, style: AppTextStyles.cardDescription),
+          Text(subtitle, textAlign: TextAlign.start, style: AppTextStyles.cardDescription),
           SizedBox(height: 16.h),
           Center(
             child: StarRating(rating: rating.toDouble(), size: 32, onRatingChanged: onChanged),
@@ -176,7 +171,7 @@ class _RatingCard extends StatelessWidget {
           SizedBox(height: 12.h),
           Center(
             child: Text(
-              rating == 0 ? 'اضغط على نجمة لتقييم' : _ratingLabels[rating]!,
+              rating == 0 ? 'اضغط على نجمة لتقييم'.tr : _ratingLabels[rating]!,
               style: rating == 0
                   ? AppTextStyles.mutedCaption
                   : TextStyle(

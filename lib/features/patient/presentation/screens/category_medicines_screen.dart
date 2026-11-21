@@ -9,6 +9,7 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/category_medicine.dart';
@@ -19,6 +20,8 @@ import '../cubit/medicine_images_cubit.dart';
 import 'category_filter_screen.dart';
 import '../widgets/category_medicine_card.dart';
 import '../widgets/category_symptom_grid.dart';
+
+import '../../../../core/localization/translations.dart';
 
 class CategoryMedicinesScreen extends StatelessWidget {
   final Category category;
@@ -119,6 +122,9 @@ class _CategoryMedicinesViewState extends State<_CategoryMedicinesView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 32.h),
+              // The screen is pushed over the home, so it needs a way back.
+              AppBackButton(onTap: () => Navigator.of(context).pop()),
+              SizedBox(height: 20.h),
               _Header(category: widget.category),
               SizedBox(height: 20.h),
               BlocBuilder<CategoryMedicinesCubit, CategoryMedicinesState>(
@@ -148,7 +154,7 @@ class _CategoryMedicinesViewState extends State<_CategoryMedicinesView> {
                         ),
                       CategoryMedicinesLoaded(:final medicines) when medicines.isEmpty => Center(
                           child: Text(
-                            'لا توجد أدوية مطابقة حالياً',
+                            'لا توجد أدوية مطابقة حالياً'.tr,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.homePharmacyCardSubtitle,
                           ),
@@ -187,11 +193,11 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(category.nameAr, textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+        Text(category.name, textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
         SizedBox(height: 8.h),
         Text(
-          'تصفح كل خيارات ${category.nameAr} المتوفرة لدينا.',
-          textAlign: TextAlign.right,
+          'تصفح كل خيارات {0} المتوفرة لدينا.'.trArgs([category.name]),
+          textAlign: TextAlign.start,
           style: AppTextStyles.allCategoriesSubtitle,
         ),
       ],
@@ -231,12 +237,12 @@ class _SearchField extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     onChanged: onChanged,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.homeSearchHint.copyWith(color: AppColors.onboardingText),
                     decoration: InputDecoration(
                       isCollapsed: true,
                       border: InputBorder.none,
-                      hintText: 'ابحث عن دواء او اكتب بماذا تشعر',
+                      hintText: 'ابحث عن دواء او اكتب بماذا تشعر'.tr,
                       hintStyle: AppTextStyles.homeSearchHint,
                     ),
                   ),
@@ -290,12 +296,12 @@ class _SymptomLandingView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('بماذا تشعر', textAlign: TextAlign.right, style: AppTextStyles.categorySectionTitle),
+          Text('بماذا تشعر'.tr, textAlign: TextAlign.start, style: AppTextStyles.categorySectionTitle),
           SizedBox(height: 16.h),
           CategorySymptomGrid(symptoms: symptoms, onSymptomTap: onSymptomTap),
           if (medicines.isNotEmpty) ...[
             SizedBox(height: 32.h),
-            Text('أدوية قد تعالجها', textAlign: TextAlign.right, style: AppTextStyles.categorySectionTitle),
+            Text('أدوية قد تعالجها'.tr, textAlign: TextAlign.start, style: AppTextStyles.categorySectionTitle),
             SizedBox(height: 16.h),
             GridView.builder(
               shrinkWrap: true,
@@ -350,7 +356,7 @@ class _MedicinesGrid extends StatelessWidget {
 void _openDetails(BuildContext context, CategoryMedicine medicine) {
   final medicineId = medicine.medicineId;
   if (medicineId == null) {
-    AppSnackbar.show(context, 'هذا الدواء غير متوفر في أي صيدلية حالياً');
+    AppSnackbar.show(context, 'هذا الدواء غير متوفر في أي صيدلية حالياً'.tr);
     return;
   }
   Navigator.of(context).pushNamed(Routes.medicineDetailScreen, arguments: medicineId);

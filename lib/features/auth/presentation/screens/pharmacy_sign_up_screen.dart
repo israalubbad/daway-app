@@ -10,6 +10,8 @@ import '../cubit/pharmacy_sign_up_state.dart';
 import '../widgets/pharmacy_sign_up_form.dart';
 import 'pharmacy_location_permission_screen.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Sign-up entry point for pharmacies, reached from [PharmacyAuthScreen]'s
 /// "ليس لديك حساب ؟" link. Mirrors [SignUpScreen]'s layout with pharmacy
 /// fields instead of patient ones.
@@ -42,14 +44,14 @@ class PharmacySignUpScreen extends StatelessWidget {
                 const Center(child: AppLogo()),
                 SizedBox(height: 32.h),
                 Text(
-                  'أنشئ حسابك',
-                  textAlign: TextAlign.right,
+                  'أنشئ حسابك'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'ابدأ رحلتك مع دواك واحصل على احتياجاتك من الصيدلية بسهولة.',
-                  textAlign: TextAlign.right,
+                  'ابدأ رحلتك مع دواك واحصل على احتياجاتك من الصيدلية بسهولة.'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.authScreenSubtitle,
                 ),
                 SizedBox(height: 24.h),
@@ -58,11 +60,11 @@ class PharmacySignUpScreen extends StatelessWidget {
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
-                    Text('لديك حساب بالفعل ؟ ', style: AppTextStyles.authFooterMuted),
+                    Text('لديك حساب بالفعل ؟ '.tr, style: AppTextStyles.authFooterMuted),
                     GestureDetector(
                       onTap: () =>
                           Navigator.of(context).pushReplacementNamed(Routes.pharmacyAuthScreen),
-                      child: Text('سجّل دخولك', style: AppTextStyles.authLinkText),
+                      child: Text('سجّل دخولك'.tr, style: AppTextStyles.authLinkText),
                     ),
                   ],
                 ),

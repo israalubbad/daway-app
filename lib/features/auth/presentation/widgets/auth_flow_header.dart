@@ -5,7 +5,9 @@ import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/header_icon_button.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The top of a password-reset screen: the back chip, the title, and the line
+
 /// or two under it. Meant to sit in a column that is [Column.crossAxisAlignment]
 /// stretch, under the 32px the screens leave below the status bar.
 class AuthFlowHeader extends StatelessWidget {
@@ -37,7 +39,7 @@ class AuthFlowHeader extends StatelessWidget {
             assetName: 'assets/icons/back_icon.svg',
             iconSize: 24,
             backgroundColor: AppColors.accountIconBg,
-            semanticLabel: 'رجوع',
+            semanticLabel: 'رجوع'.tr,
             // maybePop, so the screen's own PopScope hears of it like of the
             // system back button.
             onTap: () => Navigator.of(context).maybePop(),

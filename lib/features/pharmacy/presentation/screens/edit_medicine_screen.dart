@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/helpers/digits_only_formatter.dart';
+import '../../../../core/helpers/text_controller_sync.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
@@ -12,6 +13,8 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/entities/medicine.dart';
 import '../cubit/edit_medicine_cubit.dart';
 import '../cubit/edit_medicine_state.dart';
+
+import '../../../../core/localization/translations.dart';
 
 /// Price, quantity, availability, trade name, Arabic trade name, and active
 /// ingredient are all editable here.
@@ -53,12 +56,6 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
     super.dispose();
   }
 
-  void _syncController(TextEditingController controller, String value) {
-    if (controller.text == value) return;
-    controller.text = value;
-    controller.selection = TextSelection.collapsed(offset: value.length);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +69,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
           onPressed: () => Navigator.of(context).pop(false),
         ),
         title: Text(
-          'تعديل الدواء',
+          'تعديل الدواء'.tr,
           style: AppTextStyles.screenTitle.copyWith(color: AppColors.mainTeal, fontSize: 20.sp),
         ),
       ),
@@ -88,60 +85,60 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
           },
           builder: (context, state) {
             final formData = state.formData;
-            _syncController(_tradeNameController, formData.tradeName);
-            _syncController(_nameArController, formData.nameAr);
-            _syncController(_activeIngredientController, formData.activeIngredient);
-            _syncController(_priceController, formData.price);
-            _syncController(_quantityController, formData.quantity);
+            _tradeNameController.syncText(formData.tradeName);
+            _nameArController.syncText(formData.nameAr);
+            _activeIngredientController.syncText(formData.activeIngredient);
+            _priceController.syncText(formData.price);
+            _quantityController.syncText(formData.quantity);
 
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('الاسم بالعربي (اختياري)', style: AppTextStyles.inputLabel),
+                  Text('الاسم بالعربي (اختياري)'.tr, style: AppTextStyles.inputLabel),
                   SizedBox(height: 8.h),
                   AppTextField(
                     controller: _nameArController,
-                    hintText: 'مثال: بانادول',
+                    hintText: 'مثال: بانادول'.tr,
                     prefixIcon: Icon(Icons.medication_outlined, color: AppColors.grey, size: 20.sp),
                     onChanged: (value) => context.read<EditMedicineCubit>().nameArChanged(value),
                   ),
                   SizedBox(height: 16.h),
-                  Text('الاسم التجاري (بالإنجليزي) *', style: AppTextStyles.inputLabel),
+                  Text('الاسم التجاري (بالإنجليزي) *'.tr, style: AppTextStyles.inputLabel),
                   SizedBox(height: 8.h),
                   AppTextField(
                     controller: _tradeNameController,
-                    hintText: 'مثال: Panadol',
+                    hintText: 'مثال: Panadol'.tr,
                     prefixIcon: Icon(Icons.medication_outlined, color: AppColors.grey, size: 20.sp),
                     onChanged: (value) => context.read<EditMedicineCubit>().tradeNameChanged(value),
                   ),
                   if (formData.tradeNameHasArabicChars) ...[
                     SizedBox(height: 6.h),
-                    Text('يجب أن يكون الاسم التجاري بالإنجليزي فقط', style: AppTextStyles.errorText),
+                    Text('يجب أن يكون الاسم التجاري بالإنجليزي فقط'.tr, style: AppTextStyles.errorText),
                   ],
                   if (_attemptedSave &&
                       !formData.tradeNameHasArabicChars &&
                       formData.tradeName.trim().isEmpty) ...[
                     SizedBox(height: 6.h),
-                    Text('هذا الحقل مطلوب', style: AppTextStyles.errorText),
+                    Text('هذا الحقل مطلوب'.tr, style: AppTextStyles.errorText),
                   ],
                   SizedBox(height: 16.h),
-                  Text('المادة الفعالة', style: AppTextStyles.inputLabel),
+                  Text('المادة الفعالة'.tr, style: AppTextStyles.inputLabel),
                   SizedBox(height: 8.h),
                   AppTextField(
                     controller: _activeIngredientController,
-                    hintText: 'أدخل المادة الفعالة',
+                    hintText: 'أدخل المادة الفعالة'.tr,
                     prefixIcon: Icon(Icons.science_outlined, color: AppColors.grey, size: 20.sp),
                     onChanged: (value) =>
                         context.read<EditMedicineCubit>().activeIngredientChanged(value),
                   ),
                   SizedBox(height: 16.h),
-                  Text('السعر *', style: AppTextStyles.inputLabel),
+                  Text('السعر *'.tr, style: AppTextStyles.inputLabel),
                   SizedBox(height: 8.h),
                   AppTextField(
                     controller: _priceController,
-                    hintText: 'أدخل السعر',
+                    hintText: 'أدخل السعر'.tr,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
                     prefixIcon: Icon(Icons.sell_outlined, color: AppColors.grey, size: 20.sp),
@@ -149,14 +146,14 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                   ),
                   if (_attemptedSave && (formData.priceValue ?? 0) <= 0) ...[
                     SizedBox(height: 6.h),
-                    Text('هذا الحقل مطلوب', style: AppTextStyles.errorText),
+                    Text('هذا الحقل مطلوب'.tr, style: AppTextStyles.errorText),
                   ],
                   SizedBox(height: 16.h),
-                  Text('الكمية المتوفرة *', style: AppTextStyles.inputLabel),
+                  Text('الكمية المتوفرة *'.tr, style: AppTextStyles.inputLabel),
                   SizedBox(height: 8.h),
                   AppTextField(
                     controller: _quantityController,
-                    hintText: 'أدخل الكمية المتوفرة',
+                    hintText: 'أدخل الكمية المتوفرة'.tr,
                     keyboardType: TextInputType.number,
                     inputFormatters: [DigitsOnlyFormatter()],
                     prefixIcon: Icon(Icons.inventory_2_outlined, color: AppColors.grey, size: 20.sp),
@@ -164,13 +161,13 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                   ),
                   if (_attemptedSave && (formData.quantityValue ?? 0) <= 0) ...[
                     SizedBox(height: 6.h),
-                    Text('هذا الحقل مطلوب', style: AppTextStyles.errorText),
+                    Text('هذا الحقل مطلوب'.tr, style: AppTextStyles.errorText),
                   ],
                   SizedBox(height: 20.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('متوفر حالياً', style: AppTextStyles.inputLabel),
+                      Text('متوفر حالياً'.tr, style: AppTextStyles.inputLabel),
                       Switch(
                         value: formData.isAvailable,
                         activeThumbColor: AppColors.mainTeal,
@@ -181,7 +178,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                   ),
                   SizedBox(height: 24.h),
                   AppCustomButton(
-                    text: 'حفظ التعديلات',
+                    text: 'حفظ التعديلات'.tr,
                     isLoading: state is EditMedicineSaving,
                     backgroundColor:
                         formData.canSubmit ? AppColors.mainTeal : AppColors.borderGrey,
@@ -201,7 +198,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     child: Text(
-                      'إلغاء',
+                      'إلغاء'.tr,
                       style: TextStyle(
                         color: AppColors.mainTeal,
                         fontWeight: FontWeight.bold,

@@ -1,11 +1,11 @@
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_addresses_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/create_patient_address_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _created = PatientAddress(
   id: 1,
@@ -62,23 +62,10 @@ class _FakeAddressesRepository implements PatientAddressesRepository {
       createResult;
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession;
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   test('passes the session token and the address fields through to the repository', () async {
     final repository = _FakeAddressesRepository();
-    final sessionRepository = _FakeSessionRepository()
+    final sessionRepository = InMemorySessionRepository()
       ..savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
     final useCase = CreatePatientAddressUseCase(repository, sessionRepository);
 
@@ -98,7 +85,7 @@ void main() {
 
   test('returns a session failure without calling the repository when logged out', () async {
     final repository = _FakeAddressesRepository();
-    final useCase = CreatePatientAddressUseCase(repository, _FakeSessionRepository());
+    final useCase = CreatePatientAddressUseCase(repository, InMemorySessionRepository());
 
     final result = await useCase(
       label: 'عنوان التوصيل',

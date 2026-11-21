@@ -5,7 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
 /// "ابحث بالصورة" promo card — hands off to the scan tab. Laid out as a Row
+
 /// (text column on the right, illustration on the left) rather than a Stack
 /// overlay, so the 16px text↔image gap and the bottom-pinned button are
 /// exact instead of incidental.
@@ -32,19 +34,19 @@ class HomeImageSearchCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'ابحث بالصورة',
-                  textAlign: TextAlign.right,
+                  'ابحث بالصورة'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.homeImageSearchTitle,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'ارفع روشتتك أو صوّر علبة الدواء للعثور عليه بسهولة',
-                  textAlign: TextAlign.right,
+                  'ارفع روشتتك أو صوّر علبة الدواء للعثور عليه بسهولة'.tr,
+                  textAlign: TextAlign.start,
                   style: AppTextStyles.homeImageSearchSubtitle,
                 ),
                 const Spacer(),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: AlignmentDirectional.centerStart,
                   child: GestureDetector(
                     onTap: onSearchTap,
                     child: Container(
@@ -68,7 +70,7 @@ class HomeImageSearchCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 6.w),
-                          Text('ابحث الان', style: AppTextStyles.homeImageSearchButton),
+                          Text('ابحث الان'.tr, style: AppTextStyles.homeImageSearchButton),
                         ],
                       ),
                     ),

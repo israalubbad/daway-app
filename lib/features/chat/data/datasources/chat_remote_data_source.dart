@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/networking/auth_options.dart';
 
 import '../../../auth/domain/entities/account_type.dart';
 
@@ -12,7 +13,6 @@ class ChatRemoteDataSource {
         AccountType.patient => '/patient/inquiries/$inquiryId/messages',
       };
 
-  Options _auth(String token) => Options(headers: {'Authorization': 'Bearer $token'});
 
   Future<Response<dynamic>> getMessages({
     required String token,
@@ -24,7 +24,7 @@ class ChatRemoteDataSource {
     return _dio.get(
       _path(accountType, inquiryId),
       queryParameters: {'page': page, if (markRead) 'mark_read': 1},
-      options: _auth(token),
+      options: authOptions(token),
     );
   }
 
@@ -37,7 +37,7 @@ class ChatRemoteDataSource {
     return _dio.post(
       _path(accountType, inquiryId),
       data: {'message': text},
-      options: _auth(token),
+      options: authOptions(token),
     );
   }
 }

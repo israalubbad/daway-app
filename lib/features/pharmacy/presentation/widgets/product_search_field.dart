@@ -5,7 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The products page's search box: an outlined 56px field with the search icon
+
 /// at its start. Owns its text controller, starting from [initialText] — so a
 /// field that is built again (the page went back to loading, then loaded) shows
 /// the query the list is filtered by.
@@ -63,7 +65,7 @@ class _ProductSearchFieldState extends State<ProductSearchField> {
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
-                hintText: 'ابحث',
+                hintText: 'ابحث'.tr,
                 hintStyle: AppTextStyles.pharmacySearchText,
               ),
             ),

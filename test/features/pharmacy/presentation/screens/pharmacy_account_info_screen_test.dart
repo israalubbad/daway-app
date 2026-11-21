@@ -29,7 +29,11 @@ const _profile = PharmacyProfile(
 /// makes, without any repository behind it.
 class _FakeProfileCubit extends Cubit<PharmacyProfileState>
     implements PharmacyProfileCubit {
-  _FakeProfileCubit() : super(PharmacyProfileLoaded.fromProfile(_profile));
+  _FakeProfileCubit({bool loading = false})
+    : super(loading ? const PharmacyProfileLoading() : PharmacyProfileLoaded.fromProfile(_profile));
+
+  /// The profile arrives, for a screen that was opened while it was loading.
+  void finishLoading() => emit(PharmacyProfileLoaded.fromProfile(_profile));
 
   int saves = 0;
   int discards = 0;
@@ -38,6 +42,9 @@ class _FakeProfileCubit extends Cubit<PharmacyProfileState>
 
   @override
   void nameChanged(String value) => emit(loaded.copyWith(name: value));
+
+  @override
+  void phoneChanged(String value) => emit(loaded.copyWith(phone: value));
 
   @override
   void locationSelected(PickedLocation location) => emit(
@@ -178,17 +185,50 @@ void main() {
     },
   );
 
-  testWidgets('the phone and password have no edit flow yet', (tester) async {
+  testWidgets('the name and phone fields start from the profile as it is when editing begins', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    // The state moved on after the screen opened (a reload, say).
+    cubit.nameChanged('اسم محدّث');
+    cubit.phoneChanged('0599000111');
+    await tester.pumpAndSettle();
+
+    await tester.tap(editChipOf('الاسم'));
+    await tester.pump();
+    await tester.tap(editChipOf('رقم الهاتف'));
+    await tester.pump();
+
+    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
+    expect(fields.first.controller!.text, 'اسم محدّث');
+    expect(fields.last.controller!.text, '0599000111');
+  });
+
+  testWidgets('editing the phone turns its row into a field and keeps the number', (
+    tester,
+  ) async {
     await pumpScreen(tester);
 
     await tester.tap(editChipOf('رقم الهاتف'));
     await tester.pump();
-    expect(find.text('قريباً'), findsOneWidget);
-
-    await tester.tap(editChipOf('كلمة المرور'));
+    await tester.enterText(find.byType(TextField), '0599123456');
     await tester.pump();
-    expect(find.text('قريباً'), findsOneWidget);
-    expect(cubit.loaded.hasChanges, isFalse);
+
+    expect(cubit.loaded.phone, '0599123456');
+    expect(cubit.loaded.hasChanges, isTrue);
+    expect(cubit.loaded.canSave, isTrue);
+  });
+
+  testWidgets('a malformed phone shows a hint and cannot be saved', (tester) async {
+    await pumpScreen(tester);
+
+    await tester.tap(editChipOf('رقم الهاتف'));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), '123');
+    await tester.pump();
+
+    expect(find.text('أدخل رقم جوال صحيح'), findsOneWidget);
+    expect(cubit.loaded.canSave, isFalse);
   });
 
   testWidgets('editing the address opens the map and keeps what it returns', (

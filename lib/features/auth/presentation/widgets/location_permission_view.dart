@@ -5,6 +5,8 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import 'permission_icon_header.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// Shared "allow location access" layout used by both the patient and
 /// pharmacy sign-up flows — each screen wires this to its own cubit and
 /// supplies the copy/color/state that differs between them.
@@ -36,7 +38,7 @@ class LocationPermissionView extends StatelessWidget {
           SizedBox(height: 32.h),
           PermissionIconHeader(
             icon: Icons.location_on_outlined,
-            title: 'اعثر على الأقرب إليك',
+            title: 'اعثر على الأقرب إليك'.tr,
             subtitle: subtitle,
           ),
           SizedBox(height: 24.h),
@@ -50,7 +52,7 @@ class LocationPermissionView extends StatelessWidget {
               ),
             ),
           AppCustomButton(
-            text: 'السماح بالوصول للموقع',
+            text: 'السماح بالوصول للموقع'.tr,
             backgroundColor: buttonColor,
             isLoading: isBusy,
             onPressed: isBusy ? () {} : onAllow,
@@ -59,7 +61,7 @@ class LocationPermissionView extends StatelessWidget {
           GestureDetector(
             onTap: onSkip,
             child: Text(
-              'تخطي',
+              'تخطي'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.authFooterMuted,
             ),

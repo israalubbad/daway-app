@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/alternatives_overview.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -16,6 +13,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/get_pharmacy_medicin
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_alternatives_medicines_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _available = Medicine(
   id: 1,
@@ -82,6 +80,7 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -144,26 +143,6 @@ class _FakeAlternativesRepository implements PharmacyAlternativesRepository {
   }) async => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakeMedicineRepository medicineRepository;
   late PharmacyAlternativesMedicinesCubit cubit;
@@ -172,7 +151,7 @@ void main() {
     _FakeMedicineRepository? medicineRepo,
     _FakeAlternativesRepository? alternativesRepo,
   }) {
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     return PharmacyAlternativesMedicinesCubit(
       GetMedicinesWithAlternativeStatusUseCase(
         GetPharmacyMedicinesUseCase(
@@ -262,7 +241,7 @@ void main() {
       // is no longer a no-op) by the time the reload starts.
       final completer = Completer<void>();
       final delayedRepo = _DelayedMedicineRepository(completer);
-      final sessionRepository = _FakeSessionRepository();
+      final sessionRepository = InMemorySessionRepository.pharmacy();
       final delayedCubit = PharmacyAlternativesMedicinesCubit(
         GetMedicinesWithAlternativeStatusUseCase(
           GetPharmacyMedicinesUseCase(delayedRepo, sessionRepository),
@@ -338,6 +317,7 @@ class _DelayedMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,

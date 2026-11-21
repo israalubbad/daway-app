@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class FavoritesRemoteDataSource {
@@ -13,7 +14,7 @@ class FavoritesRemoteDataSource {
     return _dio.get(
       ApiConstants.patientFavoriteMedicines,
       queryParameters: {'page': page},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -23,7 +24,7 @@ class FavoritesRemoteDataSource {
   }) {
     return _dio.post(
       '${ApiConstants.patientFavoriteMedicines}/$medicineId',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -33,7 +34,7 @@ class FavoritesRemoteDataSource {
   }) {
     return _dio.delete(
       '${ApiConstants.patientFavoriteMedicines}/$medicineId',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

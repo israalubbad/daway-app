@@ -25,8 +25,8 @@ class ChatRepositoryImpl implements ChatRepository {
     required AccountType accountType,
     required int inquiryId,
     bool markRead = true,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final json = await fetchAllPages(
         source: 'GET .../inquiries/{id}/messages',
         fetchPage: (page) async => (await _remoteDataSource.getMessages(
@@ -46,9 +46,7 @@ class ChatRepositoryImpl implements ChatRepository {
           return byTime != 0 ? byTime : a.id.compareTo(b.id);
         });
       return Success(messages);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -57,8 +55,8 @@ class ChatRepositoryImpl implements ChatRepository {
     required AccountType accountType,
     required int inquiryId,
     required String text,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.sendText(
         token: token,
         accountType: accountType,
@@ -71,8 +69,6 @@ class ChatRepositoryImpl implements ChatRepository {
         throw FormatException('Unexpected send-message response shape: $body');
       }
       return Success(ChatMessageModel.fromJson(data, baseHost: _host).toEntity());
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

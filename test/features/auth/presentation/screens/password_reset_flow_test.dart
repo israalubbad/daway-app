@@ -5,9 +5,7 @@ import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/features/auth/domain/entities/patient_auth_result.dart';
 import 'package:daway_app/features/auth/domain/entities/pharmacy_auth_result.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/auth/domain/usecases/pharmacy_login_usecase.dart';
 import 'package:daway_app/features/auth/domain/usecases/save_session_usecase.dart';
 import 'package:daway_app/features/auth/presentation/cubit/password_reset_cubit.dart';
@@ -25,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
 import '../../../../helpers/fake_password_reset_repository.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 // The whole way through: from the login's link to the confirmation and back to
 // the login, over the real screens, cubit and use cases, with only the backend
@@ -63,17 +62,6 @@ class _FakeAuthRepository implements AuthRepository {
   Future<ApiResult<void>> logout({required String token}) async => const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async => null;
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 void main() {
   late FakePasswordResetRepository repository;
 
@@ -87,7 +75,7 @@ void main() {
     await setDesignViewport(tester);
     final loginCubit = PharmacyAuthCubit(
       PharmacyLoginUseCase(_FakeAuthRepository()),
-      SaveSessionUseCase(_FakeSessionRepository()),
+      SaveSessionUseCase(InMemorySessionRepository()),
     );
     addTearDown(loginCubit.close);
 

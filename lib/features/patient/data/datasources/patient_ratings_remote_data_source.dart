@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PatientRatingsRemoteDataSource {
@@ -20,7 +21,7 @@ class PatientRatingsRemoteDataSource {
         'stars_rating': stars,
         if (comment != null && comment.isNotEmpty) 'comment': comment,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

@@ -1,7 +1,4 @@
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/alternatives_overview.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -17,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _baseMedicine = Medicine(
   id: 14,
@@ -111,6 +109,7 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -143,26 +142,6 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
   }) async => throw UnimplementedError();
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(
-    accountType: AccountType.pharmacy,
-    token: 'tok-1',
-  );
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   Future<void> setPhoneViewport(WidgetTester tester) async {
     tester.view.physicalSize = const Size(375, 812);
@@ -172,7 +151,7 @@ void main() {
   }
 
   Widget buildTestableScreen(_FakeRepository repository) {
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     final cubit = PharmacyAlternativesCubit(
       _baseMedicine,
       GetAlternativesOverviewUseCase(

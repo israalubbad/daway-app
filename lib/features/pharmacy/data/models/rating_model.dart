@@ -1,6 +1,8 @@
 import '../../domain/entities/rating.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/ratings`. Only `stars` is confirmed
+
 /// against a live response (see PharmacyDashboardRepositoryImpl's average
 /// rating calculation) — no pharmacy on the demo backend has an actual
 /// review yet to confirm `comment`/`created_at`/the reviewer-name key
@@ -22,6 +24,14 @@ class RatingModel {
     required this.patientName,
   });
 
+  /// The star count of a record: `stars`, or `stars_rating` (the name the
+  /// patient side sends it under), or `rating`. Throws when none is a number.
+  static int starsOf(Map<String, dynamic> json) {
+    final value = json['stars'] ?? json['stars_rating'] ?? json['rating'];
+    if (value is num) return value.toInt();
+    return int.parse('$value');
+  }
+
   factory RatingModel.fromJson(Map<String, dynamic> json) {
     final reviewer =
         json['patient'] as Map<String, dynamic>? ??
@@ -31,13 +41,13 @@ class RatingModel {
       // Required, unlike id/comment/name below: a rating with no valid star
       // count isn't a real review, and letting it default would silently
       // pollute the average while staying invisible in the 1-5 histogram.
-      stars: (json['stars'] as num).toInt(),
+      stars: starsOf(json),
       comment: json['comment'] as String?,
       // Required too: this repository sorts by createdAt to show the newest
       // reviews first, so a fallback like DateTime.now() would wrongly sort
       // a corrupted record to the top instead of just being skipped.
       createdAt: DateTime.parse(json['created_at'] as String),
-      patientName: reviewer?['name'] as String? ?? 'مستخدم',
+      patientName: reviewer?['name'] as String? ?? 'مستخدم'.tr,
     );
   }
 

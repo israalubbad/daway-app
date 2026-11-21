@@ -14,7 +14,9 @@ import '../cubit/health_profile_cubit.dart';
 import '../cubit/health_profile_state.dart';
 import '../widgets/patient_sub_screen_header.dart';
 
+import '../../../../core/localization/translations.dart';
 /// "الملف الصحي" — blood type, allergies, chronic diseases and notes, backed
+
 /// by `/patient/health-profile`.
 class PatientHealthProfileScreen extends StatelessWidget {
   const PatientHealthProfileScreen({super.key});
@@ -53,7 +55,7 @@ class _HealthProfileViewState extends State<_HealthProfileView> {
   Future<void> _save(BuildContext context) async {
     final error = await context.read<HealthProfileCubit>().save(_notesController.text);
     if (!context.mounted) return;
-    AppSnackbar.show(context, error ?? 'تم حفظ الملف الصحي');
+    AppSnackbar.show(context, error ?? 'تم حفظ الملف الصحي'.tr);
   }
 
   @override
@@ -74,9 +76,9 @@ class _HealthProfileViewState extends State<_HealthProfileView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const PatientSubScreenHeader(
-                    title: 'الملف الصحي',
-                    description: 'معلوماتك الطبية تساعد الصيدلي على اقتراح الدواء المناسب لك.',
+                  PatientSubScreenHeader(
+                    title: 'الملف الصحي'.tr,
+                    description: 'معلوماتك الطبية تساعد الصيدلي على اقتراح الدواء المناسب لك.'.tr,
                   ),
                   SizedBox(height: 24.h),
                   switch (state) {
@@ -118,7 +120,7 @@ class _Form extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('فصيلة الدم', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text('فصيلة الدم'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         Wrap(
           alignment: WrapAlignment.start,
@@ -135,31 +137,31 @@ class _Form extends StatelessWidget {
         ),
         SizedBox(height: 24.h),
         _ListSection(
-          title: 'الحساسية',
-          hint: 'أضف حساسية (مثل: بنسلين)',
+          title: 'الحساسية'.tr,
+          hint: 'أضف حساسية (مثل: بنسلين)'.tr,
           items: state.allergies,
           onAdd: cubit.addAllergy,
           onRemove: cubit.removeAllergy,
         ),
         SizedBox(height: 24.h),
         _ListSection(
-          title: 'الأمراض المزمنة',
-          hint: 'أضف مرضاً مزمناً (مثل: السكري)',
+          title: 'الأمراض المزمنة'.tr,
+          hint: 'أضف مرضاً مزمناً (مثل: السكري)'.tr,
           items: state.chronicDiseases,
           onAdd: cubit.addChronicDisease,
           onRemove: cubit.removeChronicDisease,
         ),
         SizedBox(height: 24.h),
-        Text('ملاحظات', textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text('ملاحظات'.tr, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         AppTextField(
           controller: notesController,
-          hintText: 'أي معلومات صحية أخرى',
+          hintText: 'أي معلومات صحية أخرى'.tr,
           maxLines: 4,
           fillColor: Colors.white,
         ),
         SizedBox(height: 32.h),
-        AppCustomButton(text: 'حفظ', isLoading: state.isSaving, onPressed: onSave),
+        AppCustomButton(text: 'حفظ'.tr, isLoading: state.isSaving, onPressed: onSave),
         SizedBox(height: 24.h),
       ],
     );
@@ -211,7 +213,7 @@ class _ListSectionState extends State<_ListSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(widget.title, textAlign: TextAlign.right, style: AppTextStyles.profileFieldLabel),
+        Text(widget.title, textAlign: TextAlign.start, style: AppTextStyles.profileFieldLabel),
         SizedBox(height: 8.h),
         Row(
           children: [

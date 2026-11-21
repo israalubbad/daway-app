@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_custom_button.dart';
 import '../cubit/patient_auth_cubit.dart';
 import '../cubit/patient_auth_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class PatientPhoneForm extends StatefulWidget {
   const PatientPhoneForm({super.key});
 
@@ -41,8 +43,8 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'رقم هاتفك',
-            textAlign: TextAlign.right,
+            'رقم هاتفك'.tr,
+            textAlign: TextAlign.start,
             style: AppTextStyles.authFieldLabel,
           ),
 
@@ -65,7 +67,7 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
                 },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'الرجاء إدخال رقم الهاتف';
+                    return 'الرجاء إدخال رقم الهاتف'.tr;
                   }
                   return null;
                 },
@@ -104,7 +106,7 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
                 child: Text(
                   state.errorMessage!,
                   style: AppTextStyles.authFieldError,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               );
             },
@@ -116,7 +118,7 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
             buildWhen: (previous, current) => previous.isSendingOtp != current.isSendingOtp,
             builder: (context, state) {
               return AppCustomButton(
-                text: 'التالي',
+                text: 'التالي'.tr,
                 backgroundColor: AppColors.mainTeal,
                 isLoading: state.isSendingOtp,
                 onPressed: () {
@@ -133,12 +135,12 @@ class _PatientPhoneFormState extends State<PatientPhoneForm> {
           Wrap(
             alignment: WrapAlignment.center,
             children: [
-              Text('ليس لديك حساب ؟ ', style: AppTextStyles.authFooterMuted),
+              Text('ليس لديك حساب ؟ '.tr, style: AppTextStyles.authFooterMuted),
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, Routes.signUpScreen);
                 },
-                child: Text('أنشئ حساب', style: AppTextStyles.authLinkText),
+                child: Text('أنشئ حساب'.tr, style: AppTextStyles.authLinkText),
               ),
             ],
           ),

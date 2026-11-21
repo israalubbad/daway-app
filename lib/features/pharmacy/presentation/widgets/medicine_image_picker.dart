@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,10 +8,11 @@ import '../../../../core/helpers/image_source_picker.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 
-/// Dashed upload box for the medicine's (optional) photo, on the "add
-/// medicine" screen. Distinct from [ProfileAvatarPicker] — that one is a
-/// circular avatar edited in place — but both share the same camera/gallery
-/// picking flow via [pickImageFromSourceSheet].
+import '../../../../core/localization/translations.dart';
+
+/// The dashed "أضف صورة" box for the medicine's (optional) photo, on the "add
+/// medicine" screen: a camera in a round chip over the label, replaced by the
+/// photo once one is picked. Picking goes through [pickImageFromSourceSheet].
 class MedicineImagePicker extends StatelessWidget {
   final String? imageLocalPath;
   final String? imageUrl;
@@ -40,17 +42,23 @@ class MedicineImagePicker extends StatelessWidget {
       return Image.file(File(imageLocalPath!), fit: BoxFit.cover);
     }
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return Image.network(imageUrl!, fit: BoxFit.cover);
+      return networkImage(imageUrl!, fit: BoxFit.cover);
     }
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.add_photo_alternate_outlined, size: 32.sp, color: AppColors.primaryTeal),
-          SizedBox(height: 8.h),
-          Text('أضف صورة الدواء (اختياري)', style: AppTextStyles.footerText),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 48.r,
+          height: 48.r,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.accountIconBg,
+          ),
+          child: Icon(Icons.photo_camera_outlined, size: 24.sp, color: AppColors.mainTeal),
+        ),
+        SizedBox(height: 8.h),
+        Text('أضف صورة'.tr, style: AppTextStyles.footerText.copyWith(color: AppColors.mainTeal)),
+      ],
     );
   }
 
@@ -58,17 +66,21 @@ class MedicineImagePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(
-          onTap: () => _pickImage(context),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: CustomPaint(
-              painter: _DashedBorderPainter(color: AppColors.primaryTeal),
-              child: Container(
-                width: double.infinity,
-                height: 140.h,
-                color: AppColors.background,
-                child: _buildContent(),
+        Semantics(
+          button: true,
+          label: 'أضف صورة'.tr,
+          child: GestureDetector(
+            onTap: () => _pickImage(context),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: CustomPaint(
+                painter: const _DashedBorderPainter(color: AppColors.iconBlueBorder),
+                child: Container(
+                  width: 106.r,
+                  height: 106.r,
+                  color: AppColors.permissionIconBg,
+                  child: _buildContent(),
+                ),
               ),
             ),
           ),

@@ -1,8 +1,5 @@
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/widgets/star_rating.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_ratings_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/submit_pharmacy_rating_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/rate_experience_cubit.dart';
@@ -11,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakePatientRatingsRepository implements PatientRatingsRepository {
   ApiResult<void> result = const Success(null);
@@ -25,24 +23,6 @@ class _FakePatientRatingsRepository implements PatientRatingsRepository {
   }) async {
     lastStars = stars;
     return result;
-  }
-}
-
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
   }
 }
 
@@ -61,7 +41,7 @@ void main() {
 
   setUp(() {
     repository = _FakePatientRatingsRepository();
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.patient();
     getIt.registerFactoryParam<RateExperienceCubit, int, void>(
       (pharmacyId, _) => RateExperienceCubit(
         pharmacyId,
@@ -81,7 +61,7 @@ void main() {
     );
   }
 
-  testWidgets('shows the header with the pharmacy name and both rating cards', (tester) async {
+  testWidgets('shows the header with the pharmacy name and only the pharmacy card', (tester) async {
     await setPhoneViewport(tester);
 
     await tester.pumpWidget(buildTestableScreen());
@@ -89,20 +69,18 @@ void main() {
 
     expect(find.text('قيم تجربتك معنا'), findsOneWidget);
     expect(find.textContaining('صيدلية النور'), findsOneWidget);
-    expect(find.text('تقييم التطبيق'), findsOneWidget);
+    expect(find.text('تقييم التطبيق'), findsNothing);
     expect(find.text('تقييم الصيدلية'), findsOneWidget);
-    expect(find.text('اضغط على نجمة لتقييم'), findsNWidgets(2));
+    expect(find.text('اضغط على نجمة لتقييم'), findsOneWidget);
   });
 
-  testWidgets('tapping the 1st star on the app card shows the "سيء" label', (tester) async {
+  testWidgets('tapping the 1st star shows the "سيء" label', (tester) async {
     await setPhoneViewport(tester);
 
     await tester.pumpWidget(buildTestableScreen());
     await tester.pumpAndSettle();
-    // The app-rating card is the first StarRating in the tree; its first
-    // star is its first GestureDetector (the header's own back button has
-    // its own GestureDetector too, so a bare `.first` over the whole tree
-    // would hit that instead).
+    // The header's own back button has a GestureDetector too, so look inside
+    // the StarRating rather than over the whole tree.
     await tester.tap(
       find
           .descendant(of: find.byType(StarRating).first, matching: find.byType(GestureDetector))
@@ -121,6 +99,6 @@ void main() {
     await tester.tap(find.text('إرسال التقييم'));
     await tester.pumpAndSettle();
 
-    expect(find.text('يرجى اختيار تقييم واحد على الأقل'), findsOneWidget);
+    expect(find.text('يرجى اختيار تقييم للصيدلية'), findsOneWidget);
   });
 }

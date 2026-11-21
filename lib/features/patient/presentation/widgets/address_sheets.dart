@@ -6,7 +6,9 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_custom_button.dart';
 import '../../domain/entities/patient_address.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The names an address can be given. "آخر" is the catch-all, stored as-is.
+
 const addressLabels = ['المنزل', 'العمل', 'آخر'];
 
 enum AddressEditAction { save, changeLocation, delete }
@@ -70,12 +72,12 @@ class _AddressLabelSheetState extends State<_AddressLabelSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('ما نوع هذا العنوان؟',
-                textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+            Text('ما نوع هذا العنوان؟'.tr,
+                textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
             SizedBox(height: 8.h),
             Text(
-              'اختر اسماً يسهّل عليك التعرف عليه.',
-              textAlign: TextAlign.right,
+              'اختر اسماً يسهّل عليك التعرف عليه.'.tr,
+              textAlign: TextAlign.start,
               style: AppTextStyles.allCategoriesSubtitle,
             ),
             SizedBox(height: 24.h),
@@ -85,7 +87,7 @@ class _AddressLabelSheetState extends State<_AddressLabelSheet> {
             ),
             SizedBox(height: 32.h),
             AppCustomButton(
-              text: 'حفظ العنوان',
+              text: 'حفظ العنوان'.tr,
               onPressed: () => Navigator.of(context).pop(_selected),
             ),
           ],
@@ -125,12 +127,12 @@ class _AddressEditSheetState extends State<_AddressEditSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('تعديل العنوان',
-                textAlign: TextAlign.right, style: AppTextStyles.allCategoriesTitle),
+            Text('تعديل العنوان'.tr,
+                textAlign: TextAlign.start, style: AppTextStyles.allCategoriesTitle),
             SizedBox(height: 8.h),
             Text(
               widget.address.address,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.allCategoriesSubtitle,
@@ -141,10 +143,10 @@ class _AddressEditSheetState extends State<_AddressEditSheet> {
               onSelected: (label) => setState(() => _selected = label),
             ),
             SizedBox(height: 32.h),
-            AppCustomButton(text: 'حفظ', onPressed: () => _close(AddressEditAction.save)),
+            AppCustomButton(text: 'حفظ'.tr, onPressed: () => _close(AddressEditAction.save)),
             SizedBox(height: 12.h),
             AppCustomButton(
-              text: 'تغيير الموقع',
+              text: 'تغيير الموقع'.tr,
               backgroundColor: Colors.white,
               textColor: AppColors.onboardingText,
               borderColor: AppColors.iconBlueBorder,
@@ -154,7 +156,7 @@ class _AddressEditSheetState extends State<_AddressEditSheet> {
             SizedBox(height: 4.h),
             TextButton(
               onPressed: () => _close(AddressEditAction.delete),
-              child: Text('حذف العنوان', style: TextStyle(color: AppColors.logoutRed)),
+              child: Text('حذف العنوان'.tr, style: TextStyle(color: AppColors.logoutRed)),
             ),
           ],
         ),
@@ -186,7 +188,7 @@ class _LabelChips extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                label,
+                label.tr,
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,

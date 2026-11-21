@@ -2,10 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../constants/api_constants.dart';
+import 'response_cache_interceptor.dart';
+import 'response_cache_store.dart';
 import 'session_expired_interceptor.dart';
 
 abstract class DioFactory {
-  static Dio getDio({void Function()? onSessionExpired}) {
+  static Dio getDio({
+    void Function()? onSessionExpired,
+    ResponseCacheStore? cacheStore,
+  }) {
     final dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
@@ -23,6 +28,10 @@ abstract class DioFactory {
 
     if (onSessionExpired != null) {
       dio.interceptors.add(SessionExpiredInterceptor(onSessionExpired));
+    }
+
+    if (cacheStore != null) {
+      dio.interceptors.add(ResponseCacheInterceptor(cacheStore));
     }
 
     if (kDebugMode) {

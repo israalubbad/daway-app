@@ -1,6 +1,7 @@
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/features/patient/data/datasources/orders_remote_data_source.dart';
 import 'package:daway_app/features/patient/data/repositories/orders_repository_impl.dart';
+import 'package:daway_app/features/patient/domain/entities/checkout_quote.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,6 +12,13 @@ class _StubRemoteDataSource extends OrdersRemoteDataSource {
   /// Explicit per-page responses — set these to test multi-page walks.
   final Map<int, Object?> pageResponses = {};
   Object? nextCheckoutResponse;
+  Object? nextQuoteResponse;
+  bool quoteThrows = false;
+  int? lastQuotedDeliveryFee;
+  double? lastQuotedDiscount;
+  double? lastQuotedGrandTotal;
+  String? lastIdempotencyKey;
+  String? lastQuoteCoupon;
   bool getThrows = false;
   bool checkoutThrows = false;
   int? lastAddressId;
@@ -27,13 +35,33 @@ class _StubRemoteDataSource extends OrdersRemoteDataSource {
   }
 
   @override
+  Future<Response<dynamic>> getCheckoutQuote({
+    required String token,
+    required int addressId,
+    String? couponCode,
+  }) async {
+    if (quoteThrows) throw DioException(requestOptions: RequestOptions());
+    lastAddressId = addressId;
+    lastQuoteCoupon = couponCode;
+    return Response(requestOptions: RequestOptions(), data: nextQuoteResponse, statusCode: 200);
+  }
+
+  @override
   Future<Response<dynamic>> checkout({
     required String token,
     required int addressId,
     String? couponCode,
     String? notes,
+    int? quotedDeliveryFee,
+    double? quotedDiscount,
+    double? quotedGrandTotal,
+    String? idempotencyKey,
   }) async {
     if (checkoutThrows) throw DioException(requestOptions: RequestOptions());
+    lastQuotedDeliveryFee = quotedDeliveryFee;
+    lastQuotedDiscount = quotedDiscount;
+    lastQuotedGrandTotal = quotedGrandTotal;
+    lastIdempotencyKey = idempotencyKey;
     lastAddressId = addressId;
     return Response(
       requestOptions: RequestOptions(),
@@ -134,6 +162,121 @@ void main() {
       final result = await repository.checkout(token: 'tok', addressId: 1);
 
       expect(result, isA<ApiError<Object?>>());
+    });
+  });
+
+  group('checkout with a quote', () {
+    const quote = CheckoutQuote(
+      subtotal: 80,
+      discount: 5,
+      total: 75,
+      deliveryFee: 9,
+      grandTotal: 84,
+    );
+
+    test('sends the quoted amounts and the idempotency key', () async {
+      remoteDataSource.nextCheckoutResponse = {
+        'data': {'order_id': 7},
+      };
+
+      final result = await repository.checkout(
+        token: 'tok',
+        addressId: 1,
+        quote: quote,
+        idempotencyKey: 'key-1',
+      );
+
+      expect((result as Success).data, 7);
+      expect(remoteDataSource.lastQuotedDeliveryFee, 9);
+      expect(remoteDataSource.lastQuotedDiscount, 5);
+      expect(remoteDataSource.lastQuotedGrandTotal, 84);
+      expect(remoteDataSource.lastIdempotencyKey, 'key-1');
+    });
+
+    test('sends none of them without a quote', () async {
+      remoteDataSource.nextCheckoutResponse = {
+        'data': {'order_id': 7},
+      };
+
+      await repository.checkout(token: 'tok', addressId: 1);
+
+      expect(remoteDataSource.lastQuotedDeliveryFee, isNull);
+      expect(remoteDataSource.lastQuotedDiscount, isNull);
+      expect(remoteDataSource.lastQuotedGrandTotal, isNull);
+      expect(remoteDataSource.lastIdempotencyKey, isNull);
+    });
+  });
+
+  group('getCheckoutQuote', () {
+    test('reads the amounts, the whole-number fee and the pricing details', () async {
+      remoteDataSource.nextQuoteResponse = {
+        'success': true,
+        'data': {
+          'subtotal': 80,
+          'discount': 5,
+          'total': 75,
+          'delivery_fee': 9,
+          'grand_total': 84,
+          'distance_meters': 2300,
+          'pricing_mode': 'distance',
+          'tier_id': 3,
+        },
+      };
+
+      final result = await repository.getCheckoutQuote(
+        token: 'tok',
+        addressId: 4,
+        couponCode: 'SAVE10',
+      );
+
+      final quote = (result as Success<CheckoutQuote>).data;
+      expect(quote.subtotal, 80);
+      expect(quote.discount, 5);
+      expect(quote.total, 75);
+      expect(quote.deliveryFee, 9);
+      expect(quote.grandTotal, 84);
+      expect(quote.distanceMeters, 2300);
+      expect(quote.pricingMode, 'distance');
+      expect(quote.tierId, 3);
+      expect(remoteDataSource.lastAddressId, 4);
+      expect(remoteDataSource.lastQuoteCoupon, 'SAVE10');
+    });
+
+    test('amounts sent as decimal strings are read as numbers', () async {
+      remoteDataSource.nextQuoteResponse = {
+        'data': {
+          'subtotal': '80.00',
+          'discount': '0.00',
+          'total': '80.00',
+          'delivery_fee': '9',
+          'grand_total': '89.00',
+        },
+      };
+
+      final result = await repository.getCheckoutQuote(token: 'tok', addressId: 4);
+
+      final quote = (result as Success<CheckoutQuote>).data;
+      expect(quote.deliveryFee, 9);
+      expect(quote.grandTotal, 89);
+      expect(quote.distanceMeters, isNull);
+    });
+
+    test('a response without a delivery fee is an error, not a free delivery', () async {
+      remoteDataSource.nextQuoteResponse = {
+        'data': {'subtotal': 80, 'total': 80, 'grand_total': 80},
+      };
+
+      final result = await repository.getCheckoutQuote(token: 'tok', addressId: 4);
+
+      expect(result, isA<ApiError<CheckoutQuote>>());
+    });
+
+    test('surfaces a network failure instead of throwing', () async {
+      remoteDataSource.quoteThrows = true;
+
+      final result = await repository.getCheckoutQuote(token: 'tok', addressId: 4);
+
+      expect(result, isA<ApiError<CheckoutQuote>>());
     });
   });
 }

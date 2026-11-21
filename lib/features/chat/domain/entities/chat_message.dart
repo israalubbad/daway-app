@@ -1,3 +1,5 @@
+import '../../../../core/localization/translations.dart';
+
 /// True when [text] is just a link to an uploaded image (what the chat sends
 /// for a picture: the image is uploaded to Cloudinary and its link is the
 /// message text).
@@ -13,7 +15,7 @@ bool isImageLink(String text) {
 
 /// How a message reads in a conversations list: a picture shows as "صورة"
 /// instead of its link.
-String chatPreviewText(String text) => isImageLink(text) ? 'صورة' : text;
+String chatPreviewText(String text) => isImageLink(text) ? 'صورة'.tr : text;
 
 /// One message of an inquiry thread (`.../inquiries/{id}/messages`).
 class ChatMessage {

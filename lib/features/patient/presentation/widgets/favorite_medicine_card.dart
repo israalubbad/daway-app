@@ -1,3 +1,4 @@
+import '../../../../core/widgets/network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,17 +9,19 @@ import '../../../../core/theming/app_text_styles.dart';
 import '../../domain/entities/favorite_medicine.dart';
 import '../helpers/pharmacy_availability_label.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// A saved medicine in "الأدوية المحفوظة". The enriched favorites response
 /// has no dosage/strength field (unlike the design's "500 مجم" chip), so
 /// that chip isn't modeled here — add it back once the backend returns one.
 class FavoriteMedicineCard extends StatelessWidget {
   final FavoriteMedicine medicine;
-  final VoidCallback onCompareTap;
+  final VoidCallback onDetailsTap;
 
   const FavoriteMedicineCard({
     super.key,
     required this.medicine,
-    required this.onCompareTap,
+    required this.onDetailsTap,
   });
 
   @override
@@ -54,7 +57,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                 child: (imageUrl != null && imageUrl.isNotEmpty)
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(7.r),
-                        child: Image.network(
+                        child: networkImage(
                           imageUrl,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) => Icon(
@@ -75,7 +78,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                   children: [
                     Text(
                       medicine.displayName,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.favoriteCardName,
@@ -84,7 +87,7 @@ class FavoriteMedicineCard extends StatelessWidget {
                       SizedBox(height: 4.h),
                       Text(
                         medicine.tradeName,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.mutedCaption,
@@ -111,15 +114,15 @@ class FavoriteMedicineCard extends StatelessWidget {
                   child: Text(
                     hasPharmacies
                         ? pharmaciesAvailabilityLabel(medicine.pharmaciesCount)
-                        : 'غير متوفر حالياً',
-                    textAlign: TextAlign.right,
+                        : 'غير متوفر حالياً'.tr,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.favoriteCardAvailability,
                   ),
                 ),
                 if (medicine.minPrice != null) ...[
-                  Text('يبدأ من ', style: AppTextStyles.favoriteCardPriceLabel),
+                  Text('يبدأ من '.tr, style: AppTextStyles.favoriteCardPriceLabel),
                   Text(
                     '${formatPrice(medicine.minPrice!)} ₪',
                     style: AppTextStyles.favoriteCardPrice,
@@ -132,7 +135,7 @@ class FavoriteMedicineCard extends StatelessWidget {
           SizedBox(
             height: 56.h,
             child: ElevatedButton(
-              onPressed: onCompareTap,
+              onPressed: onDetailsTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainTeal,
                 foregroundColor: Colors.white,
@@ -142,10 +145,8 @@ class FavoriteMedicineCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset('assets/icons/price_comparison.svg', width: 14.w, height: 14.w),
-                  SizedBox(width: 6.w),
                   Text(
-                    'مقارنة الأسعار',
+                    'تفاصيل الدواء'.tr,
                     style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700),
                   ),
                 ],

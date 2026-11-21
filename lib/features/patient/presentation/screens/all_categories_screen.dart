@@ -12,6 +12,9 @@ import '../cubit/categories_cubit.dart';
 import '../cubit/categories_state.dart';
 import '../widgets/category_icon.dart';
 
+import '../../../../core/localization/translations.dart';
+
+import '../../../../core/widgets/mirror_when_ltr.dart';
 class AllCategoriesScreen extends StatelessWidget {
   const AllCategoriesScreen({super.key});
 
@@ -36,9 +39,9 @@ class _AllCategoriesView extends StatelessWidget {
           children: [
             SizedBox(height: 32.h),
             Padding(
-              padding: EdgeInsets.only(right: 24.w),
+              padding: EdgeInsetsDirectional.only(start: 24.w),
               child: Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerStart,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -51,13 +54,13 @@ class _AllCategoriesView extends StatelessWidget {
                       border: Border.all(color: AppColors.iconBlueBorder),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    child: SvgPicture.asset(
+                    child: MirrorWhenLtr(child: SvgPicture.asset(
                       'assets/icons/back_icon.svg',
                       colorFilter: const ColorFilter.mode(
                         AppColors.mainTeal,
                         BlendMode.srcIn,
                       ),
-                    ),
+                    )),
                   ),
                 ),
               ),
@@ -66,8 +69,8 @@ class _AllCategoriesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
-                'كل احتياجاتك في مكان واحد',
-                textAlign: TextAlign.right,
+                'كل احتياجاتك في مكان واحد'.tr,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesTitle,
               ),
             ),
@@ -75,8 +78,8 @@ class _AllCategoriesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Text(
-                'اختر القسم المناسب وابدأ بالاستكشاف',
-                textAlign: TextAlign.right,
+                'اختر القسم المناسب وابدأ بالاستكشاف'.tr,
+                textAlign: TextAlign.start,
                 style: AppTextStyles.allCategoriesSubtitle,
               ),
             ),
@@ -99,7 +102,7 @@ class _AllCategoriesView extends StatelessWidget {
                         when categories.isEmpty =>
                       Center(
                         child: Text(
-                          'لا توجد أقسام متاحة حالياً',
+                          'لا توجد أقسام متاحة حالياً'.tr,
                           textAlign: TextAlign.center,
                           style: AppTextStyles.homePharmacyCardSubtitle,
                         ),
@@ -161,20 +164,20 @@ class _AllCategoryCard extends StatelessWidget {
           border: Border.all(color: AppColors.iconBlueBorder),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        padding: EdgeInsets.only(top: 8.h, right: 8.w, left: 4.w, bottom: 4.h),
+        padding: EdgeInsetsDirectional.only(top: 8.h, start: 8.w, end: 4.w, bottom: 4.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              category.nameAr,
-              textAlign: TextAlign.right,
+              category.name,
+              textAlign: TextAlign.start,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.homeCategoryLabel,
             ),
             Expanded(
               child: Align(
-                alignment: Alignment.bottomLeft,
+                alignment: AlignmentDirectional.bottomEnd,
                 child: CategoryIcon(category: category),
               ),
             ),

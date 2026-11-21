@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 
+import '../../core/localization/translations.dart';
+
 /// The centered "دواك" mark and wordmark with the app version under it, at
 /// the foot of the account-settings screen. The version line is left out
 /// when [version] is null (it could not be read).
@@ -23,7 +25,7 @@ class SettingsBrandFooter extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('دواك', style: AppTextStyles.settingsBrandName),
+            Text('دواك'.tr, style: AppTextStyles.settingsBrandName),
             SizedBox(width: 8.w),
             Container(
               width: 34.r,
@@ -45,7 +47,7 @@ class SettingsBrandFooter extends StatelessWidget {
         if (version != null) ...[
           SizedBox(height: 10.h),
           Text(
-            'الإصدار $version',
+            'الإصدار {0}'.trArgs([version]),
             textAlign: TextAlign.center,
             style: AppTextStyles.settingsMutedText,
           ),

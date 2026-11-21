@@ -43,8 +43,8 @@ class PharmacyAlternativesRepositoryImpl
     required String token,
     required Medicine baseMedicine,
     required List<Medicine> allMedicines,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final candidatesFuture = _remoteDataSource.getCandidates(
         token: token,
         pharmacyMedicineId: baseMedicine.id,
@@ -84,9 +84,7 @@ class PharmacyAlternativesRepositoryImpl
           selectedAlternativeIds: links[baseMedicine.id] ?? const {},
         ),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -160,17 +158,15 @@ class PharmacyAlternativesRepositoryImpl
     required String token,
     required int baseMedicineId,
     required int alternativeId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.create(
         token: token,
         baseMedicineId: baseMedicineId,
         alternativeId: alternativeId,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -178,16 +174,14 @@ class PharmacyAlternativesRepositoryImpl
     required String token,
     required int baseMedicineId,
     required int alternativeId,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.delete(
         token: token,
         baseMedicineId: baseMedicineId,
         alternativeId: alternativeId,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

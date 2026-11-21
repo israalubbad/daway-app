@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../domain/entities/working_hours_entry.dart';
 
-const weekDayLabels = {
-  WeekDay.sat: 'السبت',
-  WeekDay.sun: 'الأحد',
-  WeekDay.mon: 'الاثنين',
-  WeekDay.tue: 'الثلاثاء',
-  WeekDay.wed: 'الأربعاء',
-  WeekDay.thu: 'الخميس',
-  WeekDay.fri: 'الجمعة',
+import '../../../../core/localization/translations.dart';
+
+Map<WeekDay, String> get weekDayLabels => {
+  WeekDay.sat: 'السبت'.tr,
+  WeekDay.sun: 'الأحد'.tr,
+  WeekDay.mon: 'الاثنين'.tr,
+  WeekDay.tue: 'الثلاثاء'.tr,
+  WeekDay.wed: 'الأربعاء'.tr,
+  WeekDay.thu: 'الخميس'.tr,
+  WeekDay.fri: 'الجمعة'.tr,
 };
 
 /// "09:00" -> 9:00, or null when it is not an `HH:mm` string.
@@ -37,7 +39,7 @@ String formatWorkingTimeArabic(String value) {
   final minutes = time.minute == 0
       ? ''
       : ':${time.minute.toString().padLeft(2, '0')}';
-  return '$hour12$minutes${time.period == DayPeriod.am ? 'ص' : 'م'}';
+  return '$hour12$minutes${time.period == DayPeriod.am ? 'ص'.tr : 'م'.tr}';
 }
 
 /// One line for the account-info row: the shared hours ("9ص - 10م") when every
@@ -45,11 +47,11 @@ String formatWorkingTimeArabic(String value) {
 /// when the days differ.
 String summarizeWorkingHours(List<WorkingHoursEntry> entries) {
   final open = entries.where((e) => e.isOpen).toList();
-  if (open.isEmpty) return 'مغلق';
+  if (open.isEmpty) return 'مغلق'.tr;
   final first = open.first;
   final sameEveryDay = open.every(
     (e) => e.open == first.open && e.close == first.close,
   );
-  if (!sameEveryDay) return 'حسب اليوم';
+  if (!sameEveryDay) return 'حسب اليوم'.tr;
   return '${formatWorkingTimeArabic(first.open!)} - ${formatWorkingTimeArabic(first.close!)}';
 }

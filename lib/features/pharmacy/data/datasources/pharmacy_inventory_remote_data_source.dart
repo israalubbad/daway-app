@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PharmacyInventoryRemoteDataSource {
@@ -11,7 +12,7 @@ class PharmacyInventoryRemoteDataSource {
     return _dio.get(
       ApiConstants.pharmacyInventory,
       queryParameters: {'per_page': 100},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -22,7 +23,7 @@ class PharmacyInventoryRemoteDataSource {
     return _dio.post(
       ApiConstants.pharmacyInventoryBulk,
       data: body,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

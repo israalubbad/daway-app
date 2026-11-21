@@ -1,6 +1,8 @@
 import '../../domain/entities/inquiry.dart';
+import '../../../chat/domain/entities/last_message_text.dart';
 
 /// Parses one entry from `GET /pharmacy/inquiries` (confirmed against a live
+
 /// response: `id`, `status`, `message`, `created_at`, nested `user.name`,
 /// nested `medicine.trade_name`). Shared by the dashboard's recent-inquiries
 /// preview and the full الاستفسارات screen so both parse the same shape once.
@@ -41,19 +43,8 @@ class InquiryModel {
       medicineName: medicine?['trade_name'] as String?,
       unreadCount: (json['unread_messages_count'] as num?)?.toInt() ?? 0,
       patientId: (user?['id'] as num?)?.toInt() ?? (json['user_id'] as num?)?.toInt(),
-      lastMessage: _lastMessageText(json['last_message']),
+      lastMessage: lastMessageText(json['last_message']),
     );
-  }
-
-  /// `last_message` may be the message text or the message object.
-  static String? _lastMessageText(Object? value) {
-    if (value is String) return value.isEmpty ? null : value;
-    if (value is Map) {
-      final text = value['message'];
-      if (text is String && text.isNotEmpty) return text;
-      if (value['media_url'] != null) return 'صورة';
-    }
-    return null;
   }
 
   Inquiry toEntity() => Inquiry(

@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/medicine.dart';
 
+import '../../../../core/localization/translations.dart';
 /// Shared by every widget that colors itself off a [MedicineStatus] — keeps
+
 /// the available/low/out-of-stock colors defined once instead of each caller
 /// re-deriving the same switch.
 Color colorForMedicineStatus(MedicineStatus status) => switch (status) {
@@ -19,9 +21,9 @@ class MedicineStatusBadge extends StatelessWidget {
   const MedicineStatusBadge({super.key, required this.status});
 
   (String, Color) get _labelAndColor => switch (status) {
-    MedicineStatus.available => ('متوفر', colorForMedicineStatus(status)),
-    MedicineStatus.low => ('منخفض', colorForMedicineStatus(status)),
-    MedicineStatus.outOfStock => ('نافد', colorForMedicineStatus(status)),
+    MedicineStatus.available => ('متوفر'.tr, colorForMedicineStatus(status)),
+    MedicineStatus.low => ('منخفض'.tr, colorForMedicineStatus(status)),
+    MedicineStatus.outOfStock => ('نافد'.tr, colorForMedicineStatus(status)),
   };
 
   @override

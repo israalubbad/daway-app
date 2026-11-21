@@ -4,9 +4,6 @@ import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/routing/routes.dart';
 import 'package:daway_app/core/widgets/header_icon_button.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/inventory_item_update.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -25,6 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/arabic_test_app.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _amoxicillin = Medicine(
   id: 1,
@@ -100,6 +98,7 @@ class _FakeMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -151,18 +150,6 @@ class _FakeInventoryRepository implements PharmacyInventoryRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  @override
-  Future<void> saveSession(UserSession session) async {}
-
-  @override
-  Future<UserSession?> getSession() async =>
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> clearSession() async {}
-}
-
 void main() {
   late _FakeMedicineRepository medicineRepository;
   late _FakeInventoryRepository inventoryRepository;
@@ -182,7 +169,7 @@ void main() {
 
   Future<void> pumpScreen(WidgetTester tester) async {
     await setDesignViewport(tester);
-    final sessionRepository = _FakeSessionRepository();
+    final sessionRepository = InMemorySessionRepository.pharmacy();
     await tester.pumpWidget(
       buildArabicTestApp(
         onGenerateRoute: (settings) {
@@ -251,7 +238,7 @@ void main() {
   group('loading and failing', () {
     Future<void> pumpUntilLoadingOrFailed(WidgetTester tester) async {
       await setDesignViewport(tester);
-      final sessionRepository = _FakeSessionRepository();
+      final sessionRepository = InMemorySessionRepository.pharmacy();
       await tester.pumpWidget(
         buildArabicTestApp(
           home: BlocProvider(
@@ -426,12 +413,21 @@ void main() {
       expect(switchedTabs, [PharmacyDashboardTab.home]);
     });
 
-    testWidgets('تحديث المنتجات goes to the inventory page', (tester) async {
+    testWidgets('تحديث المنتجات opens the stock import page, and an update there reloads the list', (
+      tester,
+    ) async {
       await pumpScreen(tester);
+      routeResult = true;
+      final fetchesBefore = medicineRepository.fetches;
 
       await tester.tap(find.text('تحديث المنتجات'));
+      await tester.pumpAndSettle();
+      expect(pushedRoutes.last.name, Routes.pharmacyStockImportScreen);
 
-      expect(switchedTabs, [PharmacyDashboardTab.inventory]);
+      await tester.tap(find.text('page ${Routes.pharmacyStockImportScreen}'));
+      await tester.pumpAndSettle();
+
+      expect(medicineRepository.fetches, fetchesBefore + 1);
     });
 
     testWidgets('أضف منتج جديد opens the add page, and a medicine added there reloads the list', (

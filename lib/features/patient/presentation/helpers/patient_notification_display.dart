@@ -1,6 +1,8 @@
 import '../../domain/entities/patient_notification.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The filter tabs on the notifications screen.
+
 enum PatientNotificationTab { all, orders, offers, system }
 
 /// Which tab (besides "الكل") a notification belongs under, or null when it
@@ -18,22 +20,22 @@ PatientNotificationTab? tabFor(PatientNotificationType type) {
 /// line is derived from the type.
 String titleFor(PatientNotificationType type) {
   return switch (type) {
-    PatientNotificationType.medicineAvailable => 'دواء متوفر',
-    PatientNotificationType.inquiryAnswered => 'تم الرد على استفسارك',
-    PatientNotificationType.reminder => 'تذكير بموعد دوائك',
-    PatientNotificationType.system => 'إشعار من النظام',
-    PatientNotificationType.other => 'إشعار جديد',
+    PatientNotificationType.medicineAvailable => 'دواء متوفر'.tr,
+    PatientNotificationType.inquiryAnswered => 'تم الرد على استفسارك'.tr,
+    PatientNotificationType.reminder => 'تذكير بموعد دوائك'.tr,
+    PatientNotificationType.system => 'إشعار من النظام'.tr,
+    PatientNotificationType.other => 'إشعار جديد'.tr,
   };
 }
 
 /// The small category chip on a notification.
 String categoryLabelFor(PatientNotificationType type) {
   return switch (type) {
-    PatientNotificationType.medicineAvailable => 'الأدوية',
-    PatientNotificationType.inquiryAnswered => 'الاستفسارات',
-    PatientNotificationType.reminder => 'التذكيرات',
-    PatientNotificationType.system => 'النظام',
-    PatientNotificationType.other => 'عام',
+    PatientNotificationType.medicineAvailable => 'الأدوية'.tr,
+    PatientNotificationType.inquiryAnswered => 'الاستفسارات'.tr,
+    PatientNotificationType.reminder => 'التذكيرات'.tr,
+    PatientNotificationType.system => 'النظام'.tr,
+    PatientNotificationType.other => 'عام'.tr,
   };
 }
 

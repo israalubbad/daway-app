@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/networking/auth_options.dart';
 import '../../../../core/constants/api_constants.dart';
 
 class PharmacyAlternativesRemoteDataSource {
@@ -13,7 +14,7 @@ class PharmacyAlternativesRemoteDataSource {
   }) {
     return _dio.get(
       '${ApiConstants.pharmacyMedicines}/$pharmacyMedicineId/alternatives',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -25,7 +26,7 @@ class PharmacyAlternativesRemoteDataSource {
     return _dio.get(
       ApiConstants.pharmacyAlternatives,
       queryParameters: {'per_page': 100},
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -40,7 +41,7 @@ class PharmacyAlternativesRemoteDataSource {
         'base_medicine_id': baseMedicineId,
         'alternative_id': alternativeId,
       },
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 
@@ -51,7 +52,7 @@ class PharmacyAlternativesRemoteDataSource {
   }) {
     return _dio.delete(
       '${ApiConstants.pharmacyAlternatives}/$baseMedicineId/$alternativeId',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: authOptions(token),
     );
   }
 }

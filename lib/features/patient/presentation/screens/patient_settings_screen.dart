@@ -3,12 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
+import '../../../localization/presentation/cubit/language_cubit.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/theming/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_toggle_switch.dart';
 import '../../../../core/widgets/logout_confirmation_sheet.dart';
+import '../../../auth/presentation/cubit/account_closure_cubit.dart';
+import '../../../auth/presentation/cubit/account_closure_state.dart';
 import '../../../auth/presentation/cubit/logout_cubit.dart';
+import '../../../auth/presentation/widgets/delete_account_sheet.dart';
 import '../../../auth/presentation/screens/privacy_policy_screen.dart';
 import '../../../auth/presentation/screens/terms_screen.dart';
 import '../../domain/entities/account_settings.dart';
@@ -21,7 +26,9 @@ import '../widgets/patient_sub_screen_header.dart';
 import '../../../../core/widgets/settings_brand_footer.dart';
 import '../../../../core/widgets/settings_section_label.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The account-settings screen (opened from the account hub's "الإعدادات"
+
 /// row): preferences, privacy links, logout, and the app version.
 ///
 /// Expects an [AccountSettingsCubit] and a [LogoutCubit] to already be
@@ -44,6 +51,7 @@ class PatientSettingsScreen extends StatefulWidget {
       builder: (_) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => getIt<AccountSettingsCubit>()),
+          BlocProvider(create: (_) => getIt<AccountClosureCubit>()),
           BlocProvider.value(value: logoutCubit),
         ],
         child: const PatientSettingsScreen(),
@@ -57,8 +65,7 @@ class PatientSettingsScreen extends StatefulWidget {
 
 class _PatientSettingsScreenState extends State<PatientSettingsScreen>
     with WidgetsBindingObserver {
-  /// The app only ships in Arabic today, so this is fixed.
-  static const _currentLanguage = AppLanguage.arabic;
+  AppLanguage get _currentLanguage => getIt<LanguageCubit>().state;
 
   @override
   void initState() {
@@ -89,7 +96,7 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
   Future<void> _pickLanguage() async {
     final picked = await LanguageBottomSheet.show(context, selected: _currentLanguage);
     if (!mounted || picked == null || picked == _currentLanguage) return;
-    AppSnackbar.show(context, 'قريباً');
+    await getIt<LanguageCubit>().select(picked);
   }
 
   void _push(Widget screen) {
@@ -103,8 +110,23 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
     );
   }
 
+  void _confirmDeleteAccount() {
+    DeleteAccountSheet.show(context, context.read<AccountClosureCubit>());
+  }
+
   @override
   Widget build(BuildContext context) {
+    // The account is gone and its session ended: nothing signed-in is left to
+    // show, so every route is replaced with the account-type screen.
+    return BlocListener<AccountClosureCubit, AccountClosureState>(
+      listenWhen: (previous, current) => current is AccountClosureDone,
+      listener: (context, state) => Navigator.of(context)
+          .pushNamedAndRemoveUntil(Routes.accountTypeScreen, (route) => false),
+      child: _buildScaffold(),
+    );
+  }
+
+  Widget _buildScaffold() {
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -112,9 +134,9 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: const PatientSubScreenHeader(
-                  title: 'معلومات الحساب',
-                  description: 'إدارة معلوماتك الشخصية وتفاصيل حسابك',
+                child: PatientSubScreenHeader(
+                  title: 'معلومات الحساب'.tr,
+                  description: 'إدارة معلوماتك الشخصية وتفاصيل حسابك'.tr,
                 ),
               ),
             ),
@@ -155,11 +177,11 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: 24.h),
-          const SettingsSectionLabel('التفضيلات'),
+          SettingsSectionLabel('التفضيلات'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/globe_icon.svg'),
-            label: 'اللغة',
+            label: 'اللغة'.tr,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -173,14 +195,14 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/bell_icon.svg'),
-            label: 'الإشعارات',
+            label: 'الإشعارات'.tr,
             trailing: _permissionSwitch(state, (settings) => settings.notificationsEnabled),
             onTap: () => _openDeviceSettings(DeviceSetting.notifications),
           ),
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/map_pin_icon.svg'),
-            label: 'الموقع',
+            label: 'الموقع'.tr,
             trailing: _permissionSwitch(state, (settings) => settings.locationEnabled),
             onTap: () => _openDeviceSettings(DeviceSetting.location),
           ),
@@ -192,31 +214,40 @@ class _PatientSettingsScreenState extends State<PatientSettingsScreen>
             ),
           ],
           SizedBox(height: 32.h),
-          const SettingsSectionLabel('الخصوصية والأمان'),
+          SettingsSectionLabel('الخصوصية والأمان'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/shield_icon.svg'),
-            label: 'سياسة الخصوصية',
+            label: 'سياسة الخصوصية'.tr,
             trailing: const AccountRowChevron(),
             onTap: () => _push(const PrivacyPolicyScreen()),
           ),
           SizedBox(height: 16.h),
           AccountRowCard(
             leading: const AccountRowIcon('assets/icons/file_text_icon.svg'),
-            label: 'الشروط والأحكام',
+            label: 'الشروط والأحكام'.tr,
             trailing: const AccountRowChevron(),
             onTap: () => _push(const TermsScreen()),
           ),
           SizedBox(height: 24.h),
-          const SettingsSectionLabel('الحساب'),
+          SettingsSectionLabel('الحساب'.tr),
           SizedBox(height: 8.h),
           AccountRowCard(
-            label: 'تسجيل الخروج',
+            label: 'تسجيل الخروج'.tr,
             labelColor: AppColors.logoutRed,
             trailing: const AccountRowIcon('assets/icons/log_out_icon.svg', color: AppColors.logoutRed),
             height: 58,
             radius: 12,
             onTap: _confirmLogout,
+          ),
+          SizedBox(height: 16.h),
+          AccountRowCard(
+            label: 'حذف الحساب'.tr,
+            labelColor: AppColors.logoutRed,
+            trailing: Icon(Icons.delete_outline_rounded, size: 22.r, color: AppColors.logoutRed),
+            height: 58,
+            radius: 12,
+            onTap: _confirmDeleteAccount,
           ),
           SizedBox(height: 40.h),
           const Spacer(),
@@ -241,7 +272,7 @@ class _InlineRetry extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(message, textAlign: TextAlign.right, style: AppTextStyles.settingsMutedText),
+          child: Text(message, textAlign: TextAlign.start, style: AppTextStyles.settingsMutedText),
         ),
         SizedBox(width: 12.w),
         GestureDetector(
@@ -250,7 +281,7 @@ class _InlineRetry extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: Text(
-              'إعادة المحاولة',
+              'إعادة المحاولة'.tr,
               style: AppTextStyles.settingsMutedText.copyWith(
                 color: AppColors.mainTeal,
                 fontWeight: FontWeight.w700,

@@ -9,13 +9,21 @@ abstract class ApiConstants {
   static const String pharmacyLogin = '/login/pharmacy';
   static const String registerPharmacy = '/register/pharmacy';
   static const String logout = '/logout';
+  static const String accountClosure = '/account/closure';
+  static const String pharmacyClosureRequest = '/pharmacy/account/closure-request';
   static const String patientProfile = '/profile/patient';
   static const String pharmacyProfile = '/profile/pharmacy';
+  static const String pharmacyChangePassword = '/pharmacy/change-password';
   static const String pharmacyMedicines = '/pharmacy/medicines';
   static const String pharmacyMedicinesSearch = '/pharmacy/medicines/search';
   static const String pharmacyMedicinesByName = '/pharmacy/medicines/by-name';
   static const String pharmacyInventory = '/pharmacy/inventory';
   static const String pharmacyInventoryBulk = '/pharmacy/inventory/bulk';
+  static const String pharmacyInventoryImport = '/pharmacy/inventory/import';
+  static const String pharmacySubOrders = '/pharmacy/sub-orders';
+  static const String pharmacySalesSummary = '/pharmacy/accounting/sales-summary';
+  static const String pharmacyAccounting = '/pharmacy/accounting';
+  static const String pharmacyScanSessions = '/pharmacy/scan-sessions';
   static const String pharmacyDashboardStats = '/pharmacy/dashboard/stats';
   static const String pharmacyRatings = '/pharmacy/ratings';
   static const String pharmacyInquiries = '/pharmacy/inquiries';
@@ -23,7 +31,6 @@ abstract class ApiConstants {
   static const String deviceTokens = '/device-tokens';
   static const String deviceTokensCurrent = '/device-tokens/current';
   static const String notifications = '/notifications';
-  static const String notificationsCount = '/notifications/count';
   static const String notificationsMarkAllAsRead =
       '/notifications/mark-all-as-read';
   static const String categories = '/categories';
@@ -38,6 +45,7 @@ abstract class ApiConstants {
   static const String patientAddresses = '/patient/addresses';
   static const String patientOrders = '/patient/orders';
   static const String patientCheckout = '/patient/checkout';
+  static const String patientCheckoutQuote = '/patient/checkout/quote';
   static const String patientCouponsValidate = '/patient/coupons/validate';
   static const String patientPaymentBanks = '/patient/payment-banks';
   static const String patientInquiries = '/patient/inquiries';

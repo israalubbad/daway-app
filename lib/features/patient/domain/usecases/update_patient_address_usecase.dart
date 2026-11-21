@@ -1,8 +1,8 @@
-import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/api_result.dart';
 import '../../../auth/domain/repositories/session_repository.dart';
 import '../entities/patient_address.dart';
 import '../repositories/patient_addresses_repository.dart';
+import '../../../auth/domain/usecases/with_session_token.dart';
 
 class UpdatePatientAddressUseCase {
   final PatientAddressesRepository _repository;
@@ -19,23 +19,20 @@ class UpdatePatientAddressUseCase {
     required double latitude,
     required double longitude,
     required bool isDefault,
-  }) async {
-    final session = await _sessionRepository.getSession();
-    if (session == null) {
-      return const ApiError(
-        ApiFailure(message: 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى'),
-      );
-    }
-    return _repository.updateAddress(
-      token: session.token,
-      addressId: addressId,
-      label: label,
-      recipientName: recipientName,
-      phone: phone,
-      address: address,
-      latitude: latitude,
-      longitude: longitude,
-      isDefault: isDefault,
+  }) {
+    return withSessionToken(
+      _sessionRepository,
+      (token) => _repository.updateAddress(
+        token: token,
+        addressId: addressId,
+        label: label,
+        recipientName: recipientName,
+        phone: phone,
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        isDefault: isDefault,
+      ),
     );
   }
 }

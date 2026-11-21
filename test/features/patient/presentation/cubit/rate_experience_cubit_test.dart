@@ -1,12 +1,10 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_ratings_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/submit_pharmacy_rating_usecase.dart';
 import 'package:daway_app/features/patient/presentation/cubit/rate_experience_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 class _FakePatientRatingsRepository implements PatientRatingsRepository {
   ApiResult<void> result = const Success(null);
@@ -28,31 +26,13 @@ class _FakePatientRatingsRepository implements PatientRatingsRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePatientRatingsRepository repository;
 
   RateExperienceCubit buildCubit() {
     return RateExperienceCubit(
       11,
-      SubmitPharmacyRatingUseCase(repository, _FakeSessionRepository()),
+      SubmitPharmacyRatingUseCase(repository, InMemorySessionRepository.patient()),
     );
   }
 
@@ -69,17 +49,6 @@ void main() {
     expect(cubit.state.errorMessage, isNotNull);
     expect(repository.lastStars, isNull);
     expect(cubit.state.submitted, isFalse);
-  });
-
-  test('rating only the app (no pharmacy stars) submits nothing to the backend', () async {
-    final cubit = buildCubit();
-    addTearDown(cubit.close);
-
-    cubit.appRatingChanged(4);
-    await cubit.submit();
-
-    expect(repository.lastStars, isNull);
-    expect(cubit.state.submitted, isTrue);
   });
 
   test('rating the pharmacy sends its stars and trimmed notes', () async {

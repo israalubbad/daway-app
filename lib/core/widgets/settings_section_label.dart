@@ -10,6 +10,6 @@ class SettingsSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, textAlign: TextAlign.right, style: AppTextStyles.settingsSectionLabel);
+    return Text(text, textAlign: TextAlign.start, style: AppTextStyles.settingsSectionLabel);
   }
 }

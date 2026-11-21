@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/inventory_item_update.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine.dart';
 import 'package:daway_app/features/pharmacy/domain/entities/medicine_catalog_item.dart';
@@ -16,6 +13,7 @@ import 'package:daway_app/features/pharmacy/domain/usecases/update_pharmacy_inve
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_cubit.dart';
 import 'package:daway_app/features/pharmacy/presentation/cubit/pharmacy_medicines_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _available = Medicine(
   id: 1,
@@ -88,6 +86,7 @@ class _FakePharmacyMedicineRepository implements PharmacyMedicineRepository {
     required String tradeName,
     String? tradeNameAr,
     String? activeIngredient,
+    int? categoryId,
     required double price,
     required int quantity,
     required bool isAvailable,
@@ -147,28 +146,10 @@ class _FakePharmacyInventoryRepository implements PharmacyInventoryRepository {
   }
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession =
-      const UserSession(accountType: AccountType.pharmacy, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async {
-    savedSession = session;
-  }
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async {
-    savedSession = null;
-  }
-}
-
 void main() {
   late _FakePharmacyMedicineRepository repository;
   late _FakePharmacyInventoryRepository inventoryRepository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
   late PharmacyMedicinesCubit cubit;
 
   PharmacyMedicinesCubit buildCubit() => PharmacyMedicinesCubit(
@@ -185,7 +166,7 @@ void main() {
   setUp(() async {
     repository = _FakePharmacyMedicineRepository();
     inventoryRepository = _FakePharmacyInventoryRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.pharmacy();
     cubit = buildCubit();
     await cubit.load();
   });

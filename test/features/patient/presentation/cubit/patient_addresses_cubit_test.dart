@@ -1,9 +1,6 @@
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
 import 'package:daway_app/core/models/picked_location.dart';
-import 'package:daway_app/features/auth/domain/entities/account_type.dart';
-import 'package:daway_app/features/auth/domain/entities/user_session.dart';
-import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_address.dart';
 import 'package:daway_app/features/patient/domain/entities/patient_profile.dart';
 import 'package:daway_app/features/patient/domain/repositories/patient_addresses_repository.dart';
@@ -16,6 +13,7 @@ import 'package:daway_app/features/patient/domain/usecases/update_patient_addres
 import 'package:daway_app/features/patient/presentation/cubit/patient_addresses_cubit.dart';
 import 'package:daway_app/features/patient/presentation/cubit/patient_addresses_state.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../../../helpers/in_memory_session_repository.dart';
 
 const _home = PatientAddress(
   id: 1,
@@ -121,22 +119,9 @@ class _FakeProfileRepository implements PatientProfileRepository {
       const Success(null);
 }
 
-class _FakeSessionRepository implements SessionRepository {
-  UserSession? savedSession = const UserSession(accountType: AccountType.patient, token: 'tok-1');
-
-  @override
-  Future<void> saveSession(UserSession session) async => savedSession = session;
-
-  @override
-  Future<UserSession?> getSession() async => savedSession;
-
-  @override
-  Future<void> clearSession() async => savedSession = null;
-}
-
 void main() {
   late _FakeAddressesRepository repository;
-  late _FakeSessionRepository sessionRepository;
+  late InMemorySessionRepository sessionRepository;
 
   PatientAddressesCubit buildCubit() {
     return PatientAddressesCubit(
@@ -150,7 +135,7 @@ void main() {
 
   setUp(() {
     repository = _FakeAddressesRepository();
-    sessionRepository = _FakeSessionRepository();
+    sessionRepository = InMemorySessionRepository.patient();
   });
 
   test('loads the addresses on construction', () async {

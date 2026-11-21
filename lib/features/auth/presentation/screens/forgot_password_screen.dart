@@ -13,7 +13,9 @@ import '../widgets/auth_flow_header.dart';
 import '../widgets/password_reset_notice_listener.dart';
 import 'password_reset_code_screen.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The first screen of resetting a pharmacy's forgotten password, reached from
+
 /// the login: the phone number the code is to be sent to.
 ///
 /// Expects a [PasswordResetCubit] above it, which the screens after this one
@@ -48,9 +50,9 @@ class ForgotPasswordScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 32.h),
-                  const AuthFlowHeader(
-                    title: 'نسيت كلمة المرور ؟',
-                    subtitle: 'أدخل رقم هاتفك لنرسل لك رمز التحقق لإعادة تعيين كلمة المرور.',
+                  AuthFlowHeader(
+                    title: 'نسيت كلمة المرور ؟'.tr,
+                    subtitle: 'أدخل رقم هاتفك لنرسل لك رمز التحقق لإعادة تعيين كلمة المرور.'.tr,
                     // Lower than on the other screens, as in the design.
                     titleTop: 21,
                     subtitleGap: 4,
@@ -103,7 +105,7 @@ class _PhoneFormState extends State<_PhoneForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AuthTextField(
-                  label: 'رقم الهاتف',
+                  label: 'رقم الهاتف'.tr,
                   controller: _phoneController,
                   keyboardType: TextInputType.number,
                   textDirection: TextDirection.ltr,
@@ -115,7 +117,7 @@ class _PhoneFormState extends State<_PhoneForm> {
                   SizedBox(height: 8.h),
                   Text(
                     errorMessage,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authFieldError,
                   ),
                 ],
@@ -128,7 +130,7 @@ class _PhoneFormState extends State<_PhoneForm> {
           selector: (state) => state.isBusy,
           builder: (context, isBusy) {
             return AppCustomButton(
-              text: 'التالي',
+              text: 'التالي'.tr,
               textStyle: AppTextStyles.authFlowButton,
               backgroundColor: AppColors.mainTeal,
               isLoading: isBusy,

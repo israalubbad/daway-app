@@ -1,49 +1,34 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/theming/app_colors.dart';
 import '../../domain/entities/notification.dart';
 
-/// The icon, its color, and the Arabic title shown for a notification card —
-/// the backend's `message` is already a full sentence, so only these
-/// per-[NotificationType] display bits are derived client-side.
-class NotificationDisplay {
-  final IconData icon;
-  final Color color;
-  final String title;
+import '../../../../core/localization/translations.dart';
 
-  const NotificationDisplay({
-    required this.icon,
-    required this.color,
-    required this.title,
-  });
+/// The backend's `message` is already a full sentence, so only the bold title
+/// line, the category chip and the icon are derived from the type.
+String notificationTitleFor(NotificationType type) {
+  return switch (type) {
+    NotificationType.outOfStock => 'دواء نافد من المخزون'.tr,
+    NotificationType.lowStock => 'مخزون منخفض'.tr,
+    NotificationType.newInquiry => 'استفسار جديد'.tr,
+    NotificationType.newRating => 'تقييم جديد'.tr,
+    NotificationType.other => 'إشعار'.tr,
+  };
 }
 
-NotificationDisplay notificationDisplayFor(NotificationType type) {
+/// The small category chip on a notification.
+String notificationCategoryFor(NotificationType type) {
   return switch (type) {
-    NotificationType.outOfStock => const NotificationDisplay(
-      icon: Icons.error_outline,
-      color: AppColors.error,
-      title: 'دواء نافد من المخزون',
-    ),
-    NotificationType.lowStock => const NotificationDisplay(
-      icon: Icons.trending_down,
-      color: AppColors.warning,
-      title: 'مخزون منخفض',
-    ),
-    NotificationType.newInquiry => const NotificationDisplay(
-      icon: Icons.chat_bubble_outline,
-      color: AppColors.primaryTeal,
-      title: 'استفسار جديد',
-    ),
-    NotificationType.newRating => const NotificationDisplay(
-      icon: Icons.star_outline_rounded,
-      color: AppColors.warning,
-      title: 'تقييم جديد',
-    ),
-    NotificationType.other => const NotificationDisplay(
-      icon: Icons.person_outline,
-      color: AppColors.primaryTeal,
-      title: 'إشعار',
-    ),
+    NotificationType.outOfStock || NotificationType.lowStock => 'المخزون'.tr,
+    NotificationType.newInquiry => 'الاستفسارات'.tr,
+    NotificationType.newRating => 'التقييمات'.tr,
+    NotificationType.other => 'عام'.tr,
+  };
+}
+
+/// The icon in the box at the start of a notification.
+String notificationIconAssetFor(NotificationType type) {
+  return switch (type) {
+    NotificationType.outOfStock || NotificationType.lowStock => 'assets/icons/order_icon.svg',
+    NotificationType.newInquiry => 'assets/icons/massage_icon.svg',
+    NotificationType.newRating || NotificationType.other => 'assets/icons/bell_icon.svg',
   };
 }

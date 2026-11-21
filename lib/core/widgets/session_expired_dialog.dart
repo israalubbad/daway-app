@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theming/app_colors.dart';
 import '../theming/app_text_styles.dart';
 
+import '../../core/localization/translations.dart';
+
 /// Blocking dialog telling the user their session ended. The only way out is
 /// the button, which the caller turns into "go to login".
 class SessionExpiredDialog extends StatelessWidget {
@@ -31,13 +33,13 @@ class SessionExpiredDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'انتهت الجلسة',
+                'انتهت الجلسة'.tr,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.confirmSheetTitle,
               ),
               SizedBox(height: 12.h),
               Text(
-                'انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى للمتابعة.',
+                'انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى للمتابعة.'.tr,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.confirmSheetMessage,
               ),
@@ -54,7 +56,7 @@ class SessionExpiredDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                   ),
-                  child: Text('إعادة تسجيل الدخول', style: AppTextStyles.sheetButtonLabel),
+                  child: Text('إعادة تسجيل الدخول'.tr, style: AppTextStyles.sheetButtonLabel),
                 ),
               ),
             ],

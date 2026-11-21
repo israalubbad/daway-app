@@ -1,3 +1,7 @@
+import '../../../../core/helpers/smart_date_formatter.dart';
+
+import '../../../../core/localization/translations.dart';
+
 /// How often a reminder repeats — replaces the old weekday-multi-select
 /// model (redesigned 2026-09-28: one reminder now fires at fixed times
 /// through every day instead of on chosen days of the week).
@@ -13,9 +17,9 @@ enum ReminderFrequency {
       };
 
   String get chipLabel => switch (this) {
-        ReminderFrequency.daily => 'كل يوم',
-        ReminderFrequency.every12Hours => 'كل 12 ساعة',
-        ReminderFrequency.every6Hours => 'كل 6 ساعة',
+        ReminderFrequency.daily => 'كل يوم'.tr,
+        ReminderFrequency.every12Hours => 'كل 12 ساعة'.tr,
+        ReminderFrequency.every6Hours => 'كل 6 ساعة'.tr,
       };
 }
 
@@ -38,19 +42,15 @@ class MedicineReminder {
     required this.minute,
   });
 
-  String get formattedTime {
-    final period = hour < 12 ? 'ص' : 'م';
-    final h = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-    return '$h:${minute.toString().padLeft(2, '0')} $period';
-  }
+  String get formattedTime => formatClockHourMinute(hour, minute);
 
   String get scheduleLabel => frequency.chipLabel;
 
   String get alertLabel => switch (frequency) {
-        ReminderFrequency.daily => 'تنبيه يومياً الساعة $formattedTime',
+        ReminderFrequency.daily => 'تنبيه يومياً الساعة {0}'.trArgs([formattedTime]),
         ReminderFrequency.every12Hours ||
         ReminderFrequency.every6Hours =>
-          'تنبيه ${frequency.chipLabel} بدءاً من $formattedTime',
+          'تنبيه {0} بدءاً من {1}'.trArgs([frequency.chipLabel, formattedTime]),
       };
 
   /// The clock times this reminder fires at, every day — [hour]/[minute]

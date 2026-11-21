@@ -19,8 +19,8 @@ class PharmacyRatingsRepositoryImpl implements PharmacyRatingsRepository {
   /// record is skipped rather than failing the whole list, same reasoning
   /// as PharmacyInquiriesRepositoryImpl.getInquiries.
   @override
-  Future<ApiResult<RatingsOverview>> getRatings({required String token}) async {
-    try {
+  Future<ApiResult<RatingsOverview>> getRatings({required String token}) {
+    return guardApi(() async {
       final response = await _remoteDataSource.getRatings(token: token);
       final body = response.data as Map<String, dynamic>;
       final ratingsJson = extractJsonList(
@@ -72,8 +72,6 @@ class PharmacyRatingsRepositoryImpl implements PharmacyRatingsRepository {
           starCounts: starCounts,
         ),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }

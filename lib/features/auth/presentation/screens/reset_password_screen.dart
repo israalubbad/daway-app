@@ -13,7 +13,9 @@ import '../widgets/auth_flow_header.dart';
 import '../widgets/password_reset_notice_listener.dart';
 import 'password_updated_screen.dart';
 
+import '../../../../core/localization/translations.dart';
 /// The third screen of resetting a password: choosing the new one.
+
 ///
 /// Expects the [PasswordResetCubit] of [ForgotPasswordScreen] above it. Going
 /// back from here takes the flow back to the code step; finishing replaces the
@@ -48,9 +50,9 @@ class ResetPasswordScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 32.h),
-                    const AuthFlowHeader(
-                      title: 'إعادة تعيين كلمة المرور',
-                      subtitle: 'أنشئ كلمة مرور جديدة لحماية حسابك.',
+                    AuthFlowHeader(
+                      title: 'إعادة تعيين كلمة المرور'.tr,
+                      subtitle: 'أنشئ كلمة مرور جديدة لحماية حسابك.'.tr,
                     ),
                     SizedBox(height: 22.h),
                     const _PasswordForm(),
@@ -127,14 +129,14 @@ class _PasswordFormState extends State<_PasswordForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AuthPasswordField(
-                  label: 'كلمة المرور',
+                  label: 'كلمة المرور'.tr,
                   controller: _passwordController,
                   textInputAction: TextInputAction.next,
                   hasError: hasError,
                 ),
                 SizedBox(height: 22.h),
                 AuthPasswordField(
-                  label: 'تأكيد كلمة المرور',
+                  label: 'تأكيد كلمة المرور'.tr,
                   controller: _confirmationController,
                   textInputAction: TextInputAction.done,
                   hasError: hasError,
@@ -143,7 +145,7 @@ class _PasswordFormState extends State<_PasswordForm> {
                   SizedBox(height: 8.h),
                   Text(
                     errorMessage,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: AppTextStyles.authFieldError,
                   ),
                 ],
@@ -156,7 +158,7 @@ class _PasswordFormState extends State<_PasswordForm> {
           selector: (state) => state.isBusy,
           builder: (context, isBusy) {
             return AppCustomButton(
-              text: 'تعيين كلمة المرور',
+              text: 'تعيين كلمة المرور'.tr,
               textStyle: AppTextStyles.authFlowButton,
               backgroundColor: AppColors.mainTeal,
               isLoading: isBusy,

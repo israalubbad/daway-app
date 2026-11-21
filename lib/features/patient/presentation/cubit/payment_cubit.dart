@@ -8,6 +8,8 @@ import '../../domain/entities/order.dart';
 import '../../domain/usecases/checkout_flow_usecases.dart';
 import 'payment_state.dart';
 
+import '../../../../core/localization/translations.dart';
+
 /// The payment of one order, across "طريقة الدفع" and "ارفع اشعار التحويل".
 class PaymentCubit extends Cubit<PaymentState> {
   final int orderId;
@@ -98,7 +100,7 @@ class PaymentCubit extends Cubit<PaymentState> {
     final current = state;
     if (current is! PaymentReady || current.isSubmitting) return null;
     final bank = current.selectedBank;
-    if (bank == null) return 'اختر طريقة الدفع أولاً';
+    if (bank == null) return 'اختر طريقة الدفع أولاً'.tr;
 
     return _run(
       current,
@@ -123,8 +125,7 @@ class PaymentCubit extends Cubit<PaymentState> {
     if (current is! PaymentReady || current.isSubmitting) return null;
 
     final message =
-        'تعذر رفع إشعار التحويل. بيانات التحويل: '
-        'البنك: $bankName، صاحب الحساب: $accountHolder، المبلغ: ${formatPrice(amount)}';
+        'تعذر رفع إشعار التحويل. بيانات التحويل: البنك: {0}، صاحب الحساب: {1}، المبلغ: {2}'.trArgs([bankName, accountHolder, formatPrice(amount)]);
     return _run(
       current,
       () => _reportProblemUseCase(orderId: orderId, message: message),

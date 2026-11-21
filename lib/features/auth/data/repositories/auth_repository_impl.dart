@@ -9,6 +9,8 @@ import '../datasources/auth_remote_data_source.dart';
 import '../models/patient_auth_response_model.dart';
 import '../models/pharmacy_auth_response_model.dart';
 
+import '../../../../core/localization/translations.dart';
+
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
 
@@ -19,8 +21,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phone,
     String? name,
     String? birthDate,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final age = birthDate == null ? null : ageFromBirthDate(birthDate);
       final response = (name != null && age != null)
           ? await _remoteDataSource.registerPatient(phone: phone, name: name, age: age)
@@ -29,17 +31,15 @@ class AuthRepositoryImpl implements AuthRepository {
       // Plain login for a phone with no account: the OTP would only lead to
       // a "no account" error after the code is typed, so stop here instead.
       if (name == null && data['is_registered'] == false) {
-        return const ApiError(
+        return ApiError(
           ApiFailure(
-            message: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد',
+            message: 'لا يوجد حساب بهذا الرقم، يرجى إنشاء حساب جديد'.tr,
             registrationRequired: true,
           ),
         );
       }
       return Success(data['otp'] as String?);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -51,8 +51,8 @@ class AuthRepositoryImpl implements AuthRepository {
     double? latitude,
     double? longitude,
     bool? notificationsEnabled,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.verifyOtp(
         phone: phone,
         otp: otp,
@@ -73,17 +73,15 @@ class AuthRepositoryImpl implements AuthRepository {
           userId: model.userId,
         ),
       );
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
   Future<ApiResult<PharmacyAuthResult>> pharmacyLogin({
     required String pharmacyId,
     required String password,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       final response = await _remoteDataSource.pharmacyLogin(
         pharmacyId: pharmacyId,
         password: password,
@@ -92,9 +90,7 @@ class AuthRepositoryImpl implements AuthRepository {
         response.data as Map<String, dynamic>,
       );
       return Success(PharmacyAuthResult(token: model.token, userId: model.userId));
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
@@ -103,8 +99,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phone,
     required String region,
     required String password,
-  }) async {
-    try {
+  }) {
+    return guardApi(() async {
       await _remoteDataSource.registerPharmacy(
         pharmacyName: pharmacyName,
         phone: phone,
@@ -112,18 +108,14 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 
   @override
-  Future<ApiResult<void>> logout({required String token}) async {
-    try {
+  Future<ApiResult<void>> logout({required String token}) {
+    return guardApi(() async {
       await _remoteDataSource.logout(token: token);
       return const Success(null);
-    } catch (e) {
-      return ApiError(mapExceptionToFailure(e));
-    }
+    });
   }
 }
