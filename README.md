@@ -1,294 +1,354 @@
-# دواك (Dawak) 💊
+# Dawak 💊 (دواك)
 
-**تطبيق جوال يربط المرضى بالصيدليات: ابحث عن دوائك، اعرف أي صيدلية عندها وبكم، واطلبه لحد البيت. والصيدلية تدير منتجاتها وطلباتها ومحاسبتها من نفس التطبيق.**
+**A mobile app that connects patients with pharmacies: find your medicine, see which pharmacy has it and for how much, and get it delivered. Pharmacies run their stock, orders, chat and accounting from the same app.**
 
-> *In English:* Dawak is a Flutter mobile app (Android / iOS) with two accounts in one: **patients** search for medicines, compare pharmacies and order with delivery; **pharmacies** manage stock, orders, chat and accounting. Clean Architecture, Cubit/Bloc, `get_it`, Dio. The UI is Arabic-first (RTL) with an English mode. Developer docs are in [section 5](#5-للمبرمجين).
+🌐 **[العربية](README.ar.md)** · English
 
-## المحتويات
+<p align="center">
+  <img src="docs/screenshots/01-choose-account.png" width="200" alt="Choose an account type">
+  <img src="docs/screenshots/02-patient-onboarding-1.png" width="200" alt="Patient onboarding">
+  <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="200" alt="Pharmacy onboarding">
+  <img src="docs/screenshots/09-pharmacy-onboarding-3.png" width="200" alt="Pharmacy chat">
+</p>
 
-1. [ما هو دواك؟](#1-ما-هو-دواك)
-2. [للمستخدم (المريض)](#2-للمستخدم-المريض)
-3. [للصيدلية (العميل)](#3-للصيدلية-العميل)
-4. [حالة المشروع: ما يشتغل وما هو قادم](#4-حالة-المشروع)
-5. [للمبرمجين](#5-للمبرمجين)
-   - [التقنيات](#51-التقنيات) · [المعمارية](#52-المعمارية) · [هيكل المجلدات](#53-هيكل-المجلدات) · [التشغيل](#54-التشغيل-لأول-مرة) · [الأوامر](#55-أوامر-مهمة) · [الباك إند](#56-الاتصال-بالباك-إند) · [الترجمة](#57-الترجمة) · [قواعد الكود](#58-قواعد-الكود) · [الاختبارات](#59-الاختبارات) · [الأمان](#510-الأمان) · [Git](#511-سير-العمل-مع-git) · [إضافة ميزة جديدة](#512-إضافة-ميزة-جديدة)
+## Contents
+
+1. [What is Dawak?](#1-what-is-dawak)
+2. [Screenshots](#2-screenshots)
+3. [For patients](#3-for-patients)
+4. [For pharmacies](#4-for-pharmacies-our-customers)
+5. [Project status](#5-project-status)
+6. [For developers](#6-for-developers)
+   - [Tech stack](#61-tech-stack) · [Architecture](#62-architecture) · [Folder structure](#63-folder-structure) · [Getting started](#64-getting-started) · [Commands](#65-useful-commands) · [Backend](#66-talking-to-the-backend) · [Localization](#67-localization) · [Code rules](#68-code-rules) · [Testing](#69-testing) · [Security](#610-security) · [Git workflow](#611-git-workflow) · [Adding a feature](#612-adding-a-feature)
 
 ---
 
-## 1) ما هو دواك؟
+## 1) What is Dawak?
 
-**المشكلة:** لما تحتاج دواء، بتلف على أكتر من صيدلية وبتتصل وتسأل «موجود عندكم؟»، وغالباً بتضيّع وقت. والصيدلية من جهتها بتدير مخزونها وطلباتها ورقياً أو بأدوات متفرقة.
+**The problem:** when you need a medicine you go from one pharmacy to the next, calling to ask "do you have it?", and lose time. Pharmacies, on their side, manage stock and orders on paper or with scattered tools.
 
-**الحل:** تطبيق واحد فيه حسابين:
+**The solution:** one app with two accounts.
 
-| الحساب | مين بيستخدمه | شو بيعمل فيه |
+| Account | Who uses it | What it does |
 |---|---|---|
-| **مستخدم** | المريض أو أي شخص بدو دواء | يبحث، يقارن الصيدليات، يطلب، يتابع طلبه |
-| **صيدلي** | صاحب الصيدلية أو موظفها | يدير المنتجات والمخزون والطلبات والمراسلات والمحاسبة |
+| **User** (patient) | Anyone who needs a medicine | Search, compare pharmacies, order, track the order |
+| **Pharmacist** | A pharmacy owner or staff | Manage products and stock, orders, chat and accounting |
 
-التطبيق يشتغل بالعربي (من اليمين لليسار) وفيه وضع إنجليزي من **الإعدادات ← اللغة**.
-
----
-
-## 2) للمستخدم (المريض)
-
-### كيف أبدأ؟
-1. افتح التطبيق واختر **مستخدم**.
-2. اكتب رقم جوالك (يبدأ بـ `05` ومن 10 أرقام) واطلب رمز التحقق، ثم أدخله.
-3. إذا كانت أول مرة، اكتب اسمك وتاريخ ميلادك ووافق على الشروط، ثم اسمح للتطبيق بالموقع (يساعدك تلاقي أقرب صيدلية) وبالإشعارات.
-
-### شو بقدر أعمل؟
-
-| الميزة | الوصف |
-|---|---|
-| **البحث** | اكتب اسم الدواء أو اكتب «بماذا تشعر». أو تصفح الأقسام: أدوية، العناية بالأسنان، الإسعافات الأولية، الأم والطفل، البشرة والجمال، مستلزمات طبية، العناية بالعين، الصحة والسلامة، فيتامينات ومكملات. وفي فلاتر حسب شكل الدواء. |
-| **صفحة الدواء** | بتشوف أي صيدليات عندها الدواء، والسعر في كل وحدة، وهل هي مفتوحة الآن، وكم تبعد عنك. |
-| **«نبّهني عند التوفر»** | إذا الدواء مش متوفر، التطبيق بيبلغك لما يتوفر. |
-| **اسأل الصيدلية** | تراسل الصيدلية وتسألها قبل ما تشتري. وتلاقي كل مراسلاتك في تاب **المراسلات**. |
-| **المفضلة** | احفظ الأدوية اللي بتحتاجها كتير. |
-| **الخريطة** | أقرب الصيدليات إليك، مع زر اتصال وزر اتجاهات. |
-| **السلة والطلب** | أضف الأدوية، اختر عنوان التوصيل، أدخل كود الخصم إذا عندك، وشوف سعر التوصيل والإجمالي **قبل** ما تأكد. (الطلب الواحد من صيدلية واحدة.) |
-| **الدفع** | تحويل بنكي: اختر البنك وارفع صورة إشعار التحويل. وإذا صار مشكلة بالرفع بتقدر تكتب بيانات التحويل بإيدك. |
-| **تتبع الطلب** | تأكيد ← قيد التجهيز ← في الطريق ← تم التسليم. وبعد التسليم بتقيّم الصيدلية. |
-| **تذكير الأدوية** | حدد اسم الدواء ووقته (يومياً، كل 12 ساعة، أو كل 6 ساعات) وبينبهك. |
-| **الملف الصحي** | فصيلة الدم، الحساسية، الأمراض المزمنة. بيساعد الصيدلي يقترح الأنسب لك. |
-| **المساعد الذكي** | اسأله عن أي دواء وبيدلك على الصيدليات المتوفر فيها. |
-| **حسابي** | العناوين، الإشعارات، الدعم الفني (واتساب أو اتصال)، الإعدادات. |
-
-### الخصوصية
-- من **الإعدادات** بتقدر تغير اللغة، وتتحكم بأذونات الموقع والإشعارات، وتقرأ سياسة الخصوصية والشروط.
-- **حذف الحساب** متاح من الإعدادات، وبيحذف حسابك وبياناتك نهائياً.
-
-### أسئلة شائعة
-- **ما وصلني رمز التحقق؟** تأكد من الرقم وجرب «إعادة إرسال الرمز» بعد انتهاء العد التنازلي.
-- **ليش ما بقدر أطلب من أكتر من صيدلية بطلب واحد؟** لأن الصيدليات ممكن تكون بعيدة عن بعض. التطبيق بيسألك تختار صيدلية وحدة وبيشيل الباقي من السلة.
-- **ليش سعر التوصيل تغيّر؟** السعر بيتحسب حسب عنوانك. إذا تغير قبل التأكيد، التطبيق بيعرض لك الإجمالي الجديد وبتأكد من جديد.
-
----
-
-## 3) للصيدلية (العميل)
-
-### كيف تنضم؟
-1. افتح التطبيق واختر **صيدلي ← إنشاء حساب**، واكتب اسم الصيدلية ورقم الجوال والعنوان (على الخريطة) وكلمة مرور (8 أحرف على الأقل).
-2. حسابك بيكون **قيد المراجعة** عند إدارة دواك.
-3. بعد الموافقة بتوصلك **معرّف الصيدلية** وكلمة المرور، وبتدخل فيهم من شاشة تسجيل الدخول.
-
-### شو تقدر تعمل؟
-
-| القسم | الوصف |
-|---|---|
-| **الرئيسية** | أرقامك بنظرة: إجمالي المنتجات، المبيعات الشهرية، المتوفر والمنخفض والنافد، تقييمك، وأحدث الطلبات. |
-| **المنتجات** | إضافة منتج وتعديله وحذفه، تعديل الكميات، البحث، وتصفية (متوفر / منخفض / نافد). |
-| **تحديث بملف Excel** | نزّل القالب، عبّي منتجاتك، ارفعه، وراجع النتيجة (محدّث / جديد / فيه أخطاء) قبل التطبيق. وبتقدر تصدّر منتجاتك الحالية. |
-| **الطلبات** | تفاصيل كل طلب: رقمه، اسم العميل، الأدوية بكميتها وسعرها، وحالة الدفع. العرض فقط؛ مراحل الطلب بتتحرك من إدارة دواك. |
-| **المراسلات** | رد على أسئلة المرضى (نص وصور). |
-| **البدائل** | حدد بديلاً لدواء نافد بنفس المادة الفعالة. |
-| **التقييمات** | شوف آراء عملائك. |
-| **المحاسبة** | نظرة عامة، فواتير البيع (بيع جديد بالباركود، مشاركة الفاتورة PDF)، الإرجاعات، حركة الصندوق، وتحويل هاتفك لماسح باركود لشاشة البيع بالموقع. |
-| **الإعدادات** | بيانات الصيدلية، الموقع، ساعات العمل، تغيير كلمة المرور، اللغة، وطلب إغلاق الحساب. |
-
----
-
-## 4) حالة المشروع
-
-| الميزة | الحالة |
-|---|---|
-| حسابا المريض والصيدلية، الطلب والدفع بالتحويل، التتبع، المراسلات، المخزون، المحاسبة | ✅ شغالة |
-| الترجمة الإنجليزية (النصوص + أسماء الأقسام من الباك) | ✅ شغالة |
-| تاب **المسح الضوئي** عند المريض (تصوير العلبة أو الروشتة) | ⏳ «قريباً»: يحتاج API يستقبل الصورة ويرجّع المنتج |
-| إرسال الروشتة لأقرب صيدلية | ⏳ مش مبنية (الأجزاء الأساسية موجودة، والقرار مفتوح) |
-| «نسيت كلمة المرور» للصيدلية | ⏳ الشاشات جاهزة، والباك ما فيه الـ endpoints بعد |
-| تحريك حالة الطلب من الصيدلية (قبول/تجهيز) | ❌ مش موجود حالياً؛ تتحرك من الإدارة |
-| الدفع الإلكتروني | ❌ حالياً تحويل بنكي فقط |
-| رمز التحقق | ⚠️ الباك بيرجّعه والتطبيق بيعرضه على الشاشة **مؤقتاً** لحد ما يتفعّل الـ SMS |
-
----
-
-## 5) للمبرمجين
-
-### 5.1) التقنيات
-
-| المجال | الأداة |
-|---|---|
-| اللغة والإطار | Dart `^3.10.7`، Flutter (stable، جُرّب على 3.47) |
-| إدارة الحالة | `flutter_bloc` (**Cubit فقط**)، حالات `sealed class` |
-| الحقن | `get_it` (ملف واحد: `lib/core/di/dependency_injection.dart`) |
-| الشبكة | `dio` مع interceptors (انتهاء الجلسة، كاش الردود) |
-| التخزين | `flutter_secure_storage` (التوكن)، `shared_preferences` (اللغة) |
-| الخرائط والموقع | `google_maps_flutter`، `geolocator`، `geocoding` |
-| الإشعارات | `firebase_messaging`، `flutter_local_notifications` (التذكيرات) |
-| الصور | `cached_network_image` + Cloudinary (رفع بدون توقيع) |
-| الملفات | `file_picker`، `excel`، `pdf` (+ خط Tajawal مدمج)، `share_plus` |
-| الباركود | `mobile_scanner` |
-| الواجهة | `flutter_screenutil` (تصميم 440×956)، `flutter_svg`، `google_fonts` |
-
-> **بدون توليد كود:** لا Freezed ولا build_runner. نستخدم `sealed class` و`switch` و records.
-
-### 5.2) المعمارية
-
-Clean Architecture، والاعتماد باتجاه واحد فقط:
-
-```
-presentation  →  domain  ←  data
-(شاشات + Cubit)   (منطق)     (API + تخزين)
+```mermaid
+flowchart LR
+    A[Choose account] --> B[Short onboarding]
+    B --> C{Account}
+    C -->|User| D[Sign in with phone + code]
+    C -->|Pharmacist| E[Sign in with pharmacy ID + password]
+    D --> F[Patient home:<br/>search, cart, orders, chat]
+    E --> G[Pharmacy home:<br/>products, orders, chat, accounting]
 ```
 
-| الطبقة | فيها | قواعد |
+The app is **Arabic-first (right-to-left)** and has an **English mode** (Settings → Language).
+
+---
+
+## 2) Screenshots
+
+Taken from the real release build running on an Android emulator (Pixel 9). The pictures inside the pharmacy onboarding are drawn with the app's own widgets (and animate: a finger taps the products card, order cards slide in, chat messages arrive one by one).
+
+**Getting in**
+
+| Choose an account | Patient sign in | Pharmacy sign in | Pharmacy sign up |
+|:--:|:--:|:--:|:--:|
+| <img src="docs/screenshots/01-choose-account.png" width="190"> | <img src="docs/screenshots/05-patient-login.png" width="190"> | <img src="docs/screenshots/10-pharmacy-login.png" width="190"> | <img src="docs/screenshots/11-pharmacy-sign-up.png" width="190"> |
+
+**Patient onboarding**
+
+| Search or scan | Compare pharmacies | Order from several pharmacies |
+|:--:|:--:|:--:|
+| <img src="docs/screenshots/02-patient-onboarding-1.png" width="200"> | <img src="docs/screenshots/03-patient-onboarding-2.png" width="200"> | <img src="docs/screenshots/04-patient-onboarding-3.png" width="200"> |
+
+**Pharmacy onboarding**
+
+| Control your products | Receive orders | Talk to customers |
+|:--:|:--:|:--:|
+| <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="200"> | <img src="docs/screenshots/08-pharmacy-onboarding-2.png" width="200"> | <img src="docs/screenshots/09-pharmacy-onboarding-3.png" width="200"> |
+
+---
+
+## 3) For patients
+
+### Getting started
+1. Open the app and choose **User**.
+2. Enter your mobile number (starts with `05`, 10 digits) and the verification code.
+3. First time? Enter your name and date of birth, accept the terms, then allow location (to find the nearest pharmacies) and notifications.
+
+### What can I do?
+
+| Feature | What it does |
+|---|---|
+| **Search** | Type a medicine name, or type "what do you feel". Or browse categories: Medicines, Dental Care, First Aid, Mother & Baby, Skin Care & Beauty, Medical Supplies, Eye Care, Health & Safety, Vitamins & Supplements. Filter by medicine form. |
+| **Medicine page** | Which pharmacies have it, the price at each, whether they are open now, how far they are. |
+| **"Notify me when available"** | If it is out of stock, the app tells you when it is back. |
+| **Ask the pharmacy** | Message a pharmacy before you buy. All your conversations are in the **Messages** tab. |
+| **Favorites** | Save the medicines you need often. |
+| **Map** | The nearest pharmacies, with call and directions buttons. |
+| **Cart and checkout** | Add medicines, choose a delivery address, enter a discount code, and see the delivery price and total **before** you confirm. One pharmacy per order. |
+| **Payment** | Bank transfer: pick the bank and upload a photo of the transfer receipt (or type the transfer details if the upload fails). |
+| **Order tracking** | Confirmed → preparing → on the way → delivered. After delivery you can rate the pharmacy. |
+| **Medicine reminders** | Set a medicine and a time (daily, every 12 h, or every 6 h) and get notified. |
+| **Health profile** | Blood type, allergies, chronic conditions, to help the pharmacist suggest the right medicine. |
+| **Smart assistant** | Ask about any medicine and it points you to the pharmacies that have it. |
+| **My account** | Addresses, notifications, support (WhatsApp or call), settings. |
+
+### Privacy
+- In **Settings** you can change the language, control location and notification permissions, and read the privacy policy and terms.
+- **Delete account** is in Settings and removes your account and data permanently.
+
+### FAQ
+- **I did not get the code.** Check the number and use "Resend code" when the countdown ends.
+- **Why can't I order from two pharmacies at once?** Pharmacies can be far from each other. The app asks you to pick one and removes the rest from the cart.
+- **Why did the delivery price change?** It is calculated from your address. If it changes before you confirm, the app shows the new total and asks you to confirm again.
+
+---
+
+## 4) For pharmacies (our customers)
+
+### How to join
+1. Choose **Pharmacist → Create account** and enter the pharmacy name, phone, address (on the map) and a password (8+ characters).
+2. Your account is **under review** by the Dawak team.
+3. Once approved you receive your **pharmacy ID** and password and sign in with them.
+
+### What can I do?
+
+| Section | What it does |
+|---|---|
+| **Home** | Your numbers at a glance: total products, monthly sales, in stock / low / out, your rating, and the latest orders. |
+| **Products** | Add, edit and delete products, change quantities, search and filter (in stock / low / out). |
+| **Excel update** | Download the template, fill in your products, upload it and review the result (updated / new / with errors) before applying. You can also export your current products. |
+| **Orders** | Each order's details: number, customer, medicines with quantity and price, and payment status. View only: order stages are moved by the Dawak team. |
+| **Messages** | Answer patients' questions (text and photos). |
+| **Alternatives** | Set an alternative with the same active ingredient for a medicine that is out of stock. |
+| **Ratings** | See what customers say about you. |
+| **Accounting** | Overview, sales invoices (new sale by barcode, share the invoice as PDF), returns, cash drawer, and use your phone as a barcode scanner for the website's sales screen. |
+| **Settings** | Pharmacy details, location, working hours, change password, language, and request account closure. |
+
+---
+
+## 5) Project status
+
+| Feature | Status |
+|---|---|
+| Patient and pharmacy accounts, ordering and bank-transfer payment, tracking, chat, stock, accounting | ✅ Working |
+| English mode (texts, plus category names from the backend) | ✅ Working |
+| **Scan** tab for patients (photograph a box or prescription) | ⏳ "Coming soon": needs an API that takes the picture and returns the product |
+| Sending a prescription to the nearest pharmacy | ⏳ Not built (the building blocks exist, the design decision is open) |
+| "Forgot password" for pharmacies | ⏳ Screens are ready, the backend has no endpoints yet |
+| Moving an order's status from the pharmacy (accept / prepare) | ❌ Not available; the Dawak team moves it |
+| Online card payment | ❌ Bank transfer only for now |
+| Verification code | ⚠️ The backend returns it and the app shows it on screen **temporarily**, until SMS is live |
+
+---
+
+## 6) For developers
+
+### 6.1) Tech stack
+
+| Area | Tool |
+|---|---|
+| Language and framework | Dart `^3.10.7`, Flutter (stable, tested on 3.47) |
+| State management | `flutter_bloc` (**Cubit only**), `sealed class` states |
+| Dependency injection | `get_it` (one file: `lib/core/di/dependency_injection.dart`) |
+| Networking | `dio` with interceptors (session expiry, response cache) |
+| Storage | `flutter_secure_storage` (token, reminders), `shared_preferences` (language) |
+| Maps and location | `google_maps_flutter`, `geolocator`, `geocoding` |
+| Notifications | `firebase_messaging`, `flutter_local_notifications` (reminders) |
+| Images | `cached_network_image` + Cloudinary (unsigned upload) |
+| Files | `file_picker`, `excel`, `pdf` (Tajawal font embedded), `share_plus` |
+| Barcode | `mobile_scanner` |
+| UI | `flutter_screenutil` (design 440×956), `flutter_svg`, `google_fonts` |
+
+> **No code generation:** no Freezed, no build_runner. We use `sealed class`, `switch` expressions and records.
+
+### 6.2) Architecture
+
+Clean Architecture; dependencies point one way only.
+
+```mermaid
+flowchart LR
+    P["presentation<br/>screens, widgets, Cubits"] --> D["domain<br/>entities, use cases,<br/>repository interfaces"]
+    DA["data<br/>datasources (Dio), models,<br/>repository implementations"] --> D
+    DA --> API[(Backend API)]
+```
+
+| Layer | Contains | Rules |
 |---|---|---|
-| `presentation` | الشاشات، الـ widgets، الـ Cubits وحالاتها | لا منطق عمل. الـ Cubit بيعتمد على **الـ use cases فقط** (مش على الريبوزيتوري) |
-| `domain` | الـ entities، واجهات الريبوزيتوري، الـ use cases | **Dart صرف** بدون أي `package:flutter` |
-| `data` | الـ datasources (Dio)، الـ models (JSON)، تنفيذ الريبوزيتوري | بيلتقط الاستثناءات ويحوّلها إلى `Failure` |
+| `presentation` | Screens, widgets, Cubits and their states | No business logic. A Cubit depends on **use cases only**, never on repositories |
+| `domain` | Entities, repository interfaces, use cases | **Pure Dart**, no `package:flutter` |
+| `data` | Datasources, JSON models, repository implementations | Catches exceptions and maps them to typed `Failure`s |
 
-مسار الأخطاء: `data` يلتقط ← `ApiResult<T>` (`Success` / `ApiError`) ← الـ use case ← الـ Cubit ← رسالة للمستخدم.
+Error path: `data` catches → `ApiResult<T>` (`Success` / `ApiError`) → use case → Cubit → a friendly message in the UI.
 
-### 5.3) هيكل المجلدات
+### 6.3) Folder structure
 
 ```
 lib/
-├─ main.dart            نقطة البداية (Firebase، .env، DI، اللغة المحفوظة)
-├─ app.dart             MaterialApp + اللغة والاتجاه
-├─ core/                المشترك بين الميزات
-│  ├─ constants/        مسارات الـ API وثوابت التطبيق
-│  ├─ di/               تسجيل get_it
-│  ├─ erroring/         Failure و mapExceptionToFailure و guardApi
-│  ├─ helpers/          دوال مساعدة (تواريخ، أسعار، JSON، ...)
-│  ├─ localization/     نظام الترجمة (.tr) وجداول الإنجليزي
-│  ├─ networking/       Dio + كاش الردود + اعتراض انتهاء الجلسة
-│  ├─ routing/          الراوتر وأسماء الشاشات
-│  ├─ services/         الإشعارات المحلية والـ push
-│  ├─ theming/          الألوان والخطوط والستايلات
-│  └─ widgets/          widgets مشتركة
+├─ main.dart            entry point (Firebase, .env, DI, saved language)
+├─ app.dart             MaterialApp, locale and direction
+├─ core/                shared by all features
+│  ├─ constants/        API paths and app constants
+│  ├─ di/               get_it registration
+│  ├─ erroring/         Failure, mapExceptionToFailure, guardApi
+│  ├─ helpers/          small helpers (dates, prices, JSON, ...)
+│  ├─ localization/     the .tr system and the English tables
+│  ├─ networking/       Dio, response cache, session-expiry interceptor
+│  ├─ routing/          router and screen names
+│  ├─ services/         local notifications and push
+│  ├─ theming/          colors, fonts, text styles
+│  └─ widgets/          shared widgets
 └─ features/
-   ├─ auth/             الدخول، التسجيل، OTP، الجلسة، إغلاق الحساب
-   ├─ patient/          كل ما يخص المريض
-   ├─ pharmacy/         كل ما يخص الصيدلية
-   ├─ accounting/       المحاسبة (للصيدلية)
-   ├─ chat/             المراسلات والمساعد الذكي
-   ├─ scanner/          ربط الهاتف كماسح باركود
-   ├─ onboarding/       شاشات التعريف
-   └─ localization/     حفظ اللغة المختارة
+   ├─ auth/             sign in, sign up, OTP, session, account closure
+   ├─ patient/          everything for the patient
+   ├─ pharmacy/         everything for the pharmacy
+   ├─ accounting/       accounting (pharmacy)
+   ├─ chat/             conversations and the smart assistant
+   ├─ scanner/          pairing a phone as a barcode scanner
+   ├─ onboarding/       intro screens
+   └─ localization/     saving the chosen language
 
-كل ميزة:  data/{datasources,models,repositories}
-          domain/{entities,repositories,usecases}
-          presentation/{cubit,screens,widgets,helpers}
+each feature:  data/{datasources,models,repositories}
+               domain/{entities,repositories,usecases}
+               presentation/{cubit,screens,widgets,helpers}
 
-test/                   نفس بنية lib، و helpers/ فيه أدوات مشتركة للاختبارات
+test/                   mirrors lib; test/helpers has shared test tools
 ```
 
-### 5.4) التشغيل لأول مرة
+The router is `lib/core/routing/app_router.dart` and the screen names are in `routes.dart`. Routes are unnamed (`settings.name` is null), so navigate structurally.
 
-**المتطلبات:** Flutter stable، Android Studio (SDK)، JDK 17.
+### 6.4) Getting started
+
+**Requirements:** Flutter (stable), Android Studio with the Android SDK, JDK 17.
 
 ```bash
 git clone https://github.com/daway-app/daway-mobile.git
 cd daway-mobile
-cp .env.example .env          # ثم عدّل القيم (انظر الجدول)
+cp .env.example .env          # then edit the values (see the table)
 flutter pub get
 flutter run
 ```
 
-| الملف | المحتوى | ملاحظة |
+| File | Content | Note |
 |---|---|---|
-| `.env` | `API_BASE_URL` (ينتهي بـ `/api`)، `CLOUDINARY_CLOUD_NAME`، `CLOUDINARY_UPLOAD_PRESET`، `CLOUDINARY_DEFAULT_AVATAR_URL` | **ما بيتتبع بـ git**. وينحزم داخل التطبيق، فلا تحط فيه أسراراً |
-| `android/local.properties` | `MAPS_API_KEY=...` | مفتاح Google Maps. ما بيتتبع بـ git. قيّده بالـ package والـ SHA-1 |
-| `android/app/google-services.json` | إعداد Firebase | موجود بالمشروع |
+| `.env` | `API_BASE_URL` (ends with `/api`), `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_UPLOAD_PRESET`, `CLOUDINARY_DEFAULT_AVATAR_URL` | **Not tracked by git.** It is bundled into the app, so never put secrets in it |
+| `android/local.properties` | `MAPS_API_KEY=...` | Google Maps key. Not tracked. Restrict it by package name and SHA-1 |
+| `android/app/google-services.json` | Firebase config | Already in the repo |
 
-### 5.5) أوامر مهمة
+### 6.5) Useful commands
 
 ```bash
-flutter analyze                 # لازم يطلع "No issues found"
-flutter test                    # كل الاختبارات (~1600)
-flutter test test/features/patient          # مجلد واحد
+flutter analyze                 # must say "No issues found"
+flutter test                    # all tests (~1600)
+flutter test test/features/patient          # one folder
 
-# رؤية شاشات المحاسبة ببيانات تجريبية بدون باك
+# see the accounting screens with sample data, no backend needed
 flutter run --dart-define=ACCOUNTING_SAMPLE=true
 
-# نسخة ريليز صغيرة (arm64 فقط، مشفّرة): حوالي 38 ميغا
+# small release build (arm64 only, obfuscated): about 38 MB
 flutter build apk --release --target-platform android-arm64 --split-per-abi \
   --obfuscate --split-debug-info=build/symbols
 
-# أيقونة التطبيق وشاشة البداية
+# app icon and splash screen
 dart run flutter_launcher_icons
 dart run flutter_native_splash:create
 ```
 
-- **توقيع الريليز:** انسخ `android/key.properties.example` إلى `android/key.properties` واملأه (والـ keystore **خارج** المشروع). بدونه الريليز بيتوقّع بمفتاح debug، ومش للنشر.
-- احفظ مجلد `build/symbols` مع كل نسخة مشفّرة، تحتاجه لقراءة تتبع الأخطاء.
+- **Release signing:** copy `android/key.properties.example` to `android/key.properties` and fill it in (keep the keystore **outside** the repo). Without it the release build is signed with the debug key and is not for publishing.
+- Keep `build/symbols` with every obfuscated build; you need it to read stack traces.
 
-### 5.6) الاتصال بالباك إند
+### 6.6) Talking to the backend
 
-- **العنوان:** `API_BASE_URL` من `.env`. كل المسارات في `lib/core/constants/api_constants.dart`.
-- **المصادقة:** `Authorization: Bearer <token>`. التوكن بالـ secure storage وبينمسح عند الخروج.
-- **شكل الرد:** `{ success, message, data, pagination? }`. القوائم بصفحات من 20 (الحجم ثابت من الباك).
-- **الأخطاء:** `mapExceptionToFailure` بتحول الاستثناء لـ `Failure`. رسالة السيرفر بتنعرض لأخطاء 4xx فقط، ولأخطاء 5xx بتنعرض رسالة التطبيق.
-- **انتهاء الجلسة:** أي 401 على طلب فيه توكن بيمسح الجلسة، وبيعرض حوار، وبيرجّع المستخدم لشاشة اختيار الحساب.
-- **الكاش:** `ResponseCacheInterceptor` بيحفظ ردود GET لمسارات محددة (حد أقصى 2 ميغا، 40 ملف، وبيتمسح مع الجلسة). الأقسام تُعرض من الكاش ساعة، والأدوية دقيقتين، وقوائم المستخدم بتنجلب دائماً وبتُستخدم من الكاش فقط بلا إنترنت.
-- **الطلب والدفع:** يحسب الباك السعر والتوصيل. التطبيق بيطلب `POST /patient/checkout/quote` ثم بيرسل `quoted_*` مع `idempotency_key`؛ و`409 quote_changed` بيعيد التسعير.
-- **مراحل الطلب وما يتوقعه التطبيق من الباك:** [BACKEND_ORDER_FLOW.md](BACKEND_ORDER_FLOW.md).
+- **Base URL:** `API_BASE_URL` from `.env`. All paths live in `lib/core/constants/api_constants.dart`.
+- **Auth:** `Authorization: Bearer <token>`. The token is in secure storage and is cleared on logout.
+- **Response shape:** `{ success, message, data, pagination? }`. Lists come in pages of 20 (fixed by the backend).
+- **Errors:** `mapExceptionToFailure` turns an exception into a `Failure`. The server's own message is shown for 4xx only; for 5xx the app's own wording is shown.
+- **Session expiry:** any 401 on a request that carried a token clears the session, shows a dialog and returns to the account chooser.
+- **Cache:** `ResponseCacheInterceptor` keeps GET answers of chosen routes (max 2 MB / 40 files, cleared with the session). Categories are served from cache for an hour, medicines for two minutes; the user's own lists are always fetched and only fall back to the cache offline.
+- **Order and payment:** the backend computes price and delivery. The app calls `POST /patient/checkout/quote`, then sends `quoted_*` fields with an `idempotency_key`; `409 quote_changed` triggers a re-quote.
 
-### 5.7) الترجمة
-
-الأساس عربي، والإنجليزي جدول مفاتيحه هي النص العربي نفسه:
-
-```dart
-Text('إتمام الطلب'.tr)                       // نص ثابت
-Text('طلب رقم {0}'.trArgs([order.number]))   // نص فيه قيمة
+```mermaid
+stateDiagram-v2
+    [*] --> pending: patient checks out
+    pending --> awaiting_payment: admin sets delivery price and approves
+    awaiting_payment --> payment_under_review: patient uploads the receipt
+    payment_under_review --> confirmed: admin approves the payment
+    confirmed --> preparing: pharmacy starts preparing
+    preparing --> out_for_delivery
+    out_for_delivery --> delivered
+    pending --> cancelled
+    awaiting_payment --> cancelled
 ```
 
-- الجدول في `lib/core/localization/en/*.dart`. نص بدون ترجمة بيظهر بالعربي (ما بيطلع فاضي).
-- اختبار `test/core/localization/translations_test.dart` **بيفشل** إذا في نص `.tr` بدون ترجمة.
-- لا تحط `const` حول `.tr`. والثوابت اللي فيها نصوص تكون `getter`.
-- لا تستخدم `.tr` على نص بينرسل للباك أو بتقارن فيه.
-- اتجاه التخطيط تلقائي: استخدم `start/end` و`EdgeInsetsDirectional` و`AlignmentDirectional`، ولا تستخدم `left/right`. والأيقونات الاتجاهية (السهم، الرجوع) تلفها بـ `MirrorWhenLtr`.
-- أسماء الأقسام بتجي من الباك (`name_ar` / `name_en`) وبتُعرض عبر `.name`.
+The stages the app expects from the backend are described in [BACKEND_ORDER_FLOW.md](BACKEND_ORDER_FLOW.md) (in Arabic).
 
-### 5.8) قواعد الكود
+### 6.7) Localization
 
-1. **أصغر تغيير يحل المشكلة**، وحل السبب مش العرض.
-2. **الـ domain نقي:** ممنوع `package:flutter` تحت `domain/`.
-3. **أي كود بيتكرر بمكانين** مكانه `core/`. ابحث فيه قبل ما تكتب شي جديد.
-4. **استخدم الأدوات المشتركة بدل ما تعيد كتابتها:**
-   - `withSessionToken` / `withSession` (use cases): `lib/features/auth/domain/usecases/with_session_token.dart`
-   - `guardApi` (ريبوزيتوري): `lib/core/erroring/error_handler.dart`
-   - `authFieldDecoration()` لحقول الدخول، و`AccountingStyles.inputDecoration()` لحقول المحاسبة
-   - `networkImage(url)` للصور (كاش على القرص)، و`formatPrice` للأسعار
-5. **الـ build:** `const` قدر الإمكان، وما تنشئ controllers داخل `build()`، وتخلص منها في `dispose()`.
-6. **`setState`** للحالة المحلية للواجهة فقط (تبديل، تركيز)، وتكون بأصغر widget.
-7. **الأمان:** لا أسرار بالكود، لا تسجّل بيانات حساسة، تحقق من كل مدخل خارجي.
+Arabic is the base; English is a table keyed by the Arabic text itself.
 
-### 5.9) الاختبارات
+```dart
+Text('إتمام الطلب'.tr)                        // a fixed text
+Text('طلب رقم {0}'.trArgs([order.number]))    // a text with a value
+```
 
-- حوالي **243 ملف** و**1600+ اختبار**. الـ domain والـ data إلزامي، وأي إصلاح bug معه اختبار يعيد المشكلة.
-- اختبار واحد = سلوك واحد، وبدون تأخيرات أو اعتماد على الوقت.
-- أدوات مشتركة بـ `test/helpers/`: `InMemorySessionRepository` (جلسة بالذاكرة)، و`buildArabicTestApp` (تطبيق اختبار RTL بأبعاد التصميم).
-- شاشات بتستخدم `get_it`: سجّل الـ fakes بـ `setUp` و`getIt.reset()` بـ `tearDown`.
-- حالات فيها `CircularProgressIndicator` ما تنفع معها `pumpAndSettle`، استخدم `pump(Duration)`.
+- Tables are in `lib/core/localization/en/*.dart`. A text with no translation shows in Arabic (never blank).
+- `test/core/localization/translations_test.dart` **fails** if a `.tr` text has no English entry.
+- Do not put `const` around `.tr`; constants that hold texts must be getters.
+- Never use `.tr` on a text that is sent to the backend or compared against.
+- Layout direction is automatic: use `start`/`end`, `EdgeInsetsDirectional` and `AlignmentDirectional`, never `left`/`right`. Wrap direction-sensitive icons (arrows, back) in `MirrorWhenLtr`.
+- Category names come from the backend (`name_ar` / `name_en`) and are shown through `.name`.
 
-### 5.10) الأمان
+### 6.8) Code rules
 
-- ملفات `.env` و`local.properties` و`key.properties` والـ keystore خارج git.
-- النسخ الاحتياطي معطّل (`allowBackup=false`) والـ cleartext ممنوع.
-- التذكيرات (أسماء أدوية) محفوظة بالـ secure storage.
-- **معروف ومؤقت:** عرض رمز التحقق على الشاشة (`otp_verification_form.dart`)، يُحذف عند تفعيل الـ SMS.
-- **توصيات مفتوحة:** تقييد مفتاح Maps و preset الـ Cloudinary، رفع صور المراسلات على الباك بدل رابط عام، وحدّ محاولات `/otp/send` و`/login/pharmacy` من جهة الباك.
+1. **The smallest change that solves the problem**, and fix causes, not symptoms.
+2. **Pure domain:** no `package:flutter` under `domain/`.
+3. **Code used in two places belongs in `core/`.** Search it before writing anything new.
+4. **Use the shared tools instead of rewriting the pattern:**
+   - `withSessionToken` / `withSession` for use cases: `lib/features/auth/domain/usecases/with_session_token.dart`
+   - `guardApi` for repositories: `lib/core/erroring/error_handler.dart`
+   - `authFieldDecoration()` for sign-in fields, `AccountingStyles.inputDecoration()` for accounting fields
+   - `networkImage(url)` for pictures (disk cache), `formatPrice` for prices
+5. **Build methods:** `const` where possible, never create controllers inside `build()`, dispose them in `dispose()`.
+6. **`setState`** only for local UI state (toggles, focus), in the smallest widget.
+7. **Security:** no secrets in code, no sensitive logging, validate every external input.
 
-### 5.11) سير العمل مع Git
+### 6.9) Testing
 
-- **الفروع:** `feature/...` للميزات، `fix/...` للإصلاحات، `refactor/...` للتنظيف. الأساس `develop`.
-- **الـ CI** (`.github/workflows/dart.yml`): `flutter analyze` ثم `flutter test` على كل push و PR على `develop`.
-- قبل الدمج: `flutter analyze` و`flutter test` نظيفين، ومراجعة الكود، ووصف الـ PR بملف `.md`.
+- About **243 files** and **1600+ tests**. Domain and data tests are mandatory, and a bug fix comes with a test that reproduces it.
+- One behavior per test; nothing flaky or time-dependent.
+- Shared tools in `test/helpers/`: `InMemorySessionRepository` (an in-memory session) and `buildArabicTestApp` (an RTL test app at the design size).
+- Screens that use `get_it`: register fakes in `setUp` and call `getIt.reset()` in `tearDown`.
+- A screen with a `CircularProgressIndicator` cannot use `pumpAndSettle`; use `pump(Duration)`.
 
-### 5.12) إضافة ميزة جديدة
+### 6.10) Security
 
-1. أنشئ `features/<name>/{data,domain,presentation}`.
-2. **domain:** الـ entity، واجهة الريبوزيتوري، والـ use case (بـ `withSessionToken`).
-3. **data:** الـ datasource (Dio)، الـ model، والريبوزيتوري (بـ `guardApi`). وأضف المسار في `api_constants.dart`.
-4. **presentation:** الـ Cubit (بيعتمد على الـ use cases فقط) مع `sealed` states، ثم الشاشة. وسجّل الشاشة بالـ `AppRouter`.
-5. **سجّل كل شي** في `core/di/dependency_injection.dart`.
-6. **النصوص:** اكتبها بالعربي مع `.tr`، وأضف الإنجليزي في `core/localization/en/`.
-7. **الاختبارات:** للـ use case والريبوزيتوري والـ Cubit، وللشاشة إذا فيها سلوك.
-8. شغّل `flutter analyze` و`flutter test`.
+- `.env`, `local.properties`, `key.properties` and the keystore are outside git.
+- App backup is disabled (`allowBackup=false`) and cleartext traffic is blocked.
+- Reminders (medicine names) are kept in secure storage.
+- **Known and temporary:** the verification code is shown on screen (`otp_verification_form.dart`); remove it when SMS is live.
+- **Open recommendations:** restrict the Maps key and the Cloudinary preset, upload chat pictures through the backend instead of a public link, and rate-limit `/otp/send` and `/login/pharmacy` on the backend.
+
+### 6.11) Git workflow
+
+- **Branches:** `feature/...`, `fix/...`, `refactor/...`, `docs/...`. The base is `develop`.
+- **CI** (`.github/workflows/dart.yml`): `flutter analyze` then `flutter test` on every push and pull request to `develop`.
+- Before merging: clean `flutter analyze` and `flutter test`, a code review, and a Markdown PR description.
+
+### 6.12) Adding a feature
+
+1. Create `features/<name>/{data,domain,presentation}`.
+2. **domain:** the entity, the repository interface and the use case (with `withSessionToken`).
+3. **data:** the datasource (Dio), the model and the repository (with `guardApi`). Add the path to `api_constants.dart`.
+4. **presentation:** the Cubit (depending on use cases only) with `sealed` states, then the screen. Register the screen in `AppRouter`.
+5. **Register everything** in `core/di/dependency_injection.dart`.
+6. **Texts:** write them in Arabic with `.tr` and add the English in `core/localization/en/`.
+7. **Tests:** for the use case, the repository and the Cubit, and for the screen when it has behavior.
+8. Run `flutter analyze` and `flutter test`.
 
 ---
 
-**المستودع:** <https://github.com/daway-app/daway-mobile>
+**Repository:** <https://github.com/daway-app/daway-mobile>
