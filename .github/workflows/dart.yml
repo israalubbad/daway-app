@@ -19,9 +19,13 @@ jobs:
       - uses: actions/checkout@v4
 
       # 1. إعداد بيئة Flutter
+      # Pinned to the version the project is built and tested with. Newer stable
+      # releases deprecate package:flutter/material.dart, and `flutter analyze`
+      # fails on those infos until the code moves to package:material_ui.
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.47.x'
           cache: true
 
       # 2. تثبيت حزم Flutter
