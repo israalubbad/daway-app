@@ -26,12 +26,26 @@ From the release build on an Android emulator. The pictures inside the pharmacy 
 - Cart (one pharmacy per order), delivery price shown before confirming, bank-transfer payment with receipt upload, order tracking, pharmacy rating.
 - Settings: language, permissions, support, delete account.
 
+Key screens, from the Figma design the app follows:
+
+| Home | Categories | Choose a pharmacy | Cart |
+|:--:|:--:|:--:|:--:|
+| <img src="docs/design/patient-home.png" width="170"> | <img src="docs/design/patient-categories.png" width="170"> | <img src="docs/design/patient-medicine-pharmacies.png" width="170"> | <img src="docs/design/patient-cart.png" width="170"> |
+
+| Payment | Order tracking | Pharmacies map | Reminders |
+|:--:|:--:|:--:|:--:|
+| <img src="docs/design/patient-payment.png" width="170"> | <img src="docs/design/patient-order-tracking.png" width="170"> | <img src="docs/design/patient-map.png" width="170"> | <img src="docs/design/patient-reminders.png" width="170"> |
+
 **Pharmacies** (join by sign-up, then the Dawak team approves and sends the pharmacy ID and password)
 - Home with key numbers and the latest orders.
 - Products: add, edit, delete, change quantities, update from Excel, set alternatives for out-of-stock items.
 - Orders (view only), chat with patients, ratings.
 - Accounting: sales and PDF invoices, returns, cash drawer, phone as a barcode scanner.
 - Settings: details, location, working hours, password, account closure.
+
+| Home | Products | Orders | Ratings |
+|:--:|:--:|:--:|:--:|
+| <img src="docs/design/pharmacy-home.png" width="170"> | <img src="docs/design/pharmacy-products.png" width="170"> | <img src="docs/design/pharmacy-orders.png" width="170"> | <img src="docs/design/pharmacy-ratings.png" width="170"> |
 
 ## Status
 
