@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_parsing.dart';
 import '../../domain/entities/cart_item.dart';
 
 class CartItemModel {
@@ -20,20 +21,28 @@ class CartItemModel {
   /// The line's medicine can come from either the general catalog
   /// (`medicine`) or the MOH catalog (`moh_medicine`) depending on which one
   /// the pharmacy stocked it from — exactly one of the two is non-null.
+  ///
+  /// Numbers are read tolerantly (see [jsonDouble]): `price` arrives as a
+  /// string when the backend serialises a decimal column.
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
-    final medicine = json['medicine'] as Map<String, dynamic>?;
-    final mohMedicine = json['moh_medicine'] as Map<String, dynamic>?;
-    final name = medicine?['trade_name'] as String? ??
-        mohMedicine?['trade_name'] as String? ??
+    final medicine = jsonMap(json['medicine']);
+    final mohMedicine = jsonMap(json['moh_medicine']);
+    final pharmacy = jsonMap(json['pharmacy']);
+    final name = jsonString(medicine?['trade_name']) ??
+        jsonString(mohMedicine?['trade_name']) ??
+        jsonString(json['medicine_name']) ??
         '';
 
     return CartItemModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      pharmacyId: (json['pharmacy_id'] as num?)?.toInt() ?? 0,
-      pharmacyName: json['pharmacy_name'] as String? ?? '',
+      id: jsonInt(json['id']) ?? 0,
+      pharmacyId: jsonInt(json['pharmacy_id']) ?? jsonInt(pharmacy?['id']) ?? 0,
+      pharmacyName: jsonString(json['pharmacy_name']) ??
+          jsonString(pharmacy?['pharmacy_name']) ??
+          jsonString(pharmacy?['name']) ??
+          '',
       medicineName: name,
-      price: (json['price'] as num?)?.toDouble() ?? 0,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
+      price: jsonDouble(json['price']) ?? jsonDouble(json['unit_price']) ?? 0,
+      quantity: jsonInt(json['quantity']) ?? 1,
     );
   }
 

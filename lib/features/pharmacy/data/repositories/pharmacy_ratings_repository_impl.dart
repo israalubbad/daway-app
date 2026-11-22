@@ -6,6 +6,7 @@ import '../../domain/entities/rating.dart';
 import '../../domain/repositories/pharmacy_ratings_repository.dart';
 import '../datasources/pharmacy_ratings_remote_data_source.dart';
 import '../models/rating_model.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 class PharmacyRatingsRepositoryImpl implements PharmacyRatingsRepository {
   final PharmacyRatingsRemoteDataSource _remoteDataSource;
@@ -58,8 +59,8 @@ class PharmacyRatingsRepositoryImpl implements PharmacyRatingsRepository {
       // that list via the outer catch.
       int totalCount;
       try {
-        final pagination = body['pagination'] as Map<String, dynamic>?;
-        totalCount = (pagination?['total'] as num?)?.toInt() ?? ratings.length;
+        final pagination = jsonMap(body['pagination']);
+        totalCount = jsonInt(pagination?['total']) ?? ratings.length;
       } catch (_) {
         totalCount = ratings.length;
       }

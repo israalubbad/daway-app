@@ -103,6 +103,49 @@ void main() {
       expect((result as Success).data.single.medicineName, 'Adol');
     });
 
+    test('a cart whose prices and ids come as strings still loads', () async {
+      remoteDataSource.nextCartResponse = {
+        'success': true,
+        'data': {
+          'id': 1,
+          'items': [
+            {
+              'id': '7',
+              'pharmacy_id': '11',
+              'pharmacy_name': 'صيدلية النور',
+              'medicine': {'trade_name': 'Panadol'},
+              'quantity': '2',
+              'price': '18.00',
+              'total': '36.00',
+            },
+          ],
+          'subtotal': '36.00',
+        },
+      };
+
+      final result = await repository.getItems(token: 'tok');
+
+      final items = (result as Success).data;
+      expect(items.single.price, 18.0);
+      expect(items.single.lineTotal, 36.0);
+    });
+
+    test('a row that is not an object is skipped, the other lines still load', () async {
+      remoteDataSource.nextCartResponse = {
+        'success': true,
+        'data': {
+          'items': [
+            'garbage',
+            {'id': 7, 'quantity': 1, 'price': 10, 'medicine': {'trade_name': 'Adol'}},
+          ],
+        },
+      };
+
+      final result = await repository.getItems(token: 'tok');
+
+      expect((result as Success).data, hasLength(1));
+    });
+
     test('an empty cart is a valid, non-error result', () async {
       remoteDataSource.nextCartResponse = {
         'success': true,

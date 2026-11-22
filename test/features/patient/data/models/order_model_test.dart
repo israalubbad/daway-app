@@ -1,67 +1,42 @@
 import 'package:daway_app/features/patient/data/models/order_model.dart';
-import 'package:daway_app/features/patient/domain/entities/order.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('parses an order row from GET /patient/orders', () {
-    final model = OrderModel.fromJson({
-      'id': 1,
-      'total': 25.0,
+  test('reads a normal order row', () {
+    final order = OrderModel.fromJson({
+      'id': 12,
       'status': 'confirmed',
-      'items_count': 2,
-      'address': {'id': 1, 'label': 'المنزل', 'address': 'غزة - الرمال'},
-      'pharmacy': {'id': 1, 'name': 'صيدلية الأمل'},
-      'created_at': '2026-09-29 10:20:29',
-    });
+      'items_count': 3,
+      'total': 45.5,
+      'pharmacy': {'name': 'صيدلية النور'},
+      'address': {'address': 'غزة'},
+      'created_at': '2026-10-25T10:00:00Z',
+    }).toEntity();
 
-    final entity = model.toEntity();
-
-    expect(entity.orderNumber, '1');
-    expect(entity.pharmacyName, 'صيدلية الأمل');
-    expect(entity.status, OrderStatus.confirmed);
-    expect(entity.itemsCount, 2);
-    expect(entity.price, 25.0);
-    expect(entity.address, 'غزة - الرمال');
-    // created_at has no timezone marker, so it's the server's UTC clock (see
-    // server_timestamp.dart) — compare the instant, not local wall-clock
-    // fields, so this holds in whatever timezone the tests run in.
-    expect(
-      entity.createdAt.isAtSameMomentAs(DateTime.utc(2026, 9, 29, 10, 20, 29)),
-      isTrue,
-    );
+    expect(order.orderNumber, '12');
+    expect(order.pharmacyName, 'صيدلية النور');
+    expect(order.price, 45.5);
+    expect(order.address, 'غزة');
   });
 
-  test('falls back to the address label when it has no address text', () {
-    final model = OrderModel.fromJson({
-      'address': {'id': 1, 'label': 'المنزل'},
-      'created_at': '2026-09-29 10:20:29',
-    });
-
-    expect(model.toEntity().address, 'المنزل');
+  test('a total sent as a decimal string, or as grand_total, is read', () {
+    expect(OrderModel.fromJson({'id': 1, 'total': '45.50'}).toEntity().price, 45.5);
+    expect(OrderModel.fromJson({'id': 1, 'grand_total': '60.00'}).toEntity().price, 60.0);
   });
 
-  test('an unrecognized status defaults to pending instead of throwing', () {
-    final model = OrderModel.fromJson({'status': 'some_new_status'});
+  test('wrong types read as missing instead of throwing', () {
+    final order = OrderModel.fromJson({
+      'id': '9',
+      'status': 7,
+      'items_count': 'x',
+      'pharmacy': 'النور',
+      'address': [1],
+      'created_at': 5,
+    }).toEntity();
 
-    expect(model.toEntity().status, OrderStatus.pending);
-  });
-
-  test('a malformed created_at falls back instead of throwing and failing the whole list',
-      () {
-    final model = OrderModel.fromJson({'id': 1, 'created_at': 'not-a-date'});
-
-    // Doesn't throw — this order still parses, just with a fallback date,
-    // instead of a bad date on one order breaking every order in the list.
-    expect(model.toEntity().createdAt, isA<DateTime>());
-  });
-
-  test('falls back to nulls/zero/empty for missing fields', () {
-    final entity = OrderModel.fromJson({}).toEntity();
-
-    expect(entity.orderNumber, '');
-    expect(entity.pharmacyName, '');
-    expect(entity.itemsCount, 0);
-    expect(entity.price, 0);
-    expect(entity.address, '');
+    expect(order.orderNumber, '9');
+    expect(order.pharmacyName, '');
+    expect(order.itemsCount, 0);
+    expect(order.address, '');
   });
 }

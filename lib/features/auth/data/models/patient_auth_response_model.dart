@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_parsing.dart';
 class PatientAuthResponseModel {
   final String? token;
   final bool isNewAccount;
@@ -10,9 +11,9 @@ class PatientAuthResponseModel {
     final user = data['user'] as Map<String, dynamic>;
 
     return PatientAuthResponseModel(
-      token: data['token'] as String?,
-      isNewAccount: user['is_new'] as bool? ?? false,
-      userId: (user['id'] as num?)?.toInt(),
+      token: jsonString(data['token']),
+      isNewAccount: jsonBool(user['is_new']) ?? false,
+      userId: jsonInt(user['id']),
     );
   }
 }

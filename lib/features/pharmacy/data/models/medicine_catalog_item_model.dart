@@ -1,4 +1,5 @@
 import '../../domain/entities/medicine_catalog_item.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 class MedicineCatalogItemModel {
   final int id;
@@ -27,12 +28,12 @@ class MedicineCatalogItemModel {
 
   factory MedicineCatalogItemModel.fromJson(Map<String, dynamic> json) {
     return MedicineCatalogItemModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: json['name'] as String? ?? '',
-      nameAr: json['name_ar'] as String?,
-      activeIngredient: json['sub'] as String?,
-      imageUrl: json['image_url'] as String?,
-      type: json['type'] as String?,
+      id: jsonInt(json['id']) ?? 0,
+      name: jsonString(json['name']) ?? '',
+      nameAr: jsonString(json['name_ar']),
+      activeIngredient: jsonString(json['sub']),
+      imageUrl: jsonString(json['image_url']),
+      type: jsonString(json['type']),
     );
   }
 

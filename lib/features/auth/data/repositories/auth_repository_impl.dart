@@ -2,6 +2,7 @@ import '../../../../core/erroring/error_handler.dart';
 import '../../../../core/erroring/failure.dart';
 import '../../../../core/helpers/age_calculator.dart';
 import '../../../../core/helpers/api_result.dart';
+import '../../../../core/helpers/json_parsing.dart';
 import '../../domain/entities/patient_auth_result.dart';
 import '../../domain/entities/pharmacy_auth_result.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -38,7 +39,7 @@ class AuthRepositoryImpl implements AuthRepository {
           ),
         );
       }
-      return Success(data['otp'] as String?);
+      return Success(jsonString(data['otp']));
     });
   }
 

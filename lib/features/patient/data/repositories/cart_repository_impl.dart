@@ -20,7 +20,8 @@ class CartRepositoryImpl implements CartRepository {
         throw FormatException('Unexpected GET /patient/cart response shape: ${response.data}');
       }
       final items = itemsRaw
-          .map((json) => CartItemModel.fromJson(json as Map<String, dynamic>).toEntity())
+          .whereType<Map<String, dynamic>>()
+          .map((json) => CartItemModel.fromJson(json).toEntity())
           .toList();
       return Success(items);
     });

@@ -1,4 +1,5 @@
 import '../../../../core/helpers/server_timestamp.dart';
+import '../../../../core/helpers/json_parsing.dart';
 import '../../domain/entities/order.dart';
 
 class OrderModel {
@@ -23,18 +24,18 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    final pharmacy = json['pharmacy'] as Map<String, dynamic>?;
-    final address = json['address'] as Map<String, dynamic>?;
-    final createdAtRaw = json['created_at'] as String?;
+    final pharmacy = jsonMap(json['pharmacy']);
+    final address = jsonMap(json['address']);
+    final createdAtRaw = jsonString(json['created_at']);
 
     return OrderModel(
-      pharmacyId: (pharmacy?['id'] as num?)?.toInt() ?? (json['pharmacy_id'] as num?)?.toInt(),
-      orderNumber: (json['id'] as num?)?.toInt().toString() ?? '',
-      pharmacyName: pharmacy?['name'] as String? ?? '',
-      status: OrderStatus.fromApi(json['status'] as String? ?? ''),
-      itemsCount: (json['items_count'] as num?)?.toInt() ?? 0,
-      price: (json['total'] as num?)?.toDouble() ?? 0,
-      address: address?['address'] as String? ?? address?['label'] as String? ?? '',
+      pharmacyId: jsonInt(pharmacy?['id']) ?? jsonInt(json['pharmacy_id']),
+      orderNumber: jsonInt(json['id'])?.toString() ?? '',
+      pharmacyName: jsonString(pharmacy?['name']) ?? '',
+      status: OrderStatus.fromApi(jsonString(json['status']) ?? ''),
+      itemsCount: jsonInt(json['items_count']) ?? 0,
+      price: jsonDouble(json['total']) ?? jsonDouble(json['grand_total']) ?? 0,
+      address: jsonString(address?['address']) ?? jsonString(address?['label']) ?? '',
       createdAt: tryParseServerTimestamp(createdAtRaw) ?? DateTime.now(),
     );
   }

@@ -75,7 +75,7 @@ void main() {
   });
 
   test(
-    'a malformed record among otherwise-valid inquiries is skipped, not fatal',
+    'a record with no id among otherwise-valid inquiries is skipped, not fatal',
     () async {
       remoteDataSource.nextGetResponse = {
         'data': [
@@ -86,7 +86,7 @@ void main() {
             'created_at': '2026-08-22 16:32:25',
             'user': {'id': 36, 'name': 'أحمد'},
           },
-          {'id': 2, 'medicine': 'not-an-object'},
+          {'medicine': 'not-an-object'},
         ],
         'counts': {'new': 1, 'answered': 0, 'closed': 0},
       };

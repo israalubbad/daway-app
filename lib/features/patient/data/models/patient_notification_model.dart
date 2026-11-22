@@ -1,5 +1,6 @@
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/patient_notification.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 /// Parses one entry from `GET /notifications` — the same shape the pharmacy
 /// side confirmed live (`id`, `type`, `message`, `is_read`, `created_at`);
@@ -26,7 +27,7 @@ class PatientNotificationModel {
       // type should degrade to PatientNotificationType.other, not skip the
       // whole record over a display-only field.
       type: patientNotificationTypeFrom(json['type'] is String ? json['type'] as String : null),
-      message: json['message'] as String? ?? '',
+      message: jsonString(json['message']) ?? '',
       isRead: json['is_read'] == true || json['is_read'] == 1,
       // Required: the list is sorted newest-first by this, so a fallback like
       // DateTime.now() would wrongly float a corrupted record to the top.

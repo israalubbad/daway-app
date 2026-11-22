@@ -32,20 +32,20 @@ class MedicineModel {
   });
 
   factory MedicineModel.fromJson(Map<String, dynamic> json) {
-    final catalog = json['medicine'] as Map<String, dynamic>? ?? const {};
+    final catalog = jsonMap(json['medicine']) ?? const {};
 
     return MedicineModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      medicineId: (json['medicine_id'] as num?)?.toInt() ?? (catalog['id'] as num?)?.toInt() ?? 0,
-      name: catalog['trade_name'] as String? ?? '',
-      nameAr: catalog['trade_name_ar'] as String?,
-      activeIngredient: catalog['active_ingredient'] as String?,
-      imageUrl: catalog['image_url'] as String?,
+      id: jsonInt(json['id']) ?? 0,
+      medicineId: jsonInt(json['medicine_id']) ?? jsonInt(catalog['id']) ?? 0,
+      name: jsonString(catalog['trade_name']) ?? '',
+      nameAr: jsonString(catalog['trade_name_ar']),
+      activeIngredient: jsonString(catalog['active_ingredient']),
+      imageUrl: jsonString(catalog['image_url']),
       price: jsonDouble(json['price']) ?? 0,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
-      isAvailable: json['is_available'] as bool? ?? true,
-      isLowStock: json['is_low_stock'] as bool?,
-      isOutOfStock: json['is_out_of_stock'] as bool?,
+      quantity: jsonInt(json['quantity']) ?? 0,
+      isAvailable: jsonBool(json['is_available']) ?? true,
+      isLowStock: jsonBool(json['is_low_stock']),
+      isOutOfStock: jsonBool(json['is_out_of_stock']),
     );
   }
 

@@ -106,26 +106,28 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> incrementQuantity(CartItem item) => _setQuantity(item, item.quantity + 1);
+  /// Returns null on success, or the server message when the change was
+  /// refused (e.g. not enough stock), for the screen to show.
+  Future<String?> incrementQuantity(CartItem item) => _setQuantity(item, item.quantity + 1);
 
   /// Clamped at 1 — there is no delete affordance on this screen's cards
   /// (see MedicineCartOptionCard's doc comment), so the minus button simply
   /// stops decrementing rather than removing the line.
-  Future<void> decrementQuantity(CartItem item) {
+  Future<String?> decrementQuantity(CartItem item) {
     if (item.quantity <= 1) return Future.value();
     return _setQuantity(item, item.quantity - 1);
   }
 
-  Future<void> _setQuantity(CartItem item, int quantity) async {
+  Future<String?> _setQuantity(CartItem item, int quantity) async {
     final current = state;
-    if (current is! CartLoaded || current.updatingIds.contains(item.id)) return;
+    if (current is! CartLoaded || current.updatingIds.contains(item.id)) return null;
 
     emit(current.copyWith(updatingIds: {...current.updatingIds, item.id}));
     final result = await _updateCartItemQuantityUseCase(itemId: item.id, quantity: quantity);
-    if (isClosed) return;
+    if (isClosed) return null;
 
     final latest = state;
-    if (latest is! CartLoaded) return;
+    if (latest is! CartLoaded) return null;
     switch (result) {
       case Success():
         // Patch the one line locally instead of re-fetching the whole cart —
@@ -140,8 +142,10 @@ class CartCubit extends Cubit<CartState> {
             updatingIds: latest.updatingIds.difference({item.id}),
           ),
         );
-      case ApiError():
+        return null;
+      case ApiError(:final failure):
         emit(latest.copyWith(updatingIds: latest.updatingIds.difference({item.id})));
+        return failure.message;
     }
   }
 }

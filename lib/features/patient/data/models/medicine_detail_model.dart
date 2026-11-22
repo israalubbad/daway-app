@@ -1,4 +1,5 @@
 import '../../domain/entities/medicine_detail.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 class MedicineDetailModel {
   final int id;
@@ -14,9 +15,9 @@ class MedicineDetailModel {
   factory MedicineDetailModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>;
     return MedicineDetailModel(
-      id: (data['id'] as num?)?.toInt() ?? 0,
-      tradeName: data['trade_name'] as String? ?? '',
-      imageUrl: data['image_url'] as String?,
+      id: jsonInt(data['id']) ?? 0,
+      tradeName: jsonString(data['trade_name']) ?? '',
+      imageUrl: jsonString(data['image_url']),
     );
   }
 

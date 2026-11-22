@@ -50,4 +50,53 @@ void main() {
     expect(entity.price, 0);
     expect(entity.quantity, 1);
   });
+
+  test('a price sent as a Laravel decimal string is read as a number', () {
+    final entity = CartItemModel.fromJson({
+      'id': '7',
+      'pharmacy_id': '11',
+      'pharmacy_name': 'صيدلية النور',
+      'medicine': {'trade_name': 'Panadol'},
+      'quantity': '2',
+      'price': '18.00',
+    }).toEntity();
+
+    expect(entity.id, 7);
+    expect(entity.pharmacyId, 11);
+    expect(entity.price, 18.0);
+    expect(entity.quantity, 2);
+    expect(entity.lineTotal, 36.0);
+  });
+
+  test('the pharmacy can come nested and the price as unit_price', () {
+    final entity = CartItemModel.fromJson({
+      'id': 1,
+      'pharmacy': {'id': 4, 'pharmacy_name': 'صيدلية الأمل'},
+      'medicine_name': 'Adol',
+      'unit_price': '12.5',
+      'quantity': 1,
+    }).toEntity();
+
+    expect(entity.pharmacyId, 4);
+    expect(entity.pharmacyName, 'صيدلية الأمل');
+    expect(entity.medicineName, 'Adol');
+    expect(entity.price, 12.5);
+  });
+
+  test('fields of the wrong type read as missing instead of throwing', () {
+    final entity = CartItemModel.fromJson({
+      'id': 'abc',
+      'pharmacy_name': [5],
+      'medicine': 'Panadol',
+      'moh_medicine': [1],
+      'price': {'amount': 1},
+      'quantity': null,
+    }).toEntity();
+
+    expect(entity.id, 0);
+    expect(entity.pharmacyName, '');
+    expect(entity.medicineName, '');
+    expect(entity.price, 0);
+    expect(entity.quantity, 1);
+  });
 }

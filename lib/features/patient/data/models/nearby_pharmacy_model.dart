@@ -1,4 +1,5 @@
 import '../../domain/entities/nearby_pharmacy.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 class NearbyPharmacyModel {
   final int id;
@@ -21,12 +22,12 @@ class NearbyPharmacyModel {
 
   factory NearbyPharmacyModel.fromJson(Map<String, dynamic> json) {
     return NearbyPharmacyModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: json['pharmacy_name'] as String? ?? '',
-      address: json['address'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
-      phoneNumber: json['phone_number'] as String?,
+      id: jsonInt(json['id']) ?? 0,
+      name: jsonString(json['pharmacy_name']) ?? '',
+      address: jsonString(json['address']),
+      latitude: jsonDouble(json['latitude']) ?? 0,
+      longitude: jsonDouble(json['longitude']) ?? 0,
+      phoneNumber: jsonString(json['phone_number']),
       // Seen as both a JSON boolean and a 0/1 integer across this backend's
       // endpoints (see FavoriteMedicineModel's is_available parsing).
       isOpenNow: json['is_open_now'] == true || json['is_open_now'] == 1,

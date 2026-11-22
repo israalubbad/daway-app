@@ -1,4 +1,5 @@
 import '../../domain/entities/rating.dart';
+import '../../../../core/helpers/json_parsing.dart';
 
 import '../../../../core/localization/translations.dart';
 /// Parses one entry from `GET /pharmacy/ratings`. Only `stars` is confirmed
@@ -34,20 +35,20 @@ class RatingModel {
 
   factory RatingModel.fromJson(Map<String, dynamic> json) {
     final reviewer =
-        json['patient'] as Map<String, dynamic>? ??
-        json['user'] as Map<String, dynamic>?;
+        jsonMap(json['patient']) ??
+        jsonMap(json['user']);
     return RatingModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
+      id: jsonInt(json['id']) ?? 0,
       // Required, unlike id/comment/name below: a rating with no valid star
       // count isn't a real review, and letting it default would silently
       // pollute the average while staying invisible in the 1-5 histogram.
       stars: starsOf(json),
-      comment: json['comment'] as String?,
+      comment: jsonString(json['comment']),
       // Required too: this repository sorts by createdAt to show the newest
       // reviews first, so a fallback like DateTime.now() would wrongly sort
       // a corrupted record to the top instead of just being skipped.
       createdAt: DateTime.parse(json['created_at'] as String),
-      patientName: reviewer?['name'] as String? ?? 'مستخدم'.tr,
+      patientName: jsonString(reviewer?['name']) ?? 'مستخدم'.tr,
     );
   }
 

@@ -1,3 +1,4 @@
+import '../../../../core/helpers/json_parsing.dart';
 import '../../../../core/helpers/server_timestamp.dart';
 import '../../domain/entities/pharmacy_inquiry.dart';
 import '../../../chat/domain/entities/last_message_text.dart';
@@ -33,24 +34,22 @@ class PharmacyInquiryModel {
   });
 
   factory PharmacyInquiryModel.fromJson(Map<String, dynamic> json) {
-    final pharmacy = json['pharmacy'] as Map<String, dynamic>?;
-    final medicine = json['medicine'] as Map<String, dynamic>?;
-    final createdAtRaw = json['created_at'] as String?;
-    final repliedAtRaw = json['replied_at'] as String?;
+    final pharmacy = jsonMap(json['pharmacy']);
+    final medicine = jsonMap(json['medicine']);
 
     return PharmacyInquiryModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      pharmacyId: (pharmacy?['id'] as num?)?.toInt() ?? 0,
-      medicineId: (medicine?['id'] as num?)?.toInt() ?? 0,
-      medicineName: medicine?['trade_name'] as String?,
-      pharmacyName: (pharmacy?['pharmacy_name'] ?? pharmacy?['name']) as String?,
-      message: json['message'] as String? ?? '',
+      id: jsonInt(json['id']) ?? 0,
+      pharmacyId: jsonInt(pharmacy?['id']) ?? 0,
+      medicineId: jsonInt(medicine?['id']) ?? 0,
+      medicineName: jsonString(medicine?['trade_name']),
+      pharmacyName: jsonString(pharmacy?['pharmacy_name']) ?? jsonString(pharmacy?['name']),
+      message: jsonString(json['message']) ?? '',
       lastMessage: lastMessageText(json['last_message']),
-      unreadCount: (json['unread_messages_count'] as num?)?.toInt() ?? 0,
-      reply: json['reply'] as String?,
-      status: InquiryStatus.fromApi(json['status'] as String?),
-      createdAt: tryParseServerTimestamp(createdAtRaw) ?? DateTime.now(),
-      repliedAt: tryParseServerTimestamp(repliedAtRaw),
+      unreadCount: jsonInt(json['unread_messages_count']) ?? 0,
+      reply: jsonString(json['reply']),
+      status: InquiryStatus.fromApi(jsonString(json['status'])),
+      createdAt: tryParseServerTimestamp(jsonString(json['created_at'])) ?? DateTime.now(),
+      repliedAt: tryParseServerTimestamp(jsonString(json['replied_at'])),
     );
   }
 
