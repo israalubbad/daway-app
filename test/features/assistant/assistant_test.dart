@@ -1,17 +1,23 @@
+import 'package:daway_app/core/di/dependency_injection.dart';
 import 'package:daway_app/core/erroring/failure.dart';
 import 'package:daway_app/core/helpers/api_result.dart';
+import 'package:daway_app/core/localization/translations.dart';
 import 'package:daway_app/core/models/picked_location.dart';
 import 'package:daway_app/features/assistant/data/models/assistant_reply_model.dart';
 import 'package:daway_app/features/assistant/domain/entities/assistant_reply.dart';
 import 'package:daway_app/features/assistant/domain/repositories/assistant_repository.dart';
 import 'package:daway_app/features/assistant/domain/usecases/send_assistant_message_usecase.dart';
 import 'package:daway_app/features/assistant/presentation/cubit/assistant_cubit.dart';
+import 'package:daway_app/features/assistant/presentation/screens/assistant_screen.dart';
 import 'package:daway_app/features/auth/domain/entities/account_type.dart';
 import 'package:daway_app/features/auth/domain/entities/user_session.dart';
 import 'package:daway_app/features/auth/domain/repositories/session_repository.dart';
 import 'package:daway_app/features/patient/domain/repositories/location_repository.dart';
 import 'package:daway_app/features/patient/domain/usecases/get_current_location_usecase.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../helpers/arabic_test_app.dart';
 
 class _FakeAssistantRepository implements AssistantRepository {
   ApiResult<AssistantReply> result = const Success(AssistantReply(text: 'تمام'));
@@ -230,6 +236,36 @@ void main() {
       final second = cubit.send('بنادول');
       await Future.wait([first, second]);
       expect(repository.calls, 1);
+    });
+  });
+
+  group('AssistantScreen in English', () {
+    setUp(() {
+      Translations.use('en');
+      getIt.registerFactory(
+        () => AssistantCubit(
+          SendAssistantMessageUseCase(_FakeAssistantRepository(), _FakeSession()),
+          GetCurrentLocationUseCase(_FakeLocationRepository()),
+        ),
+      );
+    });
+
+    tearDown(() async {
+      Translations.use('ar');
+      await getIt.reset();
+    });
+
+    testWidgets('the title, welcome line and input hint are in English', (tester) async {
+      await setDesignViewport(tester);
+      await tester.pumpWidget(
+        buildArabicTestApp(home: const AssistantScreen(), locale: const Locale('en')),
+      );
+      await tester.pump();
+
+      expect(find.text('Smart assistant'), findsOneWidget);
+      expect(find.textContaining('Ask me about any medicine'), findsOneWidget);
+      expect(find.text('Type a medicine name or what you feel'), findsOneWidget);
+      expect(find.text(AssistantCubit.welcomeText), findsNothing);
     });
   });
 }

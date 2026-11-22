@@ -2,6 +2,12 @@
 const Map<String, String> enChat = {
   'ابدأ المحادثة بكتابة رسالة أولاً': 'Start the conversation by writing a message first',
   'المساعد الذكي': 'Smart assistant',
+  'اسأل عن دواء وأدلّك على أقرب صيدلية': 'Ask about a medicine and I will point you to the nearest pharmacy',
+  'اكتب اسم الدواء أو ما تشعر به': 'Type a medicine name or what you feel',
+  'مرحباً! اسألني عن أي دواء، أو اكتب ما تشعر به، وأدلّك على الصيدليات القريبة منك.': 'Hello! Ask me about any medicine, or describe what you feel, and I will point you to the pharmacies near you.',
+  'هذا ما وجدته لك:': 'Here is what I found for you:',
+  'لم أفهم طلبك، جرّب أن تكتب اسم الدواء.': 'I did not understand your request, try typing the medicine name.',
+  'يبعد عنك {0} كيلو': '{0} km away',
   'اسأل عن أي دواء وسأدلّك على الصيدليات المتوفر فيها': 'Ask about any medicine and I will point you to the pharmacies that have it',
   'اكتب رسالة': 'Write a message',
   'اكتب رسالتك للبدء بالمحادثة.': 'Write your message to start the conversation.',

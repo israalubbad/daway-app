@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/helpers/price_formatter.dart';
+import '../../../../core/localization/translations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theming/app_colors.dart';
 import '../../../../core/widgets/app_back_button.dart';
@@ -86,14 +87,14 @@ class _AssistantViewState extends State<_AssistantView> {
                   AppBackButton(onTap: () => Navigator.of(context).maybePop()),
                   SizedBox(height: 12.h),
                   Text(
-                    'المساعد الذكي',
-                    textAlign: TextAlign.right,
+                    'المساعد الذكي'.tr,
+                    textAlign: TextAlign.start,
                     style: TextStyle(fontSize: 16.sp, color: AppColors.textDark),
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    'اسأل عن دواء وأدلّك على أقرب صيدلية',
-                    textAlign: TextAlign.right,
+                    'اسأل عن دواء وأدلّك على أقرب صيدلية'.tr,
+                    textAlign: TextAlign.start,
                     style: TextStyle(fontSize: 12.sp, color: AppColors.grey),
                   ),
                 ],
@@ -128,7 +129,7 @@ class _AssistantViewState extends State<_AssistantView> {
                     height: 56.h,
                     child: AppTextField(
                       controller: _controller,
-                      hintText: 'اكتب اسم الدواء أو ما تشعر به',
+                      hintText: 'اكتب اسم الدواء أو ما تشعر به'.tr,
                       maxLines: 1,
                       fillColor: Colors.white,
                       textInputAction: TextInputAction.send,
@@ -178,8 +179,11 @@ class _MessageBubble extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                message.text,
-                textAlign: TextAlign.right,
+                // The welcome and fallback lines are the app's own Arabic text and
+                // are translated; the patient's words and the server's reply are
+                // not in the table, so `.tr` leaves them as they are.
+                message.text.tr,
+                textAlign: TextAlign.start,
                 style: TextStyle(fontSize: 14.sp, color: textColor, height: 1.4),
               ),
             ),
@@ -240,7 +244,7 @@ class _MedicineCard extends StatelessWidget {
             Expanded(
               child: Text(
                 medicine.name,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 14.sp, color: AppColors.textDark),
@@ -251,7 +255,7 @@ class _MedicineCard extends StatelessWidget {
               TextButton(
                 onPressed: () =>
                     Navigator.of(context).pushNamed(Routes.medicineDetailScreen, arguments: id),
-                child: Text('عرض', style: TextStyle(color: AppColors.mainTeal)),
+                child: Text('عرض'.tr, style: TextStyle(color: AppColors.mainTeal)),
               ),
             ],
           ],
@@ -269,7 +273,8 @@ class _PharmacyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final details = [
-      if (pharmacy.distanceKm != null) 'يبعد عنك ${pharmacy.distanceKm!.toStringAsFixed(1)} كيلو',
+      if (pharmacy.distanceKm != null)
+        'يبعد عنك {0} كيلو'.trArgs([pharmacy.distanceKm!.toStringAsFixed(1)]),
       if (pharmacy.price != null) '${formatPrice(pharmacy.price!)} \$',
     ].join('  •  ');
 

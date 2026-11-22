@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/localization/translations.dart';
 import '../../../../core/routing/routes.dart';
 
 /// The round floating button at the bottom-left of the inquiries list that
@@ -12,7 +13,7 @@ class AssistantOrb extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'المساعد الذكي',
+      label: 'المساعد الذكي'.tr,
       child: GestureDetector(
         onTap: () => Navigator.of(context).pushNamed(Routes.assistantScreen),
         child: Container(
