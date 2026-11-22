@@ -2,21 +2,15 @@
 
 **A mobile app that connects patients with pharmacies: find your medicine, see which pharmacy has it and for how much, and get it delivered. Pharmacies run their stock, orders, chat and accounting from the same app.**
 
-**[العربية](README.ar.md)** · English
-
 One app, two accounts: **User** (a patient who searches, orders and tracks) and **Pharmacist** (manages products, orders, chat and accounting). Arabic-first (right-to-left), with an English mode in Settings.
 
 ## Screenshots
 
 From the release build on an Android emulator. The pictures inside the pharmacy onboarding are drawn with the app's own widgets and animate.
 
-| Choose account | Patient sign in | Pharmacy sign in | Pharmacy sign up |
+| Choose account | Sign in | Onboarding | Patient home |
 |:--:|:--:|:--:|:--:|
-| <img src="docs/screenshots/01-choose-account.png" width="170"> | <img src="docs/screenshots/05-patient-login.png" width="170"> | <img src="docs/screenshots/10-pharmacy-login.png" width="170"> | <img src="docs/screenshots/11-pharmacy-sign-up.png" width="170"> |
-
-| Patient onboarding | | | Pharmacy onboarding | | |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| <img src="docs/screenshots/02-patient-onboarding-1.png" width="120"> | <img src="docs/screenshots/03-patient-onboarding-2.png" width="120"> | <img src="docs/screenshots/04-patient-onboarding-3.png" width="120"> | <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="120"> | <img src="docs/screenshots/08-pharmacy-onboarding-2.png" width="120"> | <img src="docs/screenshots/09-pharmacy-onboarding-3.png" width="120"> |
+| <img src="docs/screenshots/01-choose-account.png" width="170"> | <img src="docs/screenshots/05-patient-login.png" width="170"> | <img src="docs/screenshots/07-pharmacy-onboarding-1.png" width="170"> | <img src="docs/screenshots/12-patient-home.png" width="170"> |
 
 ## Features
 
@@ -28,12 +22,22 @@ From the release build on an Android emulator. The pictures inside the pharmacy 
 - Cart (one pharmacy per order), delivery price shown before confirming, bank-transfer payment with receipt upload, order tracking, pharmacy rating.
 - Settings: language, permissions, support, delete account.
 
+Key screens, from the Figma design the app follows:
+
+| Home | Choose a pharmacy | Cart | Payment | Order tracking | Pharmacies map |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| <img src="docs/design/patient-home.png" width="120"> | <img src="docs/design/patient-medicine-pharmacies.png" width="120"> | <img src="docs/design/patient-cart.png" width="120"> | <img src="docs/design/patient-payment.png" width="120"> | <img src="docs/design/patient-order-tracking.png" width="120"> | <img src="docs/design/patient-map.png" width="120"> |
+
 **Pharmacies** (join by sign-up, then the Dawak team approves and sends the pharmacy ID and password)
 - Home with key numbers and the latest orders.
 - Products: add, edit, delete, change quantities, update from Excel, set alternatives for out-of-stock items.
 - Orders (view only), chat with patients, ratings.
 - Accounting: sales and PDF invoices, returns, cash drawer, phone as a barcode scanner.
 - Settings: details, location, working hours, password, account closure.
+
+| Home | Products | Orders | Ratings | Account |
+|:--:|:--:|:--:|:--:|:--:|
+| <img src="docs/design/pharmacy-home.png" width="120"> | <img src="docs/design/pharmacy-products.png" width="120"> | <img src="docs/design/pharmacy-orders.png" width="120"> | <img src="docs/design/pharmacy-ratings.png" width="120"> | <img src="docs/design/pharmacy-account.png" width="120"> |
 
 ## Status
 
@@ -94,26 +98,7 @@ Release signing: copy `android/key.properties.example` to `android/key.propertie
 - `ResponseCacheInterceptor` caches chosen GET routes (max 2 MB, cleared with the session).
 - Checkout: `POST /patient/checkout/quote`, then `quoted_*` fields plus an `idempotency_key`. Order stages: [BACKEND_ORDER_FLOW.md](BACKEND_ORDER_FLOW.md) (Arabic).
 
-```mermaid
-stateDiagram-v2
-    [*] --> pending
-    pending --> awaiting_payment: admin approves, sets delivery price
-    awaiting_payment --> payment_under_review: receipt uploaded
-    payment_under_review --> confirmed: admin approves payment
-    confirmed --> preparing
-    preparing --> out_for_delivery
-    out_for_delivery --> delivered
-```
-
 **Localization.** Texts are written in Arabic with `.tr` (`'نص {0}'.trArgs([x])`); the English tables are in `lib/core/localization/en/`, keyed by the Arabic text. A test fails if a `.tr` text has no English. No `const` around `.tr`, and never `.tr` on text sent to the backend. Use `start`/`end` (not `left`/`right`) and `MirrorWhenLtr` for arrows.
-
-**Code rules**
-- Smallest change that solves the problem; fix causes, not symptoms.
-- Use the shared tools: `withSessionToken` (use cases), `guardApi` (repositories), `authFieldDecoration()`, `networkImage()`.
-- `const` where possible; no controllers in `build()`; `setState` only for local UI state.
-- Tests for domain and data; a bug fix comes with a test that reproduces it; one behavior per test.
-
-**Security.** No secrets in code or git; backup and cleartext are disabled; reminders are in secure storage. Open items: restrict the Maps key and the Cloudinary preset, rate-limit `/otp/send` and `/login/pharmacy`.
 
 **Git.** Branches `feature/`, `fix/`, `refactor/`, `docs/` off `develop`. CI (`.github/workflows/dart.yml`) runs `flutter analyze` and `flutter test` on pushes and PRs to `develop`.
 
