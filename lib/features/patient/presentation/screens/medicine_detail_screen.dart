@@ -153,8 +153,8 @@ class _MedicineDetailContent extends StatefulWidget {
 }
 
 class _MedicineDetailContentState extends State<_MedicineDetailContent> {
-  // Which pharmacy card is highlighted — purely local UI state (project rule
-  // B1: setState is for exactly this), not something any use case reads yet.
+  // Which pharmacy card is highlighted — purely local UI state (project
+  // rule B1: setState is for exactly this), not something any use case reads yet.
   int? _selectedPharmacyId;
 
   @override
